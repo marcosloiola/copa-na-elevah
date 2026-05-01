@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Elevah · Álbum Copa 2026</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overscroll-behavior: none;
+    }
+
+    /* ─── Design Tokens (Elevah) ───────────────────────── */
+    :root {
+      --primary:   #D4897B;
+      --primary-d: #B8705F;
+      --secondary: #E2A894;
+      --gold:      #D9A164;
+      --gold-d:    #B8824A;
+      --bg:        #FFF3E3;
+      --bg-card:   #FFFFFF;
+      --mauve:     #D5B6AC;
+      --coral:     #EB9491;
+      --mint:      #A0D2B7;
+      --mint-d:    #6BAF94;
+      --peach:     #FFB39C;
+      --text:      #4A2E22;
+      --text-mid:  #7A5244;
+      --text-light:#A88070;
+      --border:    #E8D5C8;
+      --shadow:    rgba(74,46,34,.10);
+
+      --chip-size: 44px;
+      --radius:    12px;
+      --radius-sm: 8px;
+      --nav-h:     66px;
+    }
+
+    /* ─── Header ───────────────────────────────────────── */
+    .app-header {
+      background: var(--bg-card);
+      border-bottom: 1.5px solid var(--border);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+    .app-header img { height: 36px; width: auto; }
+    .app-header-title {
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--text-mid);
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .header-progress {
+      margin-left: auto;
+      text-align: right;
+    }
+    .header-progress .pct {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary);
+      line-height: 1;
+    }
+    .header-progress .lbl {
+      font-size: .65rem;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    /* ─── Main / Scrollable Content ───────────────────── */
+    .app-main {
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: calc(var(--nav-h) + 8px);
+    }
+    .tab-panel { display: none; padding: 16px; }
+    .tab-panel.active { display: block; }
+
+    /* ─── Bottom Navigation ────────────────────────────── */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      background: var(--bg-card);
+      border-top: 1.5px solid var(--border);
+      display: flex;
+      z-index: 200;
+      padding-bottom: env(safe-area-inset-bottom, 0);
+      box-shadow: 0 -2px 12px var(--shadow);
+    }
+    .nav-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-light);
+      transition: color .2s;
+      padding: 6px 2px;
+      min-width: 0;
+    }
+    .nav-btn.active { color: var(--primary); }
+    .nav-btn svg { width: 22px; height: 22px; flex-shrink: 0; }
+    .nav-btn span {
+      font-size: .6rem;
+      font-weight: 600;
+      letter-spacing: .03em;
+      text-transform: uppercase;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    /* ─── Section headers ──────────────────────────────── */
+    .section-header {
+      margin: 20px 0 10px;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .section-header:first-child { margin-top: 0; }
+    .section-title {
+      font-size: .85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--primary-d);
+    }
+    .section-badge {
+      font-size: .7rem;
+      background: var(--border);
+      color: var(--text-mid);
+      border-radius: 99px;
+      padding: 1px 8px;
+      font-weight: 600;
+    }
+    .section-badge.done { background: var(--mint); color: #2D5A42; }
+    .group-label {
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text-light);
+    }
+
+    /* ─── Sticker chips ────────────────────────────────── */
+    .chips-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .chip {
+      width: var(--chip-size);
+      height: var(--chip-size);
+      border-radius: var(--radius-sm);
+      border: 2px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-mid);
+      font-size: .78rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      transition: background .15s, border-color .15s, color .15s, transform .08s;
+      -webkit-user-select: none;
+    }
+    .chip:active { transform: scale(.92); }
+    .chip.owned {
+      background: var(--mint);
+      border-color: var(--mint-d);
+      color: #1E4D36;
+    }
+    .chip.repeated {
+      background: var(--gold);
+      border-color: var(--gold-d);
+      color: #4A2800;
+    }
+    .chip.wide { width: auto; padding: 0 14px; }
+
+    /* ─── Cards ────────────────────────────────────────── */
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1.5px solid var(--border);
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 4px var(--shadow);
+    }
+    .card-title {
+      font-size: .8rem;
+      font-weight: 700;
+      color: var(--text-mid);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 12px;
+    }
+
+    /* ─── Overview ─────────────────────────────────────── */
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .stat-box {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1.5px solid var(--border);
+      padding: 14px 10px;
+      text-align: center;
+      box-shadow: 0 1px 4px var(--shadow);
+    }
+    .stat-box .val {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1;
+    }
+    .stat-box .val.green { color: var(--mint-d); }
+    .stat-box .lbl {
+      font-size: .6rem;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-top: 4px;
+    }
+    .chart-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 260px;
+      margin: 0 auto 8px;
+    }
+    .donut-center {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      pointer-events: none;
+    }
+    .donut-center .pct-big {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1;
+    }
+    .donut-center .pct-lbl {
+      font-size: .6rem;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .progress-item { margin-bottom: 10px; }
+    .progress-item-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: .75rem;
+      color: var(--text-mid);
+      margin-bottom: 4px;
+    }
+    .progress-item-header strong { font-weight: 700; color: var(--text); }
+    .progress-bar {
+      height: 8px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 99px;
+      transition: width .4s ease;
+      min-width: 0;
+    }
+    .progress-fill.full { background: var(--mint-d); }
+
+    /* ─── Empty state ──────────────────────────────────── */
+    .empty-state {
+      text-align: center;
+      padding: 48px 16px;
+      color: var(--text-light);
+    }
+    .empty-state .emoji { font-size: 2.5rem; margin-bottom: 12px; }
+    .empty-state p { font-size: .9rem; }
+
+    /* ─── Settings ─────────────────────────────────────── */
+    .settings-section { margin-bottom: 24px; }
+    .settings-section-title {
+      font-size: .7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--text-light);
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 18px;
+      border-radius: var(--radius-sm);
+      font-size: .85rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: opacity .15s, transform .1s;
+      width: 100%;
+      margin-bottom: 8px;
+    }
+    .btn:active { transform: scale(.97); }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-gold    { background: var(--gold);    color: #4A2800; }
+    .btn-mint    { background: var(--mint);    color: #1E4D36; }
+    .btn-danger  { background: #e74c3c;        color: #fff; }
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--primary);
+      color: var(--primary);
+    }
+
+    textarea.code-box {
+      width: 100%;
+      height: 80px;
+      font-family: monospace;
+      font-size: .7rem;
+      background: #f5ede6;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px;
+      color: var(--text);
+      resize: vertical;
+      margin-top: 8px;
+    }
+    .qr-output { display: flex; justify-content: center; padding: 16px 0; }
+    #qr-canvas-container canvas,
+    #qr-canvas-container img { border-radius: var(--radius-sm); }
+
+    .qr-result {
+      margin-top: 12px;
+      background: var(--bg-card);
+      border: 1.5px solid var(--mint-d);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+    }
+    .qr-result h4 {
+      font-size: .8rem;
+      font-weight: 700;
+      color: var(--mint-d);
+      margin-bottom: 8px;
+    }
+    #scan-area {
+      width: 100%;
+      max-width: 320px;
+      margin: 12px auto;
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: #000;
+      display: none;
+    }
+    #scan-area video { width: 100%; display: block; }
+
+    /* ─── How-to ───────────────────────────────────────── */
+    .howto-section { margin-bottom: 20px; }
+    .howto-section h3 {
+      font-size: .95rem;
+      font-weight: 700;
+      color: var(--primary-d);
+      margin-bottom: 8px;
+    }
+    .howto-section p, .howto-section li {
+      font-size: .85rem;
+      color: var(--text-mid);
+      line-height: 1.6;
+      margin-bottom: 6px;
+    }
+    .howto-section ul { padding-left: 18px; }
+    .howto-chip-demo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 10px 0;
+      flex-wrap: wrap;
+    }
+    .demo-chip {
+      width: 40px; height: 40px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .78rem; font-weight: 700;
+    }
+    .demo-chip.d-empty  { border: 2px solid var(--border); background: var(--bg-card); color: var(--text-mid); }
+    .demo-chip.d-owned  { border: 2px solid var(--mint-d); background: var(--mint);    color: #1E4D36; }
+    .demo-chip.d-repeat { border: 2px solid var(--gold-d); background: var(--gold);    color: #4A2800; }
+    .demo-label { font-size: .78rem; color: var(--text-mid); }
+
+    /* ─── Modals ───────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(74,46,34,.45);
+      z-index: 500;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal-box {
+      background: var(--bg-card);
+      border-radius: var(--radius) var(--radius) 0 0;
+      padding: 24px 20px;
+      width: 100%; max-width: 480px;
+      transform: translateY(40px);
+      transition: transform .25s ease;
+    }
+    .modal-overlay.open .modal-box { transform: translateY(0); }
+    .modal-box h3 { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+    .modal-box p  { font-size: .85rem; color: var(--text-mid); margin-bottom: 20px; line-height: 1.5; }
+    .modal-actions { display: flex; gap: 10px; }
+    .modal-actions .btn { flex: 1; margin-bottom: 0; }
+
+    /* ─── Animations ───────────────────────────────────── */
+    @keyframes pop {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(1.3); }
+      100% { transform: scale(1); }
+    }
+    .chip.just-toggled { animation: pop .22s ease; }
+
+    /* ─── Utility ──────────────────────────────────────── */
+    .hint {
+      font-size: .72rem;
+      color: var(--text-light);
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    .code-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      margin-top: 8px;
+    }
+    .code-row textarea { flex: 1; margin-top: 0; }
+    .btn-copy {
+      flex-shrink: 0;
+      width: 44px;
+      height: 80px;
+      padding: 0;
+      border-radius: var(--radius-sm);
+      background: var(--border);
+      border: 1.5px solid var(--mauve);
+      color: var(--text-mid);
+      font-size: .65rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: background .15s, color .15s;
+    }
+    .btn-copy:active { background: var(--mint); color: #1E4D36; }
+    .btn-copy svg { width: 18px; height: 18px; }
+
+    .exchange-result {
+      margin-top: 12px;
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      border: 1.5px solid var(--mint-d);
+      background: #F0FAF5;
+    }
+    .exchange-result h4 {
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--mint-d);
+      margin-bottom: 10px;
+    }
+    .exchange-result.no-match {
+      border-color: var(--mauve);
+      background: var(--bg-card);
+    }
+    .exchange-result.no-match h4 { color: var(--text-light); }
+
+    /* ─── Desktop overrides ────────────────────────────── */
+    @media (min-width: 640px) {
+      :root { --chip-size: 48px; }
+      .bottom-nav {
+        position: static;
+        height: auto;
+        border: none;
+        border-bottom: 1.5px solid var(--border);
+        box-shadow: none;
+        justify-content: center;
+        gap: 4px;
+        padding: 8px 16px;
+        order: -1;
+      }
+      .app-main { padding-bottom: 16px; }
+      body { flex-direction: column; }
+      .nav-btn {
+        flex: none;
+        flex-direction: row;
+        gap: 6px;
+        border-radius: 8px;
+        padding: 8px 14px;
+      }
+      .nav-btn span { font-size: .75rem; }
+      .nav-btn.active { background: #f5ede6; }
+      .stat-row { grid-template-columns: repeat(3,1fr); max-width: 400px; }
+      .tab-panel { padding: 20px 24px; max-width: 860px; margin: 0 auto; }
+      .app-header { order: -2; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══════════════════════════════════════════ -->
+<header class="app-header">
+  <img src="logo.png" alt="Elevah" onerror="this.style.display='none'">
+  <div class="app-header-title">Álbum Copa 2026</div>
+  <div class="header-progress">
+    <div class="pct" id="hdr-pct">0%</div>
+    <div class="lbl">completo</div>
+  </div>
+</header>
+
+<!-- ═══ NAV ══════════════════════════════════════════════ -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" data-tab="overview">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    <span>Visão</span>
+  </button>
+  <button class="nav-btn" data-tab="list">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+    <span>Lista</span>
+  </button>
+  <button class="nav-btn" data-tab="missing">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <span>Faltam</span>
+  </button>
+  <button class="nav-btn" data-tab="repeated">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+    <span>Repetidas</span>
+  </button>
+  <button class="nav-btn" data-tab="settings">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    <span>Config</span>
+  </button>
+  <button class="nav-btn" data-tab="howto">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    <span>Ajuda</span>
+  </button>
+</nav>
+
+<!-- ═══ MAIN ══════════════════════════════════════════════ -->
+<main class="app-main">
+
+  <!-- ABA 1: VISÃO GERAL -->
+  <div id="tab-overview" class="tab-panel active">
+    <div class="stat-row">
+      <div class="stat-box">
+        <div class="val" id="st-total">0</div>
+        <div class="lbl">Total</div>
+      </div>
+      <div class="stat-box">
+        <div class="val green" id="st-owned">0</div>
+        <div class="lbl">Tenho</div>
+      </div>
+      <div class="stat-box">
+        <div class="val" style="color:var(--coral)" id="st-missing">0</div>
+        <div class="lbl">Faltam</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Progresso Geral</div>
+      <div class="chart-wrap">
+        <canvas id="donut-chart"></canvas>
+        <div class="donut-center">
+          <div class="pct-big" id="donut-pct">0%</div>
+          <div class="pct-lbl">completo</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Por Seção</div>
+      <div id="progress-list"></div>
+    </div>
+  </div>
+
+  <!-- ABA 2: LISTA GERAL -->
+  <div id="tab-list" class="tab-panel">
+    <p class="hint" style="margin-bottom:14px">
+      <strong>1 toque</strong> = tenho &nbsp;·&nbsp; <strong>2 toques rápidos</strong> = não tenho (desfaz)
+    </p>
+    <div id="list-content"></div>
+  </div>
+
+  <!-- ABA 3: FALTANTES -->
+  <div id="tab-missing" class="tab-panel">
+    <p class="hint" style="margin-bottom:14px">
+      Figurinhas que ainda faltam. <strong>1 toque</strong> = marquei que já tenho.
+    </p>
+    <div id="missing-content"></div>
+  </div>
+
+  <!-- ABA 4: REPETIDAS -->
+  <div id="tab-repeated" class="tab-panel">
+    <p class="hint" style="margin-bottom:14px">
+      Marque figurinhas que você tem repetidas para facilitar trocas.<br>
+      <strong>1 toque</strong> = tenho repetida &nbsp;·&nbsp; <strong>2 toques</strong> = não tenho mais (desfaz)
+    </p>
+    <div id="repeated-content"></div>
+  </div>
+
+  <!-- ABA 5: CONFIGURAÇÕES -->
+  <div id="tab-settings" class="tab-panel">
+
+    <!-- SINCRONIZAÇÃO -->
+    <div class="settings-section">
+      <div class="settings-section-title">🔄 Sincronizar entre dispositivos</div>
+
+      <button class="btn btn-primary" onclick="exportCode()">
+        📋 Gerar Código de Sincronização
+      </button>
+      <div class="code-row">
+        <textarea id="export-code-box" class="code-box" placeholder="Clique em 'Gerar' para criar o código..." readonly onclick="this.select()"></textarea>
+        <button class="btn-copy" onclick="copyCode('export-code-box')" title="Copiar código">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copiar
+        </button>
+      </div>
+      <p class="hint" style="margin-bottom:16px">Copie e cole via WhatsApp em outro dispositivo para sincronizar seu progresso.</p>
+
+      <div class="card-title" style="font-size:.75rem; margin-bottom:6px">Importar via Código</div>
+      <textarea id="import-code-box" class="code-box" placeholder="Cole aqui o código de sincronização de outro dispositivo..."></textarea>
+      <button class="btn btn-outline" style="margin-top:8px" onclick="importCode()">
+        Aplicar Código
+      </button>
+    </div>
+
+    <!-- TROCA DE FIGURINHAS -->
+    <div class="settings-section">
+      <div class="settings-section-title">🤝 Troca de Figurinhas</div>
+
+      <button class="btn btn-gold" onclick="generateExchangeCode()">
+        📤 Gerar Código das Minhas Faltantes
+      </button>
+      <div class="code-row">
+        <textarea id="exchange-out-box" class="code-box" placeholder="Clique em 'Gerar' para criar o código das suas faltantes..." readonly onclick="this.select()"></textarea>
+        <button class="btn-copy" onclick="copyCode('exchange-out-box')" title="Copiar código">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copiar
+        </button>
+      </div>
+      <p class="hint" style="margin-bottom:16px">Envie este código para um amigo. Ele vai ver quais das repetidas dele você precisa.</p>
+
+      <div class="card-title" style="font-size:.75rem; margin-bottom:6px">Verificar Código de um Amigo</div>
+      <textarea id="exchange-in-box" class="code-box" placeholder="Cole aqui o código das faltantes do seu amigo..."></textarea>
+      <button class="btn btn-mint" style="margin-top:8px" onclick="applyExchangeCode()">
+        🔍 Ver minhas repetidas que ele precisa
+      </button>
+      <div id="exchange-result" style="display:none"></div>
+    </div>
+
+    <!-- ZONA DE PERIGO -->
+    <div class="settings-section">
+      <div class="settings-section-title">⚠️ Zona de Perigo</div>
+      <button class="btn btn-danger" onclick="openModal('modal-clear-album')">
+        🗑️ Apagar Álbum Completo
+      </button>
+      <button class="btn btn-danger" style="background:#c0392b; margin-top:4px" onclick="openModal('modal-clear-repeated')">
+        🗑️ Apagar Lista de Repetidas
+      </button>
+    </div>
+  </div>
+
+  <!-- ABA 6: COMO FUNCIONA -->
+  <div id="tab-howto" class="tab-panel">
+    <div class="howto-section">
+      <h3>🎴 O que é este app?</h3>
+      <p>Gestor do álbum de figurinhas da Copa do Mundo 2026, criado pela <strong>Elevah</strong>. Controle quais figurinhas você tem, quais faltam e quais estão repetidas — tudo no seu celular ou computador.</p>
+    </div>
+
+    <div class="howto-section">
+      <h3>👆 Como marcar figurinhas</h3>
+      <p>As figurinhas aparecem como botões numerados nas abas Lista, Faltantes e Repetidas:</p>
+      <div class="howto-chip-demo">
+        <div class="demo-chip d-empty">7</div>
+        <span class="demo-label">Não tenho</span>
+        <div class="demo-chip d-owned">7</div>
+        <span class="demo-label">Tenho ✓</span>
+        <div class="demo-chip d-repeat">7</div>
+        <span class="demo-label">Repetida</span>
+      </div>
+      <ul>
+        <li><strong>1 toque</strong> → marca que você tem a figurinha (ou que ela está repetida, na aba Repetidas)</li>
+        <li><strong>2 toques rápidos</strong> → desfaz a marcação</li>
+        <li>Todas as abas atualizam automaticamente após cada marcação</li>
+      </ul>
+    </div>
+
+    <div class="howto-section">
+      <h3>📊 Visão Geral</h3>
+      <p>A primeira aba mostra gráfico de progresso geral e por grupo/seleção. Atualiza em tempo real.</p>
+    </div>
+
+    <div class="howto-section">
+      <h3>🔄 Sincronizar entre dispositivos</h3>
+      <p>Na aba <strong>Configurações → Sincronizar</strong>:</p>
+      <ul>
+        <li><strong>Gerar Código</strong>: clique e um código de texto será gerado com todo o seu progresso</li>
+        <li>Clique em <strong>Copiar</strong> e mande pelo WhatsApp para o outro dispositivo</li>
+        <li>No outro dispositivo, cole o código em <em>Importar via Código</em> e clique em Aplicar</li>
+      </ul>
+    </div>
+
+    <div class="howto-section">
+      <h3>🤝 Troca de Figurinhas</h3>
+      <ul>
+        <li><strong>Gerar Código das Minhas Faltantes</strong>: gera um código com as figurinhas que você ainda precisa. Envie para um amigo.</li>
+        <li>O amigo cola esse código em <em>Verificar Código de um Amigo</em> → o app mostra quais das <em>repetidas</em> dele você precisa — facilitando a troca!</li>
+      </ul>
+    </div>
+
+    <div class="howto-section">
+      <h3>💾 Onde ficam os dados?</h3>
+      <p>Tudo é salvo no <em>localStorage</em> do seu navegador — fica no dispositivo. Para transferir para outro aparelho, use o Código de Sincronização.</p>
+    </div>
+  </div>
+
+</main>
+
+<!-- ═══ MODAIS ════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-clear-album" onclick="closeModalOnOverlay(event,'modal-clear-album')">
+  <div class="modal-box">
+    <h3>🗑️ Apagar Álbum Completo?</h3>
+    <p>Isso vai remover <strong>todas</strong> as figurinhas marcadas como "tenho". Esta ação não pode ser desfeita.</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modal-clear-album')">Cancelar</button>
+      <button class="btn btn-danger" onclick="clearAlbum()">Sim, apagar tudo</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-clear-repeated" onclick="closeModalOnOverlay(event,'modal-clear-repeated')">
+  <div class="modal-box">
+    <h3>🗑️ Apagar Lista de Repetidas?</h3>
+    <p>Isso vai remover <strong>todas</strong> as marcações de repetidas. Esta ação não pode ser desfeita.</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modal-clear-repeated')">Cancelar</button>
+      <button class="btn btn-danger" onclick="clearRepeated()">Sim, apagar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCRIPTS ═══════════════════════════════════════════ -->
+<script>
+/* ══════════════════════════════════════
+   DADOS DO ÁLBUM
+══════════════════════════════════════ */
+function range(a,b){ const r=[]; for(let i=a;i<=b;i++) r.push(String(i)); return r; }
+
+const ALBUM_DATA = [
+  { titulo:'Panini',           grupo:null, sigla:'PANINI', nums:['00'] },
+  { titulo:'FWC',              grupo:null, sigla:'FWC',    nums:range(1,19) },
+  { titulo:'México',           grupo:'A',  sigla:'MEX',    nums:range(1,20) },
+  { titulo:'África do Sul',    grupo:'A',  sigla:'RSA',    nums:range(1,20) },
+  { titulo:'Coreia do Sul',    grupo:'A',  sigla:'KOR',    nums:range(1,20) },
+  { titulo:'República Tcheca', grupo:'A',  sigla:'CZE',    nums:range(1,20) },
+  { titulo:'Canadá',           grupo:'B',  sigla:'CAN',    nums:range(1,20) },
+  { titulo:'Bósnia',           grupo:'B',  sigla:'BIH',    nums:range(1,20) },
+  { titulo:'Catar',            grupo:'B',  sigla:'QAT',    nums:range(1,20) },
+  { titulo:'Suíça',            grupo:'B',  sigla:'SUI',    nums:range(1,20) },
+  { titulo:'Brasil',           grupo:'C',  sigla:'BRA',    nums:range(1,20) },
+  { titulo:'Marrocos',         grupo:'C',  sigla:'MAR',    nums:range(1,20) },
+  { titulo:'Haiti',            grupo:'C',  sigla:'HAI',    nums:range(1,20) },
+  { titulo:'Escócia',          grupo:'C',  sigla:'SCO',    nums:range(1,20) },
+  { titulo:'Estados Unidos',   grupo:'D',  sigla:'USA',    nums:range(1,20) },
+  { titulo:'Paraguai',         grupo:'D',  sigla:'PAR',    nums:range(1,20) },
+  { titulo:'Austrália',        grupo:'D',  sigla:'AUS',    nums:range(1,20) },
+  { titulo:'Turquia',          grupo:'D',  sigla:'TUR',    nums:range(1,20) },
+  { titulo:'Alemanha',         grupo:'E',  sigla:'GER',    nums:range(1,20) },
+  { titulo:'Curaçao',          grupo:'E',  sigla:'CUW',    nums:range(1,20) },
+  { titulo:'Costa do Marfim',  grupo:'E',  sigla:'CIV',    nums:range(1,20) },
+  { titulo:'Equador',          grupo:'E',  sigla:'ECU',    nums:range(1,20) },
+  { titulo:'Holanda',          grupo:'F',  sigla:'NED',    nums:range(1,20) },
+  { titulo:'Japão',            grupo:'F',  sigla:'JPN',    nums:range(1,20) },
+  { titulo:'Suécia',           grupo:'F',  sigla:'SWE',    nums:range(1,20) },
+  { titulo:'Tunísia',          grupo:'F',  sigla:'TUN',    nums:range(1,20) },
+  { titulo:'Bélgica',          grupo:'G',  sigla:'BEL',    nums:range(1,20) },
+  { titulo:'Egito',            grupo:'G',  sigla:'EGY',    nums:range(1,20) },
+  { titulo:'Irã',              grupo:'G',  sigla:'IRN',    nums:range(1,20) },
+  { titulo:'Nova Zelândia',    grupo:'G',  sigla:'NZL',    nums:range(1,20) },
+  { titulo:'Espanha',          grupo:'H',  sigla:'ESP',    nums:range(1,20) },
+  { titulo:'Cabo Verde',       grupo:'H',  sigla:'CPV',    nums:range(1,20) },
+  { titulo:'Arábia Saudita',   grupo:'H',  sigla:'KSA',    nums:range(1,20) },
+  { titulo:'Uruguai',          grupo:'H',  sigla:'URU',    nums:range(1,20) },
+  { titulo:'França',           grupo:'I',  sigla:'FRA',    nums:range(1,20) },
+  { titulo:'Senegal',          grupo:'I',  sigla:'SEN',    nums:range(1,20) },
+  { titulo:'Iraque',           grupo:'I',  sigla:'IRQ',    nums:range(1,20) },
+  { titulo:'Noruega',          grupo:'I',  sigla:'NOR',    nums:range(1,20) },
+  { titulo:'Argentina',        grupo:'J',  sigla:'ARG',    nums:range(1,20) },
+  { titulo:'Argélia',          grupo:'J',  sigla:'ALG',    nums:range(1,20) },
+  { titulo:'Áustria',          grupo:'J',  sigla:'AUT',    nums:range(1,20) },
+  { titulo:'Jordânia',         grupo:'J',  sigla:'JOR',    nums:range(1,20) },
+  { titulo:'Portugal',         grupo:'K',  sigla:'POR',    nums:range(1,20) },
+  { titulo:'Congo',            grupo:'K',  sigla:'COD',    nums:range(1,20) },
+  { titulo:'Uzbequistão',      grupo:'K',  sigla:'UZB',    nums:range(1,20) },
+  { titulo:'Colômbia',         grupo:'K',  sigla:'COL',    nums:range(1,20) },
+  { titulo:'Inglaterra',       grupo:'L',  sigla:'ENG',    nums:range(1,20) },
+  { titulo:'Croácia',          grupo:'L',  sigla:'CRO',    nums:range(1,20) },
+  { titulo:'Gana',             grupo:'L',  sigla:'GHA',    nums:range(1,20) },
+  { titulo:'Panamá',           grupo:'L',  sigla:'PAN',    nums:range(1,20) },
+  { titulo:'Extra',            grupo:null, sigla:'CC',     nums:range(1,14) },
+];
+
+const TOTAL = ALBUM_DATA.reduce((s,g) => s + g.nums.length, 0);
+
+// Ordem de exibição nas abas: Panini 1º, FWC 2º, países ordenados por sigla, Extra por último
+const PANINI = ALBUM_DATA.find(g => g.sigla === 'PANINI');
+const FWC    = ALBUM_DATA.find(g => g.sigla === 'FWC');
+const EXTRA  = ALBUM_DATA.find(g => g.sigla === 'CC');
+const COUNTRIES = ALBUM_DATA
+  .filter(g => g.grupo !== null)
+  .sort((a,b) => a.sigla.localeCompare(b.sigla));
+const DISPLAY_ORDER = [PANINI, FWC, ...COUNTRIES, EXTRA];
+
+function chipId(sigla,num){ return sigla+'-'+num; }
+
+/* ══════════════════════════════════════
+   ESTADO
+══════════════════════════════════════ */
+const state = { owned: new Set(), repeated: new Set() };
+
+function loadState(){
+  try {
+    const o = localStorage.getItem('elevah_owned');
+    const r = localStorage.getItem('elevah_repeated');
+    if(o) state.owned    = new Set(JSON.parse(o));
+    if(r) state.repeated = new Set(JSON.parse(r));
+  } catch(e){ console.warn('loadState error', e); }
+}
+function saveState(){
+  localStorage.setItem('elevah_owned',    JSON.stringify([...state.owned]));
+  localStorage.setItem('elevah_repeated', JSON.stringify([...state.repeated]));
+}
+
+/* ══════════════════════════════════════
+   TAP (single / double) — funciona no mobile e desktop
+══════════════════════════════════════ */
+const tapMap = {};
+function handleChipTap(id, tabType){
+  if(!tapMap[id]) tapMap[id] = {c:0, t:null};
+  const s = tapMap[id];
+  s.c++;
+  clearTimeout(s.t);
+  s.t = setTimeout(()=>{
+    if(s.c===1) doSingle(id,tabType);
+    else         doDouble(id,tabType);
+    s.c=0; s.t=null;
+  }, 270);
+}
+
+function doSingle(id,tabType){
+  if(tabType==='repeated') state.repeated.add(id);
+  else                     state.owned.add(id);
+  saveState(); renderAll(); flashChip(id,tabType);
+}
+function doDouble(id,tabType){
+  if(tabType==='repeated') state.repeated.delete(id);
+  else                     state.owned.delete(id);
+  saveState(); renderAll();
+}
+
+function flashChip(id, tabType){
+  const sfx = tabType==='repeated'?'-r': tabType==='missing'?'-m':'-l';
+  const el = document.querySelector(`[data-cid="${id}${sfx}"]`);
+  if(el){ el.classList.add('just-toggled'); el.addEventListener('animationend',()=>el.classList.remove('just-toggled'),{once:true}); }
+}
+
+/* ══════════════════════════════════════
+   RENDER HELPERS
+══════════════════════════════════════ */
+function buildGroupHTML(group, tabType){
+  const sfx = tabType==='repeated'?'-r': tabType==='missing'?'-m':'-l';
+  const isWide = group.sigla==='PANINI';
+  const ownedCount = group.nums.filter(n=>state.owned.has(chipId(group.sigla,n))).length;
+  const total = group.nums.length;
+  const allDone = ownedCount===total && total>0;
+
+  let html = `<div class="section-header">
+    <div class="section-title">${group.titulo}</div>`;
+  if(tabType!=='repeated'){
+    html += `<span class="section-badge${allDone?' done':''}">${ownedCount}/${total}</span>`;
+  }
+  if(group.grupo) html += `<span class="group-label">Grupo ${group.grupo}</span>`;
+  html += `</div><div class="chips-grid">`;
+
+  for(const num of group.nums){
+    const id = chipId(group.sigla,num);
+    const isOwned    = state.owned.has(id);
+    const isRepeated = state.repeated.has(id);
+
+    if(tabType==='missing' && isOwned) continue;
+
+    let cls='chip';
+    if(isWide) cls+=' wide';
+    if(tabType==='repeated'){ if(isRepeated) cls+=' repeated'; }
+    else                    { if(isOwned)    cls+=' owned'; }
+
+    const label = isWide ? `PANINI ${num}` : num;
+    html += `<div class="${cls}" data-cid="${id}${sfx}" data-id="${id}" data-tab="${tabType}">${label}</div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+/* ══════════════════════════════════════
+   RENDER: VISÃO GERAL
+══════════════════════════════════════ */
+let donutChart = null;
+
+function renderOverview(){
+  const owned   = state.owned.size;
+  const missing = TOTAL - owned;
+  const pct     = TOTAL ? Math.round(owned/TOTAL*100) : 0;
+
+  document.getElementById('st-total').textContent   = TOTAL;
+  document.getElementById('st-owned').textContent   = owned;
+  document.getElementById('st-missing').textContent = missing;
+  document.getElementById('donut-pct').textContent  = pct+'%';
+  document.getElementById('hdr-pct').textContent    = pct+'%';
+
+  const ctx = document.getElementById('donut-chart').getContext('2d');
+  if(donutChart){
+    donutChart.data.datasets[0].data = [owned, missing];
+    donutChart.update('none');
+  } else {
+    donutChart = new Chart(ctx,{
+      type:'doughnut',
+      data:{
+        labels:['Tenho','Faltam'],
+        datasets:[{
+          data:[owned,missing],
+          backgroundColor:['#A0D2B7','#E8D5C8'],
+          borderColor:['#6BAF94','#D5B6AC'],
+          borderWidth:2,
+          hoverOffset:4,
+        }]
+      },
+      options:{
+        cutout:'72%',
+        plugins:{
+          legend:{display:false},
+          tooltip:{callbacks:{label:c=>` ${c.label}: ${c.parsed} (${Math.round(c.parsed/TOTAL*100)}%)`}}
+        },
+        animation:{duration:500,easing:'easeOutCubic'}
+      }
+    });
+  }
+
+  // Progress bars por título (usando DISPLAY_ORDER)
+  let html='';
+  for(const g of DISPLAY_ORDER){
+    const gOwned = g.nums.filter(n=>state.owned.has(chipId(g.sigla,n))).length;
+    const gTotal = g.nums.length;
+    const gPct   = gTotal ? Math.round(gOwned/gTotal*100) : 0;
+    const isFull = gOwned===gTotal && gTotal>0;
+    const sublabel = g.grupo ? ` <span style="font-size:.65rem;color:var(--text-light);font-weight:400">${g.sigla} · Grupo ${g.grupo}</span>` : ` <span style="font-size:.65rem;color:var(--text-light);font-weight:400">${g.sigla}</span>`;
+    html+=`<div class="progress-item">
+      <div class="progress-item-header">
+        <strong>${g.titulo}</strong>${sublabel}
+        <span>${gOwned}/${gTotal} · ${gPct}%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill${isFull?' full':''}" style="width:${gPct}%"></div>
+      </div>
+    </div>`;
+  }
+  document.getElementById('progress-list').innerHTML = html;
+}
+
+/* ══════════════════════════════════════
+   RENDER: LISTA GERAL
+══════════════════════════════════════ */
+function renderList(){
+  let html='';
+  for(const g of DISPLAY_ORDER) html+=buildGroupHTML(g,'list');
+  document.getElementById('list-content').innerHTML=html;
+}
+
+/* ══════════════════════════════════════
+   RENDER: FALTANTES
+══════════════════════════════════════ */
+function renderMissing(){
+  if(state.owned.size===TOTAL){
+    document.getElementById('missing-content').innerHTML=`
+      <div class="empty-state">
+        <div class="emoji">🏆</div>
+        <p><strong>Parabéns!</strong> Álbum completo!</p>
+      </div>`;
+    return;
+  }
+  let html='';
+  for(const g of DISPLAY_ORDER){
+    const misNums=g.nums.filter(n=>!state.owned.has(chipId(g.sigla,n)));
+    if(!misNums.length) continue;
+    html+=buildGroupHTML({...g,nums:misNums},'missing');
+  }
+  document.getElementById('missing-content').innerHTML=html;
+}
+
+/* ══════════════════════════════════════
+   RENDER: REPETIDAS
+══════════════════════════════════════ */
+function renderRepeated(){
+  const rc=state.repeated.size;
+  let html=rc ? `<div class="card" style="background:#FFF8EE;border-color:var(--gold-d);margin-bottom:16px">
+    <div style="font-size:.85rem;color:var(--gold-d);font-weight:700">
+      🔄 ${rc} figurinha${rc!==1?'s':''} repetida${rc!==1?'s':''}
+    </div></div>` : '';
+  for(const g of DISPLAY_ORDER) html+=buildGroupHTML(g,'repeated');
+  document.getElementById('repeated-content').innerHTML=html;
+}
+
+/* ══════════════════════════════════════
+   RENDER ALL
+══════════════════════════════════════ */
+function renderAll(){
+  renderOverview();
+  renderList();
+  renderMissing();
+  renderRepeated();
+}
+
+/* ══════════════════════════════════════
+   EVENT DELEGATION
+══════════════════════════════════════ */
+function setupDelegation(){
+  const map={'list-content':'list','missing-content':'missing','repeated-content':'repeated'};
+  for(const [cid,tabType] of Object.entries(map)){
+    document.getElementById(cid).addEventListener('click',e=>{
+      const chip=e.target.closest('.chip[data-id]');
+      if(chip) handleChipTap(chip.dataset.id, tabType);
+    });
+  }
+}
+
+/* ══════════════════════════════════════
+   TAB NAVIGATION
+══════════════════════════════════════ */
+function switchTab(id){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  document.querySelector(`.nav-btn[data-tab="${id}"]`).classList.add('active');
+  document.querySelector('.app-main').scrollTop=0;
+}
+document.querySelectorAll('.nav-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>switchTab(btn.dataset.tab));
+});
+
+/* ══════════════════════════════════════
+   SINCRONIZAÇÃO (código completo)
+══════════════════════════════════════ */
+function getPayload(){
+  return {v:1, owned:[...state.owned], repeated:[...state.repeated], at:new Date().toISOString()};
+}
+function applyPayload(p){
+  if(!p||p.v!==1) throw new Error('invalid');
+  state.owned    = new Set(p.owned    ||[]);
+  state.repeated = new Set(p.repeated ||[]);
+  saveState(); renderAll();
+}
+function exportCode(){
+  const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(getPayload()))));
+  const box=document.getElementById('export-code-box');
+  box.value=encoded;
+}
+function importCode(){
+  const encoded=document.getElementById('import-code-box').value.trim();
+  if(!encoded){alert('Cole o código no campo acima.');return;}
+  try{
+    applyPayload(JSON.parse(decodeURIComponent(escape(atob(encoded)))));
+    alert('✅ Sincronização aplicada com sucesso!');
+    document.getElementById('import-code-box').value='';
+  } catch{ alert('❌ Código inválido. Verifique se copiou tudo.'); }
+}
+
+/* ══════════════════════════════════════
+   TROCA DE FIGURINHAS (código de faltantes)
+══════════════════════════════════════ */
+function generateExchangeCode(){
+  const missing=[];
+  for(const g of ALBUM_DATA)
+    for(const n of g.nums){
+      const id=chipId(g.sigla,n);
+      if(!state.owned.has(id)) missing.push(id);
+    }
+  if(!missing.length){
+    alert('🏆 Você não tem nenhuma figurinha faltando!');
+    return;
+  }
+  // Formato compacto: prefixo ELV2 + base64 dos IDs separados por vírgula
+  const encoded = btoa(unescape(encodeURIComponent('ELV2:'+missing.join(','))));
+  document.getElementById('exchange-out-box').value = encoded;
+}
+
+function applyExchangeCode(){
+  const encoded=document.getElementById('exchange-in-box').value.trim();
+  if(!encoded){alert('Cole o código do amigo no campo acima.');return;}
+  try{
+    const raw = decodeURIComponent(escape(atob(encoded)));
+    if(!raw.startsWith('ELV2:')) throw new Error('formato inválido');
+    const friendMissing = new Set(raw.replace('ELV2:','').split(',').filter(Boolean));
+
+    // Minhas repetidas que o amigo precisa
+    const matches = [...state.repeated].filter(id => friendMissing.has(id));
+
+    const resEl = document.getElementById('exchange-result');
+    resEl.style.display = 'block';
+
+    if(!matches.length){
+      resEl.className = 'exchange-result no-match';
+      resEl.innerHTML = `<h4>😕 Nenhuma coincidência encontrada</h4>
+        <p style="font-size:.8rem;color:var(--text-light)">Nenhuma das suas figurinhas repetidas está na lista de faltantes do amigo.</p>`;
+      return;
+    }
+
+    // Agrupar por sigla para exibir
+    const byGroup = {};
+    for(const id of matches){
+      const [sigla, num] = id.split('-');
+      if(!byGroup[sigla]) byGroup[sigla]=[];
+      byGroup[sigla].push(num);
+    }
+    let chipsHtml = '';
+    for(const [sigla, nums] of Object.entries(byGroup)){
+      const group = ALBUM_DATA.find(g=>g.sigla===sigla);
+      const titulo = group ? group.titulo : sigla;
+      chipsHtml += `<div style="margin-bottom:10px">
+        <div class="group-label" style="margin-bottom:4px">${sigla} · ${titulo}</div>
+        <div class="chips-grid">
+          ${nums.map(n=>`<div class="chip repeated">${n}</div>`).join('')}
+        </div>
+      </div>`;
+    }
+
+    resEl.className = 'exchange-result';
+    resEl.innerHTML = `<h4>✅ ${matches.length} repetida${matches.length!==1?'s':''} que o amigo precisa:</h4>${chipsHtml}`;
+  } catch(e){
+    alert('❌ Código inválido. Verifique se o amigo gerou o código corretamente.');
+  }
+}
+
+/* ══════════════════════════════════════
+   COPIAR CÓDIGO
+══════════════════════════════════════ */
+function copyCode(boxId){
+  const box = document.getElementById(boxId);
+  const text = box.value;
+  if(!text){ alert('Gere o código primeiro.'); return; }
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(text).then(()=>{
+      showCopyFeedback(boxId);
+    }).catch(()=> fallbackCopy(box));
+  } else {
+    fallbackCopy(box);
+  }
+}
+function fallbackCopy(box){
+  box.select();
+  document.execCommand('copy');
+  showCopyFeedback(box.id);
+}
+function showCopyFeedback(boxId){
+  // Flash the copy button green briefly
+  const btn = document.querySelector(`[onclick="copyCode('${boxId}')"]`);
+  if(btn){
+    const orig = btn.innerHTML;
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Copiado`;
+    btn.style.background = 'var(--mint)';
+    btn.style.color = '#1E4D36';
+    setTimeout(()=>{ btn.innerHTML=orig; btn.style.background=''; btn.style.color=''; }, 1800);
+  }
+}
+
+/* ══════════════════════════════════════
+   MODAIS
+══════════════════════════════════════ */
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function closeModalOnOverlay(e,id){ if(e.target===document.getElementById(id)) closeModal(id); }
+function clearAlbum(){
+  state.owned.clear();
+  saveState();
+  renderAll();
+  // Limpar campos de código para evitar confusão com dados desatualizados
+  document.getElementById('export-code-box').value = '';
+  document.getElementById('exchange-out-box').value = '';
+  closeModal('modal-clear-album');
+}
+function clearRepeated(){ state.repeated.clear(); saveState(); renderAll(); closeModal('modal-clear-repeated'); }
+
+/* ══════════════════════════════════════
+   INIT
+══════════════════════════════════════ */
+loadState();
+setupDelegation();
+renderAll();
+</script>
+</body>
+</html>
