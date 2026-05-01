@@ -915,8 +915,12 @@ function buildGroupHTML(group, tabType){
   const total = group.nums.length;
   const allDone = ownedCount===total && total>0;
 
+  const displayTitle = (group.sigla === group.titulo || group.sigla === group.titulo.toUpperCase())
+    ? group.sigla
+    : `${group.sigla} - ${group.titulo}`;
+
   let html = `<div class="section-header">
-    <div class="section-title">${group.titulo}</div>`;
+    <div class="section-title">${displayTitle}</div>`;
   if(tabType!=='repeated'){
     html += `<span class="section-badge${allDone?' done':''}">${ownedCount}/${total}</span>`;
   }
