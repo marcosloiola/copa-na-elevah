@@ -171,6 +171,7 @@
       margin-bottom: 8px;
     }
     .chip {
+      position: relative;
       width: var(--chip-size);
       height: var(--chip-size);
       border-radius: var(--radius-sm);
@@ -186,6 +187,24 @@
       user-select: none;
       transition: background .15s, border-color .15s, color .15s, transform .08s;
       -webkit-user-select: none;
+    }
+    .chip-rep-cnt {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: var(--primary-d);
+      color: #fff;
+      border-radius: 99px;
+      font-size: .5rem;
+      font-weight: 800;
+      min-width: 15px;
+      height: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 3px;
+      line-height: 1;
+      pointer-events: none;
     }
     .chip:active { transform: scale(.92); }
     .chip.owned {
@@ -634,7 +653,7 @@
   <div id="tab-repeated" class="tab-panel">
     <p class="hint" style="margin-bottom:14px">
       Marque figurinhas que você tem repetidas para facilitar trocas.<br>
-      <strong>1 toque</strong> = tenho repetida &nbsp;·&nbsp; <strong>2 toques</strong> = não tenho mais (desfaz)
+      <strong>1 toque</strong> = adiciona uma repetida &nbsp;·&nbsp; <strong>2 toques rápidos</strong> = remove uma repetida
     </p>
     <div id="repeated-content"></div>
   </div>
@@ -646,17 +665,14 @@
     <div class="settings-section">
       <div class="settings-section-title">🔄 Sincronizar entre dispositivos</div>
 
-      <button class="btn btn-primary" onclick="exportCode()">
-        📋 Gerar Código de Sincronização
-      </button>
       <div class="code-row">
-        <textarea id="export-code-box" class="code-box" placeholder="Clique em 'Gerar' para criar o código..." readonly onclick="this.select()"></textarea>
+        <textarea id="export-code-box" class="code-box" placeholder="Atualizado automaticamente..." readonly onclick="this.select()"></textarea>
         <button class="btn-copy" onclick="copyCode('export-code-box')" title="Copiar código">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
           Copiar
         </button>
       </div>
-      <p class="hint" style="margin-bottom:16px">Copie e cole via WhatsApp em outro dispositivo para sincronizar seu progresso.</p>
+      <p class="hint" style="margin-bottom:16px">Código atualizado automaticamente a cada marcação. Copie e cole via WhatsApp em outro dispositivo.</p>
 
       <div class="card-title" style="font-size:.75rem; margin-bottom:6px">Importar via Código</div>
       <textarea id="import-code-box" class="code-box" placeholder="Cole aqui o código de sincronização de outro dispositivo..."></textarea>
@@ -687,6 +703,35 @@
         🔍 Ver minhas repetidas que ele precisa
       </button>
       <div id="exchange-result" style="display:none"></div>
+    </div>
+
+    <!-- LISTAS EM TEXTO -->
+    <div class="settings-section">
+      <div class="settings-section-title">📋 Exportar Listas</div>
+
+      <button class="btn btn-outline" onclick="exportMissingList()">
+        🔍 Gerar Lista de Faltantes
+      </button>
+      <div class="code-row">
+        <textarea id="missing-list-box" class="code-box" placeholder="Clique para gerar a lista de figurinhas faltantes..." readonly onclick="this.select()" style="height:120px"></textarea>
+        <button class="btn-copy" style="height:120px" onclick="copyCode('missing-list-box')" title="Copiar lista">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copiar
+        </button>
+      </div>
+      <p class="hint" style="margin-bottom:16px">Lista formatada para compartilhar no WhatsApp com os números que faltam por seleção.</p>
+
+      <button class="btn btn-outline" style="border-color:var(--gold-d);color:var(--gold-d)" onclick="exportRepeatedList()">
+        🔄 Gerar Lista de Repetidas
+      </button>
+      <div class="code-row">
+        <textarea id="repeated-list-box" class="code-box" placeholder="Clique para gerar a lista de figurinhas repetidas..." readonly onclick="this.select()" style="height:120px"></textarea>
+        <button class="btn-copy" style="height:120px" onclick="copyCode('repeated-list-box')" title="Copiar lista">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copiar
+        </button>
+      </div>
+      <p class="hint">Lista formatada para compartilhar no WhatsApp com suas figurinhas repetidas.</p>
     </div>
 
     <!-- ZONA DE PERIGO -->
@@ -857,20 +902,40 @@ function chipId(sigla,num){ return sigla+'-'+num; }
 /* ══════════════════════════════════════
    ESTADO
 ══════════════════════════════════════ */
-const state = { owned: new Set(), repeated: new Set() };
+const state = { owned: new Set(), repeated: {} };
 
 function loadState(){
   try {
     const o = localStorage.getItem('elevah_owned');
     const r = localStorage.getItem('elevah_repeated');
-    if(o) state.owned    = new Set(JSON.parse(o));
-    if(r) state.repeated = new Set(JSON.parse(r));
+    if(o) state.owned = new Set(JSON.parse(o));
+    if(r){
+      const rParsed = JSON.parse(r);
+      // Compatibilidade: se for array (formato antigo Set), converte para objeto com contagem 1
+      if(Array.isArray(rParsed)){
+        state.repeated = {};
+        for(const id of rParsed) state.repeated[id] = 1;
+      } else {
+        state.repeated = rParsed || {};
+      }
+    }
   } catch(e){ console.warn('loadState error', e); }
 }
 function saveState(){
   localStorage.setItem('elevah_owned',    JSON.stringify([...state.owned]));
-  localStorage.setItem('elevah_repeated', JSON.stringify([...state.repeated]));
+  localStorage.setItem('elevah_repeated', JSON.stringify(state.repeated));
 }
+
+/* ══════════════════════════════════════
+   HELPERS: REPETIDAS (com contagem)
+══════════════════════════════════════ */
+function repCount(id){ return state.repeated[id] || 0; }
+function addRepeat(id){ state.repeated[id] = (state.repeated[id]||0)+1; }
+function removeRepeat(id){
+  if((state.repeated[id]||0) > 1) state.repeated[id]--;
+  else delete state.repeated[id];
+}
+function totalRepeatCount(){ return Object.values(state.repeated).reduce((s,c)=>s+c,0); }
 
 /* ══════════════════════════════════════
    TAP (single / double) — funciona no mobile e desktop
@@ -889,12 +954,12 @@ function handleChipTap(id, tabType){
 }
 
 function doSingle(id,tabType){
-  if(tabType==='repeated') state.repeated.add(id);
+  if(tabType==='repeated') addRepeat(id);
   else                     state.owned.add(id);
   saveState(); renderAll(); flashChip(id,tabType);
 }
 function doDouble(id,tabType){
-  if(tabType==='repeated') state.repeated.delete(id);
+  if(tabType==='repeated') removeRepeat(id);
   else                     state.owned.delete(id);
   saveState(); renderAll();
 }
@@ -921,7 +986,10 @@ function buildGroupHTML(group, tabType){
 
   let html = `<div class="section-header">
     <div class="section-title">${displayTitle}</div>`;
-  if(tabType!=='repeated'){
+  if(tabType==='missing'){
+    // Na aba Faltam, mostrar apenas a quantidade que falta (group.nums já são só as faltantes)
+    html += `<span class="section-badge">${total}</span>`;
+  } else if(tabType!=='repeated'){
     html += `<span class="section-badge${allDone?' done':''}">${ownedCount}/${total}</span>`;
   }
   if(group.grupo) html += `<span class="group-label">Grupo ${group.grupo}</span>`;
@@ -929,18 +997,26 @@ function buildGroupHTML(group, tabType){
 
   for(const num of group.nums){
     const id = chipId(group.sigla,num);
-    const isOwned    = state.owned.has(id);
-    const isRepeated = state.repeated.has(id);
+    const isOwned = state.owned.has(id);
+    const cnt     = repCount(id);
 
     if(tabType==='missing' && isOwned) continue;
 
     let cls='chip';
     if(isWide) cls+=' wide';
-    if(tabType==='repeated'){ if(isRepeated) cls+=' repeated'; }
-    else                    { if(isOwned)    cls+=' owned'; }
 
-    const label = isWide ? `PANINI ${num}` : num;
-    html += `<div class="${cls}" data-cid="${id}${sfx}" data-id="${id}" data-tab="${tabType}">${label}</div>`;
+    let innerLabel = isWide ? `PANINI ${num}` : num;
+
+    if(tabType==='repeated'){
+      if(cnt > 0){
+        cls += ' repeated';
+        if(cnt > 1) innerLabel += `<span class="chip-rep-cnt">${cnt}</span>`;
+      }
+    } else {
+      if(isOwned) cls+=' owned';
+    }
+
+    html += `<div class="${cls}" data-cid="${id}${sfx}" data-id="${id}" data-tab="${tabType}">${innerLabel}</div>`;
   }
   html += `</div>`;
   return html;
@@ -1045,10 +1121,11 @@ function renderMissing(){
    RENDER: REPETIDAS
 ══════════════════════════════════════ */
 function renderRepeated(){
-  const rc=state.repeated.size;
-  let html=rc ? `<div class="card" style="background:#FFF8EE;border-color:var(--gold-d);margin-bottom:16px">
+  const rc    = Object.keys(state.repeated).length;
+  const total = totalRepeatCount();
+  let html = rc ? `<div class="card" style="background:#FFF8EE;border-color:var(--gold-d);margin-bottom:16px">
     <div style="font-size:.85rem;color:var(--gold-d);font-weight:700">
-      🔄 ${rc} figurinha${rc!==1?'s':''} repetida${rc!==1?'s':''}
+      🔄 ${total} figurinha${total!==1?'s':''} repetida${total!==1?'s':''} · ${rc} número${rc!==1?'s':''} diferentes
     </div></div>` : '';
   for(const g of DISPLAY_ORDER) html+=buildGroupHTML(g,'repeated');
   document.getElementById('repeated-content').innerHTML=html;
@@ -1062,6 +1139,7 @@ function renderAll(){
   renderList();
   renderMissing();
   renderRepeated();
+  autoUpdateSyncCode();
 }
 
 /* ══════════════════════════════════════
@@ -1095,18 +1173,26 @@ document.querySelectorAll('.nav-btn').forEach(btn=>{
    SINCRONIZAÇÃO (código completo)
 ══════════════════════════════════════ */
 function getPayload(){
-  return {v:1, owned:[...state.owned], repeated:[...state.repeated], at:new Date().toISOString()};
+  return {v:1, owned:[...state.owned], repeated:state.repeated, at:new Date().toISOString()};
 }
 function applyPayload(p){
   if(!p||p.v!==1) throw new Error('invalid');
-  state.owned    = new Set(p.owned    ||[]);
-  state.repeated = new Set(p.repeated ||[]);
+  state.owned = new Set(p.owned||[]);
+  // Compatibilidade: suporte a formato antigo (array) e novo (objeto com contagem)
+  if(Array.isArray(p.repeated)){
+    state.repeated = {};
+    for(const id of p.repeated) state.repeated[id] = 1;
+  } else {
+    state.repeated = p.repeated || {};
+  }
   saveState(); renderAll();
 }
-function exportCode(){
-  const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(getPayload()))));
-  const box=document.getElementById('export-code-box');
-  box.value=encoded;
+function exportCode(){ autoUpdateSyncCode(); }
+function autoUpdateSyncCode(){
+  const box = document.getElementById('export-code-box');
+  if(!box) return;
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(getPayload()))));
+  box.value = encoded;
 }
 function importCode(){
   const encoded=document.getElementById('import-code-box').value.trim();
@@ -1146,7 +1232,7 @@ function applyExchangeCode(){
     const friendMissing = new Set(raw.replace('ELV2:','').split(',').filter(Boolean));
 
     // Minhas repetidas que o amigo precisa
-    const matches = [...state.repeated].filter(id => friendMissing.has(id));
+    const matches = Object.keys(state.repeated).filter(id => friendMissing.has(id));
 
     const resEl = document.getElementById('exchange-result');
     resEl.style.display = 'block';
@@ -1166,7 +1252,7 @@ function applyExchangeCode(){
       byGroup[sigla].push(num);
     }
     let chipsHtml = '';
-    for(const [sigla, nums] of Object.entries(byGroup)){
+    for(const [sigla, nums] of Object.entries(byGroup).sort((a,b)=>a[0].localeCompare(b[0]))){
       const group = ALBUM_DATA.find(g=>g.sigla===sigla);
       const titulo = group ? group.titulo : sigla;
       chipsHtml += `<div style="margin-bottom:10px">
@@ -1182,6 +1268,46 @@ function applyExchangeCode(){
   } catch(e){
     alert('❌ Código inválido. Verifique se o amigo gerou o código corretamente.');
   }
+}
+
+/* ══════════════════════════════════════
+   EXPORTAR LISTAS EM TEXTO
+══════════════════════════════════════ */
+function exportMissingList(){
+  const lines = [];
+  let total = 0;
+  for(const g of DISPLAY_ORDER){
+    const misNums = g.nums.filter(n => !state.owned.has(chipId(g.sigla, n)));
+    if(!misNums.length) continue;
+    total += misNums.length;
+    lines.push(`${g.sigla}: ${misNums.join(', ')}`);
+  }
+  const box = document.getElementById('missing-list-box');
+  if(!lines.length){
+    box.value = '🏆 Álbum completo! Nenhuma figurinha faltando.';
+    return;
+  }
+  box.value = `📋 Minhas Figurinhas Faltantes (${total} no total)\n\n` + lines.join('\n');
+}
+
+function exportRepeatedList(){
+  const lines = [];
+  for(const g of DISPLAY_ORDER){
+    const repNums = g.nums.filter(n => repCount(chipId(g.sigla, n)) > 0);
+    if(!repNums.length) continue;
+    const parts = repNums.map(n => {
+      const cnt = repCount(chipId(g.sigla, n));
+      return cnt > 1 ? `${n}(×${cnt})` : String(n);
+    });
+    lines.push(`${g.sigla}: ${parts.join(', ')}`);
+  }
+  const box = document.getElementById('repeated-list-box');
+  if(!lines.length){
+    box.value = '😅 Nenhuma figurinha repetida registrada.';
+    return;
+  }
+  const total = totalRepeatCount();
+  box.value = `🔄 Minhas Figurinhas Repetidas (${total} no total)\n\n` + lines.join('\n');
 }
 
 /* ══════════════════════════════════════
@@ -1225,13 +1351,17 @@ function closeModalOnOverlay(e,id){ if(e.target===document.getElementById(id)) c
 function clearAlbum(){
   state.owned.clear();
   saveState();
-  renderAll();
-  // Limpar campos de código para evitar confusão com dados desatualizados
-  document.getElementById('export-code-box').value = '';
+  renderAll(); // autoUpdateSyncCode é chamado dentro de renderAll
   document.getElementById('exchange-out-box').value = '';
+  document.getElementById('missing-list-box').value = '';
   closeModal('modal-clear-album');
 }
-function clearRepeated(){ state.repeated.clear(); saveState(); renderAll(); closeModal('modal-clear-repeated'); }
+function clearRepeated(){
+  state.repeated = {};
+  saveState(); renderAll();
+  document.getElementById('repeated-list-box').value = '';
+  closeModal('modal-clear-repeated');
+}
 
 /* ══════════════════════════════════════
    INIT
