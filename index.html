@@ -28,6 +28,7 @@
       --peach:#FFB39C; --text:#4A2E22; --text-mid:#7A5244;
       --text-light:#A88070; --border:#E8D5C8; --shadow:rgba(74,46,34,.10);
       --chip-size:44px; --radius:12px; --radius-sm:8px; --nav-h:66px;
+      --friend:#4A7EC7; --friend-d:#2C5282; --friend-bg:#EBF4FF; --friend-border:#90B4E0;
     }
 
     /* ─── Header ── */
@@ -140,6 +141,18 @@
     .album-card-stats { font-size:.75rem; color:var(--text-light); margin-bottom:8px; }
     .album-card-footer { display:flex; justify-content:flex-end; font-size:.72rem; color:var(--primary); font-weight:700; margin-top:8px; letter-spacing:.02em; }
 
+    /* ─── Friend album ── */
+    .album-card.friend { border-color:var(--friend-border); background:var(--friend-bg); }
+    .album-card.friend .album-card-name { color:var(--friend-d); }
+    .album-card.friend .album-card-stats { color:#4A6FA8; }
+    .album-card.friend .album-card-footer { color:var(--friend); }
+    .album-card.friend .progress-fill { background:var(--friend); }
+    .friend-badge { display:inline-flex; align-items:center; gap:4px; background:var(--friend-bg); color:var(--friend-d); border:1px solid var(--friend-border); border-radius:99px; padding:1px 8px; font-size:.6rem; font-weight:700; }
+    .album-item.friend-item { border-color:var(--friend-border); background:var(--friend-bg); }
+    .album-item.friend-item .album-item-name { color:var(--friend-d); }
+    .perfil-friend-section { margin-top:20px; }
+    .perfil-friend-empty { text-align:center; padding:20px; color:var(--text-light); font-size:.85rem; border:1.5px dashed var(--border); border-radius:var(--radius-sm); margin-bottom:8px; }
+
     /* ─── Album selector pills ── */
     .album-selector { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
     .btn-album {
@@ -150,6 +163,8 @@
     .btn-album.active { background:var(--primary); border-color:var(--primary-d); color:#fff; }
     .btn-album.all-mode { border-color:var(--gold-d); color:var(--gold-d); }
     .btn-album.all-mode.active { background:var(--gold); border-color:var(--gold-d); color:#4A2800; }
+    .btn-album.friend-mode { border-color:var(--friend-border); color:var(--friend-d); }
+    .btn-album.friend-mode.active { background:var(--friend); border-color:var(--friend-d); color:#fff; }
 
     /* ─── Sort bar ── */
     .sort-bar { display:flex; gap:6px; margin-bottom:14px; }
@@ -202,6 +217,7 @@
     .btn-danger  { background:#e74c3c; color:#fff; }
     .btn-outline { background:transparent; border:2px solid var(--primary); color:var(--primary); }
     .btn-whatsapp { background:#25D366; color:#fff; }
+    .btn-friend  { background:var(--friend); color:#fff; }
 
     /* ─── Badges ── */
     .near-badge { display:inline-flex; align-items:center; background:#FFF3D0; color:var(--gold-d); border-radius:99px; padding:1px 7px; font-size:.62rem; font-weight:700; }
@@ -373,6 +389,7 @@
   <div id="missing-all-banner" style="display:none;background:#FFF8EE;border:1.5px solid var(--gold-d);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:12px;color:var(--gold-d);font-size:.82rem;font-weight:600;line-height:1.5">
     👁️ Visualização geral de todos os álbuns — os <strong>toques nas figurinhas estão desativados</strong> neste modo. Selecione um álbum acima para editar.
   </div>
+  <div id="missing-friend-banner" style="display:none;background:var(--friend-bg);border:1.5px solid var(--friend-border);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:12px;color:var(--friend-d);font-size:.82rem;font-weight:600;line-height:1.5"></div>
   <div id="missing-content"></div>
 </div>
 
@@ -434,19 +451,21 @@
   <!-- Sub: Álbuns -->
   <div id="perfil-albuns" style="display:none">
     <button class="back-btn" onclick="goBackToPerfil()">← Voltar ao Perfil</button>
-    <div class="perfil-section-title">Meus Álbuns (máx. 3)</div>
+    <div class="perfil-section-title">Gerenciar Álbuns</div>
     <div id="perfil-albums-list"></div>
     <button class="btn btn-primary" id="btn-create-album" onclick="openModal('modal-create-album')" style="margin-top:8px">
       + Criar Novo Álbum
     </button>
+    <div id="perfil-friend-section" style="margin-top:20px"></div>
     <button class="back-btn" onclick="goBackToPerfil()" style="margin-top:24px">← Voltar ao Perfil</button>
   </div>
 
   <!-- Sub: Sincronização -->
   <div id="perfil-sync" style="display:none">
     <button class="back-btn" onclick="goBackToPerfil()">← Voltar ao Perfil</button>
-    <div class="perfil-section-title">Sincronizar entre dispositivos</div>
+    <div class="perfil-section-title">Sincronização Completa do App</div>
     <div class="settings-section">
+      <p class="hint" style="margin-bottom:10px">Transfere <strong>todos os seus álbuns</strong> e configurações entre dispositivos. O álbum de amigo <em>não</em> é incluído.</p>
       <div class="code-row">
         <textarea id="export-code-box" class="code-box" placeholder="Atualizado automaticamente..." readonly onclick="this.select()"></textarea>
         <button class="btn-copy" onclick="copyCode('export-code-box')" title="Copiar código">
@@ -454,10 +473,11 @@
           Copiar
         </button>
       </div>
-      <p class="hint" style="margin-bottom:16px">Inclui todos os álbuns e nome do usuário. Cole via WhatsApp no outro dispositivo.</p>
-      <div class="card-title" style="font-size:.75rem;margin-bottom:6px">Importar via Código</div>
+      <p class="hint" style="margin-bottom:16px">Cole via WhatsApp no outro dispositivo.</p>
+      <div class="card-title" style="font-size:.75rem;margin-bottom:6px">Importar Código Completo</div>
       <textarea id="import-code-box" class="code-box" placeholder="Cole aqui o código de sincronização..."></textarea>
       <button class="btn btn-primary" style="margin-top:8px" onclick="importCode()">✅ Aplicar Código</button>
+      <p class="hint" style="margin-top:16px">💡 Para exportar ou importar um <strong>álbum individual</strong>, use os botões 📤 📥 em cada álbum dentro de <strong>Gerenciar Álbuns</strong>.</p>
     </div>
     <button class="back-btn" onclick="goBackToPerfil()" style="margin-top:24px">← Voltar ao Perfil</button>
   </div>
@@ -591,6 +611,25 @@
     <h4>⚠️ Zona de Perigo</h4>
     <p>Permite apagar as figurinhas de um álbum específico, de todos os álbuns de uma vez, ou limpar a lista de repetidas. Os álbuns em si não são excluídos ao apagar as figurinhas — apenas as marcações são removidas.</p>
   </div>
+  <div class="howto-sub">
+    <h4>📤 📥 Exportar e Importar álbum individual</h4>
+    <p>Cada álbum tem botões próprios de exportar (📤) e importar (📥) na lista de álbuns. Exportar gera um código só daquele álbum. Importar aplica um código e <strong>substitui</strong> as figurinhas marcadas. Use para sincronizar um álbum específico, incluindo o fluxo de troca com amigo.</p>
+  </div>
+
+  <div class="howto-category" style="background:var(--friend)">👥 Álbum de Amigo</div>
+  <div class="howto-section" style="margin-top:4px">
+    <p style="font-size:.85rem;color:var(--text-mid);line-height:1.6;margin-bottom:12px">Você pode importar o álbum de um único amigo (slot extra além dos seus 3 álbuns). O álbum aparece em <strong>Faltam</strong> e <strong>Visão Geral</strong> com visual azul, separado dos seus álbuns.</p>
+  </div>
+  <div class="howto-sub">
+    <h4>Fluxo completo de troca</h4>
+    <ul style="padding-left:16px;font-size:.82rem;color:var(--text-mid);line-height:1.8">
+      <li><strong>Amigo gera o código:</strong> ele vai em Gerenciar Álbuns → 📤 no álbum dele → envia o código pra você</li>
+      <li><strong>Você importa:</strong> Gerenciar Álbuns → "Importar Álbum do Amigo" → cola o código</li>
+      <li><strong>Você marca:</strong> na aba Faltam, selecione o pill azul do amigo → marque as figurinhas que você conseguiu pra ele</li>
+      <li><strong>Você devolve:</strong> Gerenciar Álbuns → 📤 no card do amigo → envia o código de volta</li>
+      <li><strong>Amigo aplica:</strong> ele usa o botão 📥 no álbum dele para atualizar com o código que você mandou</li>
+    </ul>
+  </div>
 
   <div class="howto-section" style="margin-top:8px">
     <h3>📊 Visão Geral</h3>
@@ -617,6 +656,68 @@
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeModal('modal-clear-album')">Cancelar</button>
       <button class="btn btn-danger" onclick="clearAlbum()">Sim, apagar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Export single own album -->
+<div class="modal-overlay" id="modal-export-album" onclick="closeModalOnOverlay(event,'modal-export-album')">
+  <div class="modal-box">
+    <h3 id="modal-export-album-title">📤 Exportar Álbum</h3>
+    <p>Compartilhe este código com seu amigo para que ele importe como álbum de amigo. Quando ele devolver o código atualizado, use o botão 📥 para aplicar.</p>
+    <div class="code-row">
+      <textarea id="modal-export-album-box" class="code-box" readonly onclick="this.select()" style="height:90px"></textarea>
+      <button class="btn-copy" style="height:90px" onclick="copyCode('modal-export-album-box')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copiar
+      </button>
+    </div>
+    <div class="modal-actions" style="margin-top:12px">
+      <button class="btn btn-primary" onclick="closeModal('modal-export-album')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Import into own album -->
+<div class="modal-overlay" id="modal-import-album" onclick="closeModalOnOverlay(event,'modal-import-album')">
+  <div class="modal-box">
+    <h3 id="modal-import-album-title">📥 Importar para Álbum</h3>
+    <p>Cole o código do álbum. As figurinhas marcadas serão <strong>substituídas</strong> pelas do código.</p>
+    <textarea id="modal-import-album-box" class="code-box" placeholder="Cole o código aqui..." style="height:90px;margin-top:8px"></textarea>
+    <div class="modal-actions" style="margin-top:8px">
+      <button class="btn btn-outline" onclick="closeModal('modal-import-album')">Cancelar</button>
+      <button class="btn btn-primary" onclick="confirmImportAlbum()">✅ Aplicar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Import friend album -->
+<div class="modal-overlay" id="modal-import-friend" onclick="closeModalOnOverlay(event,'modal-import-friend')">
+  <div class="modal-box">
+    <h3>👥 Importar Álbum do Amigo</h3>
+    <p>Cole o código que seu amigo gerou pelo botão 📤 no app dele.</p>
+    <textarea id="modal-import-friend-box" class="code-box" placeholder="Cole o código do amigo aqui..." style="height:90px;margin-top:8px"></textarea>
+    <div class="modal-actions" style="margin-top:8px">
+      <button class="btn btn-outline" onclick="closeModal('modal-import-friend')">Cancelar</button>
+      <button class="btn btn-friend" onclick="confirmImportFriend()">✅ Importar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Export friend album back -->
+<div class="modal-overlay" id="modal-export-friend" onclick="closeModalOnOverlay(event,'modal-export-friend')">
+  <div class="modal-box">
+    <h3 id="modal-export-friend-title">📤 Devolver Código ao Amigo</h3>
+    <p>Envie este código para seu amigo. Ele pode usar o botão 📥 no álbum dele para atualizar as figurinhas.</p>
+    <div class="code-row">
+      <textarea id="modal-export-friend-box" class="code-box" readonly onclick="this.select()" style="height:90px"></textarea>
+      <button class="btn-copy" style="height:90px" onclick="copyCode('modal-export-friend-box')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copiar
+      </button>
+    </div>
+    <div class="modal-actions" style="margin-top:12px">
+      <button class="btn btn-primary" onclick="closeModal('modal-export-friend')">Fechar</button>
     </div>
   </div>
 </div>
@@ -742,15 +843,18 @@ function chipId(sigla, num){ return sigla + '-' + num; }
 
 /* ── STATE ──────────────────────────────────────────────── */
 const state = {
-  albums: [],           // [{id, name, owned: Set}]
-  activeAlbumId: null,  // active for Lista & marking
+  albums: [],           // [{id, name, owned: Set}] — own albums (max 3)
+  friendAlbum: null,    // {id, name, friendName, owned: Set} | null — single friend album
+  activeAlbumId: null,  // active for Lista & own-album marking
+  faltamAlbumId: null,  // active for Faltam tab (own OR friend album ID)
   repeated: {},         // {chipId: count} — global pool
-  missingShowAll: false,// Faltam "Todos os Álbuns" mode
+  missingShowAll: false,// Faltam "Todos os Álbuns" mode (own only)
   detailAlbumId: null,  // Visão Geral drill-down
 };
 let sortOrder = 'alpha';
 let userName  = '';
 let pendingDeleteAlbumId = null;
+let pendingImportAlbumId = null;  // for per-album import
 
 function generateId(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,5); }
 function getActiveAlbum(){ return state.albums.find(a => a.id === state.activeAlbumId) || state.albums[0] || null; }
@@ -762,9 +866,15 @@ function saveState(){
   localStorage.setItem('elevah_albums',    JSON.stringify(state.albums.map(a => ({id:a.id, name:a.name, owned:[...a.owned]}))));
   localStorage.setItem('elevah_repeated',  JSON.stringify(state.repeated));
   localStorage.setItem('elevah_active',    state.activeAlbumId || '');
+  localStorage.setItem('elevah_faltam',    state.faltamAlbumId || '');
   localStorage.setItem('elevah_miss_all',  state.missingShowAll ? '1' : '0');
   localStorage.setItem('elevah_username',  userName);
   localStorage.setItem('elevah_sort',      sortOrder);
+  if(state.friendAlbum){
+    localStorage.setItem('elevah_friend', JSON.stringify({id:state.friendAlbum.id, name:state.friendAlbum.name, friendName:state.friendAlbum.friendName, owned:[...state.friendAlbum.owned]}));
+  } else {
+    localStorage.removeItem('elevah_friend');
+  }
 }
 
 function loadState(){
@@ -797,6 +907,17 @@ function loadState(){
     const activeId = localStorage.getItem('elevah_active');
     state.activeAlbumId = (activeId && getAlbumById(activeId)) ? activeId : (state.albums[0]?.id || null);
     // Misc
+    // Friend album
+    const friendRaw = localStorage.getItem('elevah_friend');
+    if(friendRaw){
+      try{
+        const f = JSON.parse(friendRaw);
+        state.friendAlbum = {id:f.id, name:f.name, friendName:f.friendName||'', owned:new Set(f.owned||[])};
+      } catch(e){ state.friendAlbum = null; }
+    }
+    // Faltam album selection
+    const faltamId = localStorage.getItem('elevah_faltam');
+    state.faltamAlbumId = faltamId || null;
     state.missingShowAll = localStorage.getItem('elevah_miss_all') === '1';
     sortOrder = localStorage.getItem('elevah_sort') || 'alpha';
     userName  = localStorage.getItem('elevah_username') || '';
@@ -853,6 +974,89 @@ function promptRenameAlbum(id){
   if(newName !== null && newName.trim()){ renameAlbum(id, newName); renderPerfilAlbuns(); }
 }
 
+/* ── FRIEND ALBUM MANAGEMENT ────────────────────────────── */
+function getFaltamAlbum(){
+  if(state.faltamAlbumId && state.friendAlbum && state.faltamAlbumId === state.friendAlbum.id)
+    return state.friendAlbum;
+  return getAlbumById(state.faltamAlbumId) || getActiveAlbum();
+}
+function isFriendAlbumActive(){
+  return state.friendAlbum && state.faltamAlbumId === state.friendAlbum.id;
+}
+function setFaltamAlbum(id){
+  state.faltamAlbumId = id; state.missingShowAll = false; saveState(); renderAll();
+}
+function setFaltamFriend(){
+  if(!state.friendAlbum) return;
+  state.faltamAlbumId = state.friendAlbum.id; state.missingShowAll = false; saveState(); renderAll();
+}
+function deleteFriendAlbum(){
+  state.friendAlbum = null;
+  if(state.faltamAlbumId && !getAlbumById(state.faltamAlbumId))
+    state.faltamAlbumId = state.activeAlbumId;
+  saveState(); renderAll();
+}
+
+/* Single-album code format: {type:'single_album', albumName, fromUser, owned:[], at} */
+function encodeSingleAlbum(album){
+  const payload = {
+    type: 'single_album',
+    albumName: album.name,
+    fromUser: album.friendName || userName || '',
+    owned: [...album.owned],
+    at: new Date().toISOString()
+  };
+  return btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+}
+function decodeSingleAlbum(encoded){
+  const raw = JSON.parse(decodeURIComponent(escape(atob(encoded.trim()))));
+  if(raw.type !== 'single_album') throw new Error('not a single_album code');
+  return raw;
+}
+
+// Export a own album as single-album code → fill a textarea
+function exportSingleAlbum(albumId, boxId){
+  const album = getAlbumById(albumId);
+  if(!album){ alert('Álbum não encontrado.'); return; }
+  const box = document.getElementById(boxId);
+  if(box) box.value = encodeSingleAlbum(album);
+}
+// Export friend album back to friend
+function exportFriendAlbumBack(){
+  if(!state.friendAlbum){ alert('Nenhum álbum de amigo importado.'); return; }
+  const box = document.getElementById('friend-export-box');
+  if(box) box.value = encodeSingleAlbum(state.friendAlbum);
+}
+
+// Import single-album code INTO a specific own album (replace)
+function importIntoAlbum(albumId, encoded){
+  try{
+    const raw = decodeSingleAlbum(encoded);
+    const album = getAlbumById(albumId);
+    if(!album){ alert('Álbum não encontrado.'); return; }
+    album.owned = new Set(raw.owned || []);
+    saveState(); renderAll();
+    alert(`✅ Álbum "${album.name}" atualizado com sucesso!`);
+  } catch(e){ alert('❌ Código inválido. Verifique se copiou tudo corretamente.'); }
+}
+// Import as friend album (create or replace)
+function importAsFriendAlbum(encoded){
+  try{
+    const raw = decodeSingleAlbum(encoded);
+    if(state.friendAlbum){
+      if(!confirm(`Você já tem um álbum de amigo de "${state.friendAlbum.friendName || state.friendAlbum.name}". Deseja substituí-lo pelo álbum de "${raw.fromUser || raw.albumName}"?`)) return;
+    }
+    state.friendAlbum = {
+      id: generateId(),
+      name: 'Álbum do Amigo',
+      friendName: raw.fromUser || 'Amigo',
+      owned: new Set(raw.owned || [])
+    };
+    saveState(); renderAll(); renderPerfilAlbuns();
+    alert(`✅ Álbum de ${state.friendAlbum.friendName} importado com sucesso!`);
+  } catch(e){ alert('❌ Código inválido. Certifique-se de que o amigo gerou o código correto.'); }
+}
+
 /* ── SORT ORDER ─────────────────────────────────────────── */
 function saveSortOrder(){ localStorage.setItem('elevah_sort', sortOrder); }
 function setSortOrder(order){
@@ -894,14 +1098,14 @@ function doSingle(id, tabType){
     addRepeat(id);
   }
   else {
-    const a = getActiveAlbum();
-    if(a){ a.owned.add(id); checkGroupCompletion(id); }
+    const a = tabType === 'missing' ? getFaltamAlbum() : getActiveAlbum();
+    if(a){ a.owned.add(id); if(tabType !== 'missing' || !isFriendAlbumActive()) checkGroupCompletion(id); }
   }
   saveState(); renderAll(); flashChip(id, tabType);
 }
 function doDouble(id, tabType){
   if(tabType==='repeated'){ removeRepeat(id); }
-  else { const a = getActiveAlbum(); if(a) a.owned.delete(id); }
+  else { const a = tabType === 'missing' ? getFaltamAlbum() : getActiveAlbum(); if(a) a.owned.delete(id); }
   saveState(); renderAll();
 }
 function flashChip(id, tabType){
@@ -957,8 +1161,8 @@ function buildGroupHTML(group, tabType, ownedSet){
 let donutChart = null;
 
 function renderOverview(){
-  // Single album → always show its detail directly (no cards view)
-  if(state.albums.length === 1){
+  // Single own album AND no friend album → always show its detail directly
+  if(state.albums.length === 1 && !state.friendAlbum){
     renderAlbumDetail(state.albums[0].id);
   } else if(state.detailAlbumId){
     renderAlbumDetail(state.detailAlbumId);
@@ -1003,12 +1207,27 @@ function renderAlbumCards(){
       <div class="progress-bar"><div class="progress-fill" style="width:${cpct}%"></div></div>
     </div>`;
   }
+  // Friend album card (visually distinct, clickable for detail)
+  if(state.friendAlbum){
+    const fa = state.friendAlbum;
+    const fpct = TOTAL ? Math.round(fa.owned.size/TOTAL*100) : 0;
+    html += `<div class="album-card friend clickable" onclick="openAlbumDetail('${fa.id}')">
+      <div class="album-card-header">
+        <div class="album-card-name friend">👥 ${fa.name}</div>
+        <span class="friend-badge">Amigo: ${fa.friendName||'?'}</span>
+      </div>
+      <div class="album-card-stats">${fa.owned.size}/${TOTAL} figurinhas · ${fpct}%</div>
+      <div class="progress-bar"><div class="progress-fill" style="background:var(--friend);width:${fpct}%"></div></div>
+      <div class="album-card-footer" style="color:var(--friend)">Ver detalhes →</div>
+    </div>`;
+  }
   document.getElementById('overview-cards-content').innerHTML = html;
 }
 
 function openAlbumDetail(albumId){
   state.detailAlbumId = albumId;
-  state.activeAlbumId = albumId;
+  // Only update activeAlbumId if it's an own album (not friend)
+  if(getAlbumById(albumId)) state.activeAlbumId = albumId;
   saveState(); renderAll();
 }
 function closeAlbumDetail(){
@@ -1017,14 +1236,18 @@ function closeAlbumDetail(){
 }
 
 function renderAlbumDetail(albumId){
-  const album = getAlbumById(albumId);
+  // Support both own albums and friend album
+  const album = getAlbumById(albumId) || (state.friendAlbum?.id === albumId ? state.friendAlbum : null);
   if(!album){ closeAlbumDetail(); return; }
+  const isFriend = state.friendAlbum && albumId === state.friendAlbum.id;
   document.getElementById('overview-cards-view').style.display = 'none';
   document.getElementById('overview-detail-view').style.display = '';
-  document.getElementById('detail-album-name').textContent = '🏆 ' + album.name;
-  // Hide back button when only 1 album (no cards view to go back to)
+  document.getElementById('detail-album-name').innerHTML = isFriend
+    ? `<span style="color:var(--friend-d)">👥 ${album.name}</span> <span class="friend-badge" style="font-size:.7rem">Amigo: ${album.friendName||'?'}</span>`
+    : '🏆 ' + album.name;
+  // Hide back button only when single own album AND no friend album
   const detailBackBtn = document.querySelector('#overview-detail-view .back-btn');
-  if(detailBackBtn) detailBackBtn.style.display = state.albums.length === 1 ? 'none' : '';
+  if(detailBackBtn) detailBackBtn.style.display = (state.albums.length === 1 && !state.friendAlbum) ? 'none' : '';
 
   const owned = album.owned.size;
   const missing = TOTAL - owned;
@@ -1084,10 +1307,18 @@ function renderMissing(){
   if(state.missingShowAll && state.albums.length > 1){
     renderMissingAll(); return;
   }
-  const album = getActiveAlbum();
+  const album = getFaltamAlbum();
+  const isFriend = isFriendAlbumActive();
   if(!album){ document.getElementById('missing-content').innerHTML=''; return; }
+
+  // Friend album info banner
+  const friendBanner = document.getElementById('missing-friend-banner');
+  if(friendBanner) friendBanner.style.display = isFriend ? 'block' : 'none';
+  if(isFriend && friendBanner)
+    friendBanner.innerHTML = `👥 Você está vendo as figurinhas que faltam para <strong>${album.friendName||album.name}</strong>. Toque para marcar as que você conseguiu para ele.`;
+
   if(album.owned.size === TOTAL){
-    document.getElementById('missing-content').innerHTML=`<div class="empty-state"><div class="emoji">🏆</div><p><strong>Parabéns!</strong> Álbum completo!</p></div>`;
+    document.getElementById('missing-content').innerHTML=`<div class="empty-state"><div class="emoji">🏆</div><p><strong>${isFriend?`${album.friendName||'Amigo'} completou`:'Parabéns! Álbum completo'}!</strong></p></div>`;
     return;
   }
   let html = '';
@@ -1158,30 +1389,32 @@ function renderSortBars(){
 
 /* ── ALBUM SELECTORS ────────────────────────────────────── */
 function renderAlbumSelectors(){
-  // Lista selector
+  // Lista selector — own albums only
   const listSel = document.getElementById('list-album-selector');
   if(listSel){
     listSel.innerHTML = state.albums.map(a =>
       `<button class="btn-album${a.id===state.activeAlbumId?' active':''}" onclick="setActiveAlbum('${a.id}')">${a.name}</button>`
     ).join('');
   }
-  // Faltam selector
+  // Faltam selector — own albums + "Todos" + friend album
   const missSel = document.getElementById('missing-album-selector');
   if(missSel){
+    const curFaltam = state.faltamAlbumId;
+    const friendActive = isFriendAlbumActive();
     let html = state.albums.map(a =>
-      `<button class="btn-album${a.id===state.activeAlbumId&&!state.missingShowAll?' active':''}" onclick="setMissingAlbum('${a.id}')">${a.name}</button>`
+      `<button class="btn-album${a.id===curFaltam&&!state.missingShowAll&&!friendActive?' active':''}" onclick="setFaltamAlbum('${a.id}')">${a.name}</button>`
     ).join('');
     if(state.albums.length > 1){
-      html += `<button class="btn-album all-mode${state.missingShowAll?' active':''}" onclick="setMissingAll()">Todos os Álbuns</button>`;
+      html += `<button class="btn-album all-mode${state.missingShowAll?' active':''}" onclick="setMissingAll()">Todos</button>`;
+    }
+    if(state.friendAlbum){
+      html += `<button class="btn-album friend-mode${friendActive?' active':''}" onclick="setFaltamFriend()">👥 ${state.friendAlbum.friendName||state.friendAlbum.name}</button>`;
     }
     missSel.innerHTML = html;
   }
 }
-function setMissingAlbum(id){
-  state.activeAlbumId = id; state.missingShowAll = false; saveState(); renderAll();
-}
 function setMissingAll(){
-  state.missingShowAll = true; saveState(); renderAll();
+  state.missingShowAll = true; state.faltamAlbumId = state.activeAlbumId; saveState(); renderAll();
 }
 
 /* ── RENDER: PERFIL ─────────────────────────────────────── */
@@ -1197,7 +1430,13 @@ function renderPerfil(){
 function renderPerfilAlbuns(){
   const container = document.getElementById('perfil-albums-list');
   if(!container) return;
-  let html = '';
+  // SVG icons reused
+  const icoRename = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
+  const icoDelete = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>`;
+  const icoExport= `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>`;
+  const icoImport= `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
+
+  let html = '<div class="perfil-group-label" style="margin-top:0">Meus Álbuns</div>';
   for(const album of state.albums){
     const pct = pctForAlbum(album);
     const isActive = album.id === state.activeAlbumId;
@@ -1208,14 +1447,86 @@ function renderPerfilAlbuns(){
       </div>
       <div class="album-item-actions">
         ${isActive ? '<span class="active-badge">✓ Ativo</span>' : `<button class="btn-icon" onclick="setActiveAlbum('${album.id}')" title="Tornar ativo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>`}
-        <button class="btn-icon" onclick="promptRenameAlbum('${album.id}')" title="Renomear"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-        ${state.albums.length>1?`<button class="btn-icon danger" onclick="confirmDeleteAlbum('${album.id}')" title="Excluir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>`:''}
+        <button class="btn-icon" onclick="openExportAlbumModal('${album.id}')" title="Exportar álbum">${icoExport}</button>
+        <button class="btn-icon" onclick="openImportAlbumModal('${album.id}')" title="Importar código para este álbum">${icoImport}</button>
+        <button class="btn-icon" onclick="promptRenameAlbum('${album.id}')" title="Renomear">${icoRename}</button>
+        ${state.albums.length>1?`<button class="btn-icon danger" onclick="confirmDeleteAlbum('${album.id}')" title="Excluir">${icoDelete}</button>`:''}
       </div>
     </div>`;
   }
   container.innerHTML = html;
   const btn = document.getElementById('btn-create-album');
   if(btn) btn.disabled = state.albums.length >= 3;
+
+  // Friend album section
+  const friendContainer = document.getElementById('perfil-friend-section');
+  if(!friendContainer) return;
+  let fhtml = '<div class="perfil-group-label">Álbum de Amigo</div>';
+  if(!state.friendAlbum){
+    fhtml += `<div class="perfil-friend-empty">Nenhum álbum de amigo importado.<br>Peça para o amigo gerar o código do álbum dele.</div>
+      <button class="btn btn-friend" onclick="openImportFriendModal()">👥 Importar Álbum do Amigo</button>`;
+  } else {
+    const fa = state.friendAlbum;
+    const fpct = TOTAL ? Math.round(fa.owned.size/TOTAL*100) : 0;
+    fhtml += `<div class="album-item friend-item">
+      <div class="album-item-info">
+        <div class="album-item-name">👥 ${fa.name}</div>
+        <div class="album-item-pct" style="color:#4A6FA8">Amigo: ${fa.friendName||'?'} · ${fa.owned.size}/${TOTAL} · ${fpct}%</div>
+      </div>
+      <div class="album-item-actions">
+        <button class="btn-icon" style="color:var(--friend);border-color:var(--friend-border)" onclick="openExportFriendModal()" title="Gerar código para devolver ao amigo">${icoExport}</button>
+        <button class="btn-icon" onclick="openImportFriendModal()" title="Atualizar álbum do amigo">${icoImport}</button>
+        <button class="btn-icon danger" onclick="confirmDeleteFriend()" title="Remover álbum do amigo">${icoDelete}</button>
+      </div>
+    </div>`;
+  }
+  friendContainer.innerHTML = fhtml;
+}
+
+/* ── PER-ALBUM MODAL HELPERS ────────────────────────────── */
+function openExportAlbumModal(albumId){
+  pendingImportAlbumId = albumId;
+  const album = getAlbumById(albumId);
+  document.getElementById('modal-export-album-title').textContent = `Exportar "${album?.name||''}"`;
+  const box = document.getElementById('modal-export-album-box');
+  if(box) box.value = encodeSingleAlbum(album);
+  openModal('modal-export-album');
+}
+function openImportAlbumModal(albumId){
+  pendingImportAlbumId = albumId;
+  const album = getAlbumById(albumId);
+  document.getElementById('modal-import-album-title').textContent = `Importar para "${album?.name||''}"`;
+  document.getElementById('modal-import-album-box').value = '';
+  openModal('modal-import-album');
+}
+function confirmImportAlbum(){
+  const encoded = document.getElementById('modal-import-album-box').value.trim();
+  if(!encoded){ alert('Cole o código no campo acima.'); return; }
+  importIntoAlbum(pendingImportAlbumId, encoded);
+  closeModal('modal-import-album');
+}
+function openImportFriendModal(){
+  document.getElementById('modal-import-friend-box').value = '';
+  openModal('modal-import-friend');
+}
+function confirmImportFriend(){
+  const encoded = document.getElementById('modal-import-friend-box').value.trim();
+  if(!encoded){ alert('Cole o código do amigo no campo acima.'); return; }
+  importAsFriendAlbum(encoded);
+  closeModal('modal-import-friend');
+}
+function openExportFriendModal(){
+  if(!state.friendAlbum) return;
+  document.getElementById('modal-export-friend-title').textContent = `Código para devolver a ${state.friendAlbum.friendName||'amigo'}`;
+  const box = document.getElementById('modal-export-friend-box');
+  if(box) box.value = encodeSingleAlbum(state.friendAlbum);
+  openModal('modal-export-friend');
+}
+function confirmDeleteFriend(){
+  if(!state.friendAlbum) return;
+  if(confirm(`Remover o álbum de ${state.friendAlbum.friendName||state.friendAlbum.name}? Esta ação não pode ser desfeita.`)){
+    deleteFriendAlbum(); renderPerfilAlbuns();
+  }
 }
 
 function openPerfilSection(sectionId){
@@ -1241,13 +1552,23 @@ function editUserName(){
 // Called before every render to fix any state inconsistencies
 // (e.g. after album deletion, activeAlbumId or missingShowAll can be stale)
 function normalizeState(){
-  // Ensure activeAlbumId always points to a real album
+  // Ensure activeAlbumId always points to a real own album
   if(!getAlbumById(state.activeAlbumId) && state.albums.length > 0){
     state.activeAlbumId = state.albums[0].id;
   }
   // "Todos os Álbuns" mode makes no sense with a single album — reset it
   if(state.albums.length <= 1 && state.missingShowAll){
     state.missingShowAll = false;
+  }
+  // Ensure faltamAlbumId is valid (own album or friend album)
+  const faltamValid = getAlbumById(state.faltamAlbumId) ||
+                      (state.friendAlbum && state.faltamAlbumId === state.friendAlbum.id);
+  if(!faltamValid){
+    state.faltamAlbumId = state.activeAlbumId;
+  }
+  // If friend album was removed but faltamAlbumId still points to it, reset
+  if(!state.friendAlbum && state.faltamAlbumId && !getAlbumById(state.faltamAlbumId)){
+    state.faltamAlbumId = state.activeAlbumId;
   }
 }
 
