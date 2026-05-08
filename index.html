@@ -1645,11 +1645,19 @@ loadState();
 setupDelegation();
 renderAll();
 
-// PWA: registra service worker
+// PWA: registra service worker e escuta atualizações
 if('serviceWorker' in navigator){
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./service-worker.js')
       .catch(err => console.warn('SW registration failed:', err));
+
+    // Quando o SW envia mensagem NEW_VERSION (nova versão ativada),
+    // recarrega a página automaticamente para o usuário ver a versão nova.
+    navigator.serviceWorker.addEventListener('message', e => {
+      if(e.data && e.data.type === 'NEW_VERSION'){
+        window.location.reload();
+      }
+    });
   });
 }
 </script>

@@ -1,30 +1,30 @@
 /* ─────────────────────────────────────────────────
-   Elevah · Álbum Copa 2026  —  Service Worker v1
-   Cache-first para assets estáticos, network-first
-   para requests externos (Chart.js CDN).
+   Elevah · Álbum Copa 2026  —  Service Worker
+
+   ⚠️  COMO ATUALIZAR O APP:
+   Toda vez que o index.html for atualizado, incremente
+   o número abaixo (v1 → v2 → v3...). O browser detecta
+   a mudança neste arquivo e baixa os assets novos
+   automaticamente. O app recarrega sozinho para o usuário.
 ───────────────────────────────────────────────── */
-const CACHE = 'elevah-copa-v1';
+const CACHE = 'elevah-copa-v1'; // ← incrementar a cada deploy
 
 const STATIC_ASSETS = [
-  './index.html',
   './logo.png',
   './manifest.json',
-];
-
-const CDN_ASSETS = [
   'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js',
 ];
 
-// ── Install: pré-carrega assets locais ──────────
+// ── Install: pré-carrega assets estáticos (não o index.html — ele usa network-first) ──
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE)
       .then(cache => cache.addAll(STATIC_ASSETS))
-      .then(() => self.skipWaiting())
+      .then(() => self.skipWaiting()) // Ativa imediatamente, sem esperar fechar abas
   );
 });
 
-// ── Activate: limpa caches antigos ──────────────
+// ── Activate: limpa caches antigos e avisa clientes para recarregar ──
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
@@ -32,23 +32,22 @@ self.addEventListener('activate', e => {
         keys.filter(k => k !== CACHE).map(k => caches.delete(k))
       ))
       .then(() => self.clients.claim())
+      .then(() => {
+        // Avisa todas as janelas abertas que há uma versão nova
+        return self.clients.matchAll({ type: 'window' }).then(clients => {
+          clients.forEach(client => client.postMessage({ type: 'NEW_VERSION' }));
+        });
+      })
   );
 });
 
-// ── Fetch: cache-first para locais, network-first para CDN ──
+// ── Fetch ──────────────────────────────────────────────────────────────────
 self.addEventListener('fetch', e => {
   const url = e.request.url;
 
-  // Assets locais: cache-first
-  if(STATIC_ASSETS.some(a => url.endsWith(a.replace('./', '')))){
-    e.respondWith(
-      caches.match(e.request).then(cached => cached || fetch(e.request))
-    );
-    return;
-  }
-
-  // CDN: tenta rede, usa cache como fallback
-  if(CDN_ASSETS.some(a => url.includes(a))){
+  // index.html → network-first: sempre tenta buscar versão mais recente.
+  // Se estiver offline, usa o cache como fallback.
+  if(url.includes('index.html') || url.endsWith('/') || url.split('?')[0].endsWith('/')){
     e.respondWith(
       fetch(e.request)
         .then(res => {
@@ -61,6 +60,14 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // Demais requests: só rede
+  // Logo, manifest, Chart.js → cache-first (mudam raramente)
+  if(STATIC_ASSETS.some(a => url.includes(a.replace('./', '')))){
+    e.respondWith(
+      caches.match(e.request).then(cached => cached || fetch(e.request))
+    );
+    return;
+  }
+
+  // Qualquer outra requisição → só rede
   e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
 });
