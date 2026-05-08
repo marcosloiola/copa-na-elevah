@@ -107,11 +107,13 @@
       border-top: 1.5px solid var(--border);
       display: flex;
       z-index: 200;
-      padding-bottom: env(safe-area-inset-bottom, 0);
+      /* Padding lateral para não cortar nas bordas arredondadas do iPhone */
+      padding: 0 10px env(safe-area-inset-bottom, 0);
       box-shadow: 0 -2px 12px var(--shadow);
     }
     .nav-btn {
       flex: 1;
+      position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -121,11 +123,25 @@
       border: none;
       cursor: pointer;
       color: var(--text-light);
-      transition: color .2s;
-      padding: 6px 2px;
+      transition: color .2s, background .2s;
+      padding: 6px 4px;
       min-width: 0;
+      border-radius: var(--radius-sm);
     }
-    .nav-btn.active { color: var(--primary); }
+    .nav-btn.active {
+      color: var(--primary-d);
+      background: rgba(212,137,123,.13);
+    }
+    .nav-btn.active::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 22%;
+      right: 22%;
+      height: 3px;
+      background: var(--primary);
+      border-radius: 0 0 4px 4px;
+    }
     .nav-btn svg { width: 22px; height: 22px; flex-shrink: 0; }
     .nav-btn span {
       font-size: .6rem;
@@ -135,6 +151,7 @@
       line-height: 1;
       white-space: nowrap;
     }
+    .nav-btn.active span { font-weight: 800; }
 
     /* ─── Section headers ──────────────────────────────── */
     .section-header {
@@ -425,13 +442,23 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* ─── Progresso quase completo ─────────────────────── */
+    /* ─── Progresso quase completo / completo ─────────── */
     .progress-fill.near { background: var(--gold); }
     .near-badge {
       display: inline-flex;
       align-items: center;
       background: #FFF3D0;
       color: var(--gold-d);
+      border-radius: 99px;
+      padding: 1px 7px;
+      font-size: .62rem;
+      font-weight: 700;
+    }
+    .complete-badge {
+      display: inline-flex;
+      align-items: center;
+      background: #E0F5EC;
+      color: var(--mint-d);
       border-radius: 99px;
       padding: 1px 7px;
       font-size: .62rem;
@@ -627,7 +654,8 @@
         padding: 8px 14px;
       }
       .nav-btn span { font-size: .75rem; }
-      .nav-btn.active { background: #f5ede6; }
+      .nav-btn.active { background: rgba(212,137,123,.13); }
+      .nav-btn.active::after { display: none; }
       .stat-row { grid-template-columns: repeat(3,1fr); max-width: 400px; }
       .tab-panel { padding: 20px 24px; max-width: 860px; margin: 0 auto; }
       .app-header { order: -2; }
@@ -862,14 +890,15 @@
 
   <!-- ABA 6: COMO FUNCIONA -->
   <div id="tab-howto" class="tab-panel">
+
     <div class="howto-section">
       <h3>🎴 O que é este app?</h3>
-      <p>Gestor do álbum de figurinhas da Copa do Mundo 2026, criado pela <strong>Elevah</strong>. Controle quais figurinhas você tem, quais faltam e quais estão repetidas — tudo no seu celular ou computador.</p>
+      <p>Gestor do álbum de figurinhas da Copa do Mundo 2026, criado pela <strong>Elevah</strong>. Controle quais figurinhas você tem, quais faltam e quais estão repetidas — tudo no celular ou computador, sem instalar nada.</p>
     </div>
 
     <div class="howto-section">
       <h3>👆 Como marcar figurinhas</h3>
-      <p>As figurinhas aparecem como botões numerados nas abas Lista, Faltantes e Repetidas:</p>
+      <p>As figurinhas aparecem como botões numerados nas abas Lista, Faltam e Repetidas:</p>
       <div class="howto-chip-demo">
         <div class="demo-chip d-empty">7</div>
         <span class="demo-label">Não tenho</span>
@@ -879,39 +908,70 @@
         <span class="demo-label">Repetida</span>
       </div>
       <ul>
-        <li><strong>1 toque</strong> → marca que você tem a figurinha (ou que ela está repetida, na aba Repetidas)</li>
-        <li><strong>2 toques rápidos</strong> → desfaz a marcação</li>
+        <li><strong>1 toque</strong> → marca que você tem (ou adiciona +1 repetida na aba Repetidas)</li>
+        <li><strong>2 toques rápidos</strong> → desfaz a marcação (ou remove -1 repetida)</li>
+        <li>Na aba Repetidas você pode ter mais de uma cópia da mesma figurinha — o número aparece como badge no canto do chip</li>
         <li>Todas as abas atualizam automaticamente após cada marcação</li>
       </ul>
     </div>
 
     <div class="howto-section">
+      <h3>✨ Figurinhas especiais</h3>
+      <div class="howto-chip-demo">
+        <div class="demo-chip" style="position:relative;border:1.5px solid var(--gold-d);background:linear-gradient(145deg,#FFFCEE,#FFF0C0);color:var(--gold-d)">1<span style="position:absolute;bottom:1px;right:2px;font-size:6px;color:var(--gold)">★</span></div>
+        <span class="demo-label">Brilhante (FWC + nº 1 dos países)</span>
+      </div>
+      <div class="howto-chip-demo">
+        <div class="demo-chip" style="border:1.5px dashed var(--primary);background:#FFF7F4;color:var(--primary-d)">13</div>
+        <span class="demo-label">Foto do time (nº 13 dos países)</span>
+      </div>
+      <ul>
+        <li>Todas as figurinhas <strong>FWC</strong> e os <strong>números 1</strong> de cada país são impressas em papel brilhante — identificadas pelo fundo dourado e a estrela ★</li>
+        <li>O <strong>número 13</strong> de cada país é a foto do time em formação (11 jogadores) — identificado pela borda tracejada</li>
+      </ul>
+    </div>
+
+    <div class="howto-section">
       <h3>📊 Visão Geral</h3>
-      <p>A primeira aba mostra gráfico de progresso geral e por grupo/seleção. Atualiza em tempo real.</p>
+      <p>A primeira aba mostra o progresso geral e por seleção. As barras mudam de cor conforme você avança:</p>
+      <ul>
+        <li>Barra terracota → em andamento</li>
+        <li>Barra dourada + badge <strong>🔥 Quase!</strong> → 80% ou mais completo</li>
+        <li>Barra verde + badge <strong>✓ Completo</strong> → todos os 20 números marcados</li>
+      </ul>
+      <p>Ao marcar a última figurinha de um país, o app dispara uma animação de confetti e um aviso de parabéns! 🎉</p>
     </div>
 
     <div class="howto-section">
       <h3>🔄 Sincronizar entre dispositivos</h3>
-      <p>Na aba <strong>Configurações → Sincronizar</strong>:</p>
-      <ul>
-        <li><strong>Gerar Código</strong>: clique e um código de texto será gerado com todo o seu progresso</li>
-        <li>Clique em <strong>Copiar</strong> e mande pelo WhatsApp para o outro dispositivo</li>
-        <li>No outro dispositivo, cole o código em <em>Importar via Código</em> e clique em Aplicar</li>
-      </ul>
+      <p>Na aba <strong>Configurações → Sincronizar</strong>, o código de sincronização é gerado automaticamente a cada marcação — é só copiar e mandar pelo WhatsApp para o outro dispositivo. No outro aparelho, cole o código em <em>Importar via Código</em> e toque em Aplicar.</p>
     </div>
 
     <div class="howto-section">
       <h3>🤝 Troca de Figurinhas</h3>
       <ul>
-        <li><strong>Gerar Código das Minhas Faltantes</strong>: gera um código com as figurinhas que você ainda precisa. Envie para um amigo.</li>
-        <li>O amigo cola esse código em <em>Verificar Código de um Amigo</em> → o app mostra quais das <em>repetidas</em> dele você precisa — facilitando a troca!</li>
+        <li><strong>Gerar Código das Minhas Faltantes</strong>: cria um código com as figurinhas que você precisa. Envie para um amigo.</li>
+        <li>O amigo cola esse código em <em>Verificar Código de um Amigo</em> → o app mostra quais das repetidas dele você precisa, facilitando a negociação!</li>
       </ul>
     </div>
 
     <div class="howto-section">
-      <h3>💾 Onde ficam os dados?</h3>
-      <p>Tudo é salvo no <em>localStorage</em> do seu navegador — fica no dispositivo. Para transferir para outro aparelho, use o Código de Sincronização.</p>
+      <h3>📋 Exportar Listas</h3>
+      <p>Na aba Configurações, os botões <strong>Gerar Lista de Faltantes</strong> e <strong>Gerar Lista de Repetidas</strong> criam um texto formatado por seleção (ex: <em>BRA: 3, 7, 12</em>). Use o botão <strong>WhatsApp</strong> para abrir o app diretamente com a mensagem pronta para enviar.</p>
     </div>
+
+    <div class="howto-section">
+      <h3>📱 Instalar como app no celular</h3>
+      <p><strong>iPhone (Safari):</strong> toque no ícone de compartilhar ↑ na barra inferior → role a lista → toque em <em>Adicionar à Tela de Início</em> → confirme. O app abrirá em tela cheia sem a barra do Safari.</p>
+      <p><strong>Android (Chrome):</strong> o Chrome exibirá automaticamente um banner perguntando se deseja instalar. Ou acesse o menu ⋮ → <em>Adicionar à tela inicial</em>.</p>
+      <p>Após instalado, o app funciona 100% offline.</p>
+    </div>
+
+    <div class="howto-section">
+      <h3>💾 Onde ficam os dados?</h3>
+      <p>Tudo é salvo no <em>localStorage</em> do seu navegador — fica no dispositivo e não depende de internet. Para transferir para outro aparelho, use o Código de Sincronização na aba Configurações.</p>
+    </div>
+
   </div>
 
 </main>
@@ -1203,12 +1263,14 @@ function renderOverview(){
     const sublabel = g.grupo
       ? ` <span style="font-size:.65rem;color:var(--text-light);font-weight:400">${g.sigla} · Grupo ${g.grupo}</span>`
       : ` <span style="font-size:.65rem;color:var(--text-light);font-weight:400">${g.sigla}</span>`;
-    const nearBadge = isNear ? `<span class="near-badge">🔥 Quase!</span> ` : '';
+    const badge = isFull
+      ? `<span class="complete-badge">✓ Completo</span> `
+      : isNear ? `<span class="near-badge">🔥 Quase!</span> ` : '';
     const fillClass = isFull ? ' full' : isNear ? ' near' : '';
     html+=`<div class="progress-item">
       <div class="progress-item-header">
         <strong>${g.titulo}</strong>${sublabel}
-        <span style="display:flex;align-items:center;gap:5px">${nearBadge}<span>${gOwned}/${gTotal} · ${gPct}%</span></span>
+        <span style="display:flex;align-items:center;gap:5px">${badge}<span>${gOwned}/${gTotal} · ${gPct}%</span></span>
       </div>
       <div class="progress-bar">
         <div class="progress-fill${fillClass}" style="width:${gPct}%"></div>
