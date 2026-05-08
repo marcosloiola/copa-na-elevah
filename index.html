@@ -772,15 +772,20 @@ function loadState(){
     // Albums (new format)
     const albumsRaw = localStorage.getItem('elevah_albums');
     if(albumsRaw){
-      state.albums = JSON.parse(albumsRaw).map(a => ({id:a.id, name:a.name, owned:new Set(a.owned||[])}));
+      try {
+        const parsed = JSON.parse(albumsRaw);
+        if(Array.isArray(parsed) && parsed.length > 0){
+          state.albums = parsed.map(a => ({id:a.id, name:a.name, owned:new Set(a.owned||[])}));
+        }
+      } catch(e){ console.warn('elevah_albums parse error', e); }
     }
-    // Migration from old single-album format
+    // Migration from old single-album format (or recovery if elevah_albums was empty/corrupt)
     if(state.albums.length === 0){
       const oldOwned = localStorage.getItem('elevah_owned');
       const album = {id: generateId(), name: 'Meu Álbum', owned: new Set()};
       if(oldOwned){ try{ album.owned = new Set(JSON.parse(oldOwned)); }catch(e){} }
       state.albums = [album];
-      localStorage.removeItem('elevah_owned');
+      if(oldOwned) localStorage.removeItem('elevah_owned');
     }
     // Repeated
     const r = localStorage.getItem('elevah_repeated');
@@ -795,6 +800,10 @@ function loadState(){
     state.missingShowAll = localStorage.getItem('elevah_miss_all') === '1';
     sortOrder = localStorage.getItem('elevah_sort') || 'alpha';
     userName  = localStorage.getItem('elevah_username') || '';
+    // Always re-persist after loading to ensure data is in the latest format.
+    // Critical for migration: if the old elevah_owned was just deleted, we must
+    // immediately write elevah_albums before any page reload wipes the data.
+    saveState();
   } catch(e){ console.warn('loadState error', e); }
 }
 

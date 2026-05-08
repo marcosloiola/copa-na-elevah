@@ -7,7 +7,7 @@
    a mudança neste arquivo e baixa os assets novos
    automaticamente. O app recarrega sozinho para o usuário.
 ───────────────────────────────────────────────── */
-const CACHE = 'elevah-copa-v4'; // ← incrementar a cada deploy
+const CACHE = 'elevah-copa-v5'; // ← incrementar a cada deploy
 
 const STATIC_ASSETS = [
   './logo.png',
