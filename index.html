@@ -219,6 +219,37 @@
     }
     .chip.wide { width: auto; padding: 0 14px; }
 
+    /* ─── Figurinhas brilhantes (FWC + nº 1 dos países) ── */
+    .chip.shiny:not(.owned):not(.repeated) {
+      border-color: var(--gold-d);
+      background: linear-gradient(145deg, #FFFCEE 0%, #FFF0C0 100%);
+      color: var(--gold-d);
+    }
+    .chip.shiny.owned  { border-color: var(--gold-d); }
+    .chip.shiny::after {
+      content: '★';
+      position: absolute;
+      bottom: 1px;
+      right: 2px;
+      font-size: 6px;
+      color: var(--gold);
+      line-height: 1;
+      pointer-events: none;
+      opacity: .85;
+    }
+    .chip.shiny.owned::after    { color: var(--gold-d); opacity: .4; }
+    .chip.shiny.repeated::after { opacity: .2; }
+
+    /* ─── Foto do time (nº 13 dos países) ───────────────── */
+    .chip.team-photo:not(.owned):not(.repeated) {
+      border-color: var(--primary);
+      border-style: dashed;
+      background: #FFF7F4;
+      color: var(--primary-d);
+    }
+    .chip.team-photo.owned    { border-style: dashed; border-color: var(--mint-d); }
+    .chip.team-photo.repeated { border-style: dashed; }
+
     /* ─── Cards ────────────────────────────────────────── */
     .card {
       background: var(--bg-card);
@@ -635,25 +666,55 @@
 
   <!-- ABA 2: LISTA GERAL -->
   <div id="tab-list" class="tab-panel">
-    <p class="hint" style="margin-bottom:14px">
+    <p class="hint" style="margin-bottom:6px">
       <strong>1 toque</strong> = tenho &nbsp;·&nbsp; <strong>2 toques rápidos</strong> = não tenho (desfaz)
+    </p>
+    <p class="hint" style="margin-bottom:14px">
+      <span style="display:inline-flex;align-items:center;gap:3px;margin-right:10px">
+        <span style="position:relative;display:inline-flex;width:20px;height:20px;border:1.5px solid var(--gold-d);background:linear-gradient(145deg,#FFFCEE,#FFF0C0);border-radius:4px;align-items:center;justify-content:center;font-size:.6rem;color:var(--gold-d);font-weight:700">1<span style="position:absolute;bottom:0;right:1px;font-size:5px;color:var(--gold);line-height:1">★</span></span>
+        brilhante (FWC + nº 1)
+      </span>
+      <span style="display:inline-flex;align-items:center;gap:3px">
+        <span style="display:inline-flex;width:20px;height:20px;border:1.5px dashed var(--primary);background:#FFF7F4;border-radius:4px;align-items:center;justify-content:center;font-size:.6rem;color:var(--primary-d);font-weight:700">13</span>
+        foto do time
+      </span>
     </p>
     <div id="list-content"></div>
   </div>
 
   <!-- ABA 3: FALTANTES -->
   <div id="tab-missing" class="tab-panel">
-    <p class="hint" style="margin-bottom:14px">
+    <p class="hint" style="margin-bottom:6px">
       Figurinhas que ainda faltam. <strong>1 toque</strong> = marquei que já tenho.
+    </p>
+    <p class="hint" style="margin-bottom:14px">
+      <span style="display:inline-flex;align-items:center;gap:3px;margin-right:10px">
+        <span style="position:relative;display:inline-flex;width:20px;height:20px;border:1.5px solid var(--gold-d);background:linear-gradient(145deg,#FFFCEE,#FFF0C0);border-radius:4px;align-items:center;justify-content:center;font-size:.6rem;color:var(--gold-d);font-weight:700">1<span style="position:absolute;bottom:0;right:1px;font-size:5px;color:var(--gold);line-height:1">★</span></span>
+        brilhante (FWC + nº 1)
+      </span>
+      <span style="display:inline-flex;align-items:center;gap:3px">
+        <span style="display:inline-flex;width:20px;height:20px;border:1.5px dashed var(--primary);background:#FFF7F4;border-radius:4px;align-items:center;justify-content:center;font-size:.6rem;color:var(--primary-d);font-weight:700">13</span>
+        foto do time
+      </span>
     </p>
     <div id="missing-content"></div>
   </div>
 
   <!-- ABA 4: REPETIDAS -->
   <div id="tab-repeated" class="tab-panel">
-    <p class="hint" style="margin-bottom:14px">
+    <p class="hint" style="margin-bottom:6px">
       Marque figurinhas que você tem repetidas para facilitar trocas.<br>
       <strong>1 toque</strong> = adiciona uma repetida &nbsp;·&nbsp; <strong>2 toques rápidos</strong> = remove uma repetida
+    </p>
+    <p class="hint" style="margin-bottom:14px">
+      <span style="display:inline-flex;align-items:center;gap:3px;margin-right:10px">
+        <span style="position:relative;display:inline-flex;width:20px;height:20px;border:1.5px solid var(--gold-d);background:linear-gradient(145deg,#FFFCEE,#FFF0C0);border-radius:4px;align-items:center;justify-content:center;font-size:.6rem;color:var(--gold-d);font-weight:700">1<span style="position:absolute;bottom:0;right:1px;font-size:5px;color:var(--gold);line-height:1">★</span></span>
+        brilhante (FWC + nº 1)
+      </span>
+      <span style="display:inline-flex;align-items:center;gap:3px">
+        <span style="display:inline-flex;width:20px;height:20px;border:1.5px dashed var(--primary);background:#FFF7F4;border-radius:4px;align-items:center;justify-content:center;font-size:.6rem;color:var(--primary-d);font-weight:700">13</span>
+        foto do time
+      </span>
     </p>
     <div id="repeated-content"></div>
   </div>
@@ -1015,6 +1076,14 @@ function buildGroupHTML(group, tabType){
     } else {
       if(isOwned) cls+=' owned';
     }
+
+    // Figurinhas especiais: brilhantes (FWC completo + nº1 dos países)
+    const isShiny = (group.sigla === 'FWC') ||
+                    (group.grupo !== null && num === '1');
+    // Foto do time: nº13 dos países
+    const isTeamPhoto = group.grupo !== null && num === '13';
+    if(isShiny)    cls += ' shiny';
+    if(isTeamPhoto) cls += ' team-photo';
 
     html += `<div class="${cls}" data-cid="${id}${sfx}" data-id="${id}" data-tab="${tabType}">${innerLabel}</div>`;
   }
