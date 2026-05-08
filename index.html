@@ -465,6 +465,31 @@
       font-weight: 700;
     }
 
+    /* ─── Sort bar ─────────────────────────────────────── */
+    .sort-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .btn-sort {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      font-size: .75rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1.5px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-mid);
+      transition: background .15s, color .15s, border-color .15s, transform .1s;
+    }
+    .btn-sort.active {
+      background: var(--primary);
+      border-color: var(--primary-d);
+      color: #fff;
+    }
+    .btn-sort:active { transform: scale(.97); }
+
     textarea.code-box {
       width: 100%;
       height: 80px;
@@ -733,6 +758,7 @@
     </div>
     <div class="card">
       <div class="card-title">Por Seção</div>
+      <div id="sort-bar-overview" class="sort-bar"></div>
       <div id="progress-list"></div>
     </div>
   </div>
@@ -752,6 +778,7 @@
         foto do time
       </span>
     </p>
+    <div id="sort-bar-list" class="sort-bar"></div>
     <div id="list-content"></div>
   </div>
 
@@ -770,6 +797,7 @@
         foto do time
       </span>
     </p>
+    <div id="sort-bar-missing" class="sort-bar"></div>
     <div id="missing-content"></div>
   </div>
 
@@ -789,6 +817,7 @@
         foto do time
       </span>
     </p>
+    <div id="sort-bar-repeated" class="sort-bar"></div>
     <div id="repeated-content"></div>
   </div>
 
@@ -936,7 +965,7 @@
       <p>A primeira aba mostra o progresso geral e por seleção. As barras mudam de cor conforme você avança:</p>
       <ul>
         <li>Barra terracota → em andamento</li>
-        <li>Barra dourada + badge <strong>🔥 Quase!</strong> → 80% ou mais completo</li>
+        <li>Barra dourada + badge <strong>🔥 Quase!</strong> → 90% ou mais completo</li>
         <li>Barra verde + badge <strong>✓ Completo</strong> → todos os 20 números marcados</li>
       </ul>
       <p>Ao marcar a última figurinha de um país, o app dispara uma animação de confetti e um aviso de parabéns! 🎉</p>
@@ -1007,69 +1036,78 @@
 function range(a,b){ const r=[]; for(let i=a;i<=b;i++) r.push(String(i)); return r; }
 
 const ALBUM_DATA = [
-  { titulo:'Panini',           grupo:null, sigla:'PANINI', nums:['00'] },
-  { titulo:'FWC',              grupo:null, sigla:'FWC',    nums:range(1,19) },
-  { titulo:'México',           grupo:'A',  sigla:'MEX',    nums:range(1,20) },
-  { titulo:'África do Sul',    grupo:'A',  sigla:'RSA',    nums:range(1,20) },
-  { titulo:'Coreia do Sul',    grupo:'A',  sigla:'KOR',    nums:range(1,20) },
-  { titulo:'República Tcheca', grupo:'A',  sigla:'CZE',    nums:range(1,20) },
-  { titulo:'Canadá',           grupo:'B',  sigla:'CAN',    nums:range(1,20) },
-  { titulo:'Bósnia',           grupo:'B',  sigla:'BIH',    nums:range(1,20) },
-  { titulo:'Catar',            grupo:'B',  sigla:'QAT',    nums:range(1,20) },
-  { titulo:'Suíça',            grupo:'B',  sigla:'SUI',    nums:range(1,20) },
-  { titulo:'Brasil',           grupo:'C',  sigla:'BRA',    nums:range(1,20) },
-  { titulo:'Marrocos',         grupo:'C',  sigla:'MAR',    nums:range(1,20) },
-  { titulo:'Haiti',            grupo:'C',  sigla:'HAI',    nums:range(1,20) },
-  { titulo:'Escócia',          grupo:'C',  sigla:'SCO',    nums:range(1,20) },
-  { titulo:'Estados Unidos',   grupo:'D',  sigla:'USA',    nums:range(1,20) },
-  { titulo:'Paraguai',         grupo:'D',  sigla:'PAR',    nums:range(1,20) },
-  { titulo:'Austrália',        grupo:'D',  sigla:'AUS',    nums:range(1,20) },
-  { titulo:'Turquia',          grupo:'D',  sigla:'TUR',    nums:range(1,20) },
-  { titulo:'Alemanha',         grupo:'E',  sigla:'GER',    nums:range(1,20) },
-  { titulo:'Curaçao',          grupo:'E',  sigla:'CUW',    nums:range(1,20) },
-  { titulo:'Costa do Marfim',  grupo:'E',  sigla:'CIV',    nums:range(1,20) },
-  { titulo:'Equador',          grupo:'E',  sigla:'ECU',    nums:range(1,20) },
-  { titulo:'Holanda',          grupo:'F',  sigla:'NED',    nums:range(1,20) },
-  { titulo:'Japão',            grupo:'F',  sigla:'JPN',    nums:range(1,20) },
-  { titulo:'Suécia',           grupo:'F',  sigla:'SWE',    nums:range(1,20) },
-  { titulo:'Tunísia',          grupo:'F',  sigla:'TUN',    nums:range(1,20) },
-  { titulo:'Bélgica',          grupo:'G',  sigla:'BEL',    nums:range(1,20) },
-  { titulo:'Egito',            grupo:'G',  sigla:'EGY',    nums:range(1,20) },
-  { titulo:'Irã',              grupo:'G',  sigla:'IRN',    nums:range(1,20) },
-  { titulo:'Nova Zelândia',    grupo:'G',  sigla:'NZL',    nums:range(1,20) },
-  { titulo:'Espanha',          grupo:'H',  sigla:'ESP',    nums:range(1,20) },
-  { titulo:'Cabo Verde',       grupo:'H',  sigla:'CPV',    nums:range(1,20) },
-  { titulo:'Arábia Saudita',   grupo:'H',  sigla:'KSA',    nums:range(1,20) },
-  { titulo:'Uruguai',          grupo:'H',  sigla:'URU',    nums:range(1,20) },
-  { titulo:'França',           grupo:'I',  sigla:'FRA',    nums:range(1,20) },
-  { titulo:'Senegal',          grupo:'I',  sigla:'SEN',    nums:range(1,20) },
-  { titulo:'Iraque',           grupo:'I',  sigla:'IRQ',    nums:range(1,20) },
-  { titulo:'Noruega',          grupo:'I',  sigla:'NOR',    nums:range(1,20) },
-  { titulo:'Argentina',        grupo:'J',  sigla:'ARG',    nums:range(1,20) },
-  { titulo:'Argélia',          grupo:'J',  sigla:'ALG',    nums:range(1,20) },
-  { titulo:'Áustria',          grupo:'J',  sigla:'AUT',    nums:range(1,20) },
-  { titulo:'Jordânia',         grupo:'J',  sigla:'JOR',    nums:range(1,20) },
-  { titulo:'Portugal',         grupo:'K',  sigla:'POR',    nums:range(1,20) },
-  { titulo:'Congo',            grupo:'K',  sigla:'COD',    nums:range(1,20) },
-  { titulo:'Uzbequistão',      grupo:'K',  sigla:'UZB',    nums:range(1,20) },
-  { titulo:'Colômbia',         grupo:'K',  sigla:'COL',    nums:range(1,20) },
-  { titulo:'Inglaterra',       grupo:'L',  sigla:'ENG',    nums:range(1,20) },
-  { titulo:'Croácia',          grupo:'L',  sigla:'CRO',    nums:range(1,20) },
-  { titulo:'Gana',             grupo:'L',  sigla:'GHA',    nums:range(1,20) },
-  { titulo:'Panamá',           grupo:'L',  sigla:'PAN',    nums:range(1,20) },
-  { titulo:'Extra',            grupo:null, sigla:'CC',     nums:range(1,14) },
+  { titulo:'Panini',           grupo:null, sigla:'PANINI',             nums:['00'] },
+  { titulo:'FWC',              grupo:null, sigla:'FWC',                nums:range(1,19) },
+  { titulo:'México',           grupo:'A',  sigla:'MEX',  order:1,     nums:range(1,20) },
+  { titulo:'África do Sul',    grupo:'A',  sigla:'RSA',  order:2,     nums:range(1,20) },
+  { titulo:'Coreia do Sul',    grupo:'A',  sigla:'KOR',  order:3,     nums:range(1,20) },
+  { titulo:'República Tcheca', grupo:'A',  sigla:'CZE',  order:4,     nums:range(1,20) },
+  { titulo:'Canadá',           grupo:'B',  sigla:'CAN',  order:5,     nums:range(1,20) },
+  { titulo:'Bósnia',           grupo:'B',  sigla:'BIH',  order:6,     nums:range(1,20) },
+  { titulo:'Catar',            grupo:'B',  sigla:'QAT',  order:7,     nums:range(1,20) },
+  { titulo:'Suíça',            grupo:'B',  sigla:'SUI',  order:8,     nums:range(1,20) },
+  { titulo:'Brasil',           grupo:'C',  sigla:'BRA',  order:9,     nums:range(1,20) },
+  { titulo:'Marrocos',         grupo:'C',  sigla:'MAR',  order:10,    nums:range(1,20) },
+  { titulo:'Haiti',            grupo:'C',  sigla:'HAI',  order:11,    nums:range(1,20) },
+  { titulo:'Escócia',          grupo:'C',  sigla:'SCO',  order:12,    nums:range(1,20) },
+  { titulo:'Estados Unidos',   grupo:'D',  sigla:'USA',  order:13,    nums:range(1,20) },
+  { titulo:'Paraguai',         grupo:'D',  sigla:'PAR',  order:14,    nums:range(1,20) },
+  { titulo:'Austrália',        grupo:'D',  sigla:'AUS',  order:15,    nums:range(1,20) },
+  { titulo:'Turquia',          grupo:'D',  sigla:'TUR',  order:16,    nums:range(1,20) },
+  { titulo:'Alemanha',         grupo:'E',  sigla:'GER',  order:17,    nums:range(1,20) },
+  { titulo:'Curaçao',          grupo:'E',  sigla:'CUW',  order:18,    nums:range(1,20) },
+  { titulo:'Costa do Marfim',  grupo:'E',  sigla:'CIV',  order:19,    nums:range(1,20) },
+  { titulo:'Equador',          grupo:'E',  sigla:'ECU',  order:20,    nums:range(1,20) },
+  { titulo:'Holanda',          grupo:'F',  sigla:'NED',  order:21,    nums:range(1,20) },
+  { titulo:'Japão',            grupo:'F',  sigla:'JPN',  order:22,    nums:range(1,20) },
+  { titulo:'Suécia',           grupo:'F',  sigla:'SWE',  order:23,    nums:range(1,20) },
+  { titulo:'Tunísia',          grupo:'F',  sigla:'TUN',  order:24,    nums:range(1,20) },
+  { titulo:'Bélgica',          grupo:'G',  sigla:'BEL',  order:25,    nums:range(1,20) },
+  { titulo:'Egito',            grupo:'G',  sigla:'EGY',  order:26,    nums:range(1,20) },
+  { titulo:'Irã',              grupo:'G',  sigla:'IRN',  order:27,    nums:range(1,20) },
+  { titulo:'Nova Zelândia',    grupo:'G',  sigla:'NZL',  order:28,    nums:range(1,20) },
+  { titulo:'Espanha',          grupo:'H',  sigla:'ESP',  order:29,    nums:range(1,20) },
+  { titulo:'Cabo Verde',       grupo:'H',  sigla:'CPV',  order:30,    nums:range(1,20) },
+  { titulo:'Arábia Saudita',   grupo:'H',  sigla:'KSA',  order:31,    nums:range(1,20) },
+  { titulo:'Uruguai',          grupo:'H',  sigla:'URU',  order:32,    nums:range(1,20) },
+  { titulo:'França',           grupo:'I',  sigla:'FRA',  order:33,    nums:range(1,20) },
+  { titulo:'Senegal',          grupo:'I',  sigla:'SEN',  order:34,    nums:range(1,20) },
+  { titulo:'Iraque',           grupo:'I',  sigla:'IRQ',  order:35,    nums:range(1,20) },
+  { titulo:'Noruega',          grupo:'I',  sigla:'NOR',  order:36,    nums:range(1,20) },
+  { titulo:'Argentina',        grupo:'J',  sigla:'ARG',  order:37,    nums:range(1,20) },
+  { titulo:'Argélia',          grupo:'J',  sigla:'ALG',  order:38,    nums:range(1,20) },
+  { titulo:'Áustria',          grupo:'J',  sigla:'AUT',  order:39,    nums:range(1,20) },
+  { titulo:'Jordânia',         grupo:'J',  sigla:'JOR',  order:40,    nums:range(1,20) },
+  { titulo:'Portugal',         grupo:'K',  sigla:'POR',  order:41,    nums:range(1,20) },
+  { titulo:'Congo',            grupo:'K',  sigla:'COD',  order:42,    nums:range(1,20) },
+  { titulo:'Uzbequistão',      grupo:'K',  sigla:'UZB',  order:43,    nums:range(1,20) },
+  { titulo:'Colômbia',         grupo:'K',  sigla:'COL',  order:44,    nums:range(1,20) },
+  { titulo:'Inglaterra',       grupo:'L',  sigla:'ENG',  order:45,    nums:range(1,20) },
+  { titulo:'Croácia',          grupo:'L',  sigla:'CRO',  order:46,    nums:range(1,20) },
+  { titulo:'Gana',             grupo:'L',  sigla:'GHA',  order:47,    nums:range(1,20) },
+  { titulo:'Panamá',           grupo:'L',  sigla:'PAN',  order:48,    nums:range(1,20) },
+  { titulo:'Coca-Cola',        grupo:null, sigla:'CC',                nums:range(1,14) },
 ];
 
 const TOTAL = ALBUM_DATA.reduce((s,g) => s + g.nums.length, 0);
 
-// Ordem de exibição nas abas: Panini 1º, FWC 2º, países ordenados por sigla, Extra por último
-const PANINI = ALBUM_DATA.find(g => g.sigla === 'PANINI');
-const FWC    = ALBUM_DATA.find(g => g.sigla === 'FWC');
-const EXTRA  = ALBUM_DATA.find(g => g.sigla === 'CC');
-const COUNTRIES = ALBUM_DATA
-  .filter(g => g.grupo !== null)
-  .sort((a,b) => a.sigla.localeCompare(b.sigla));
-const DISPLAY_ORDER = [PANINI, FWC, ...COUNTRIES, EXTRA];
+// Grupos base (fixos)
+const G_PANINI    = ALBUM_DATA.find(g => g.sigla === 'PANINI');
+const G_FWC       = ALBUM_DATA.find(g => g.sigla === 'FWC');
+const G_EXTRA     = ALBUM_DATA.find(g => g.sigla === 'CC');
+const G_COUNTRIES = ALBUM_DATA.filter(g => g.grupo !== null);
+
+// Ordem dinâmica: PANINI e FWC sempre primeiro, Coca-Cola sempre último
+// sortOrder === 'alpha'  → países por sigla (padrão)
+// sortOrder === 'groups' → países pelo índice do álbum (campo order)
+function getDisplayOrder(){
+  const sorted = [...G_COUNTRIES].sort((a,b) =>
+    sortOrder === 'groups'
+      ? a.order - b.order
+      : a.sigla.localeCompare(b.sigla)
+  );
+  return [G_PANINI, G_FWC, ...sorted, G_EXTRA];
+}
 
 function chipId(sigla,num){ return sigla+'-'+num; }
 
@@ -1077,6 +1115,17 @@ function chipId(sigla,num){ return sigla+'-'+num; }
    ESTADO
 ══════════════════════════════════════ */
 const state = { owned: new Set(), repeated: {} };
+let sortOrder = 'alpha'; // 'alpha' | 'groups' — carregado em loadState()
+
+function saveSortOrder(){
+  localStorage.setItem('elevah_sort', sortOrder);
+}
+function setSortOrder(order){
+  if(sortOrder === order) return;
+  sortOrder = order;
+  saveSortOrder();
+  renderAll();
+}
 
 function loadState(){
   try {
@@ -1093,6 +1142,7 @@ function loadState(){
         state.repeated = rParsed || {};
       }
     }
+    sortOrder = localStorage.getItem('elevah_sort') || 'alpha';
   } catch(e){ console.warn('loadState error', e); }
 }
 function saveState(){
@@ -1252,14 +1302,14 @@ function renderOverview(){
     });
   }
 
-  // Progress bars por título (usando DISPLAY_ORDER)
+  // Progress bars por título (usando getDisplayOrder())
   let html='';
-  for(const g of DISPLAY_ORDER){
+  for(const g of getDisplayOrder()){
     const gOwned = g.nums.filter(n=>state.owned.has(chipId(g.sigla,n))).length;
     const gTotal = g.nums.length;
     const gPct   = gTotal ? Math.round(gOwned/gTotal*100) : 0;
     const isFull = gOwned===gTotal && gTotal>0;
-    const isNear = gPct >= 80 && !isFull;
+    const isNear = gPct >= 90 && !isFull;
     const sublabel = g.grupo
       ? ` <span style="font-size:.65rem;color:var(--text-light);font-weight:400">${g.sigla} · Grupo ${g.grupo}</span>`
       : ` <span style="font-size:.65rem;color:var(--text-light);font-weight:400">${g.sigla}</span>`;
@@ -1285,7 +1335,7 @@ function renderOverview(){
 ══════════════════════════════════════ */
 function renderList(){
   let html='';
-  for(const g of DISPLAY_ORDER) html+=buildGroupHTML(g,'list');
+  for(const g of getDisplayOrder()) html+=buildGroupHTML(g,'list');
   document.getElementById('list-content').innerHTML=html;
 }
 
@@ -1302,7 +1352,7 @@ function renderMissing(){
     return;
   }
   let html='';
-  for(const g of DISPLAY_ORDER){
+  for(const g of getDisplayOrder()){
     const misNums=g.nums.filter(n=>!state.owned.has(chipId(g.sigla,n)));
     if(!misNums.length) continue;
     html+=buildGroupHTML({...g,nums:misNums},'missing');
@@ -1320,8 +1370,25 @@ function renderRepeated(){
     <div style="font-size:.85rem;color:var(--gold-d);font-weight:700">
       🔄 ${total} figurinha${total!==1?'s':''} repetida${total!==1?'s':''} · ${rc} número${rc!==1?'s':''} diferentes
     </div></div>` : '';
-  for(const g of DISPLAY_ORDER) html+=buildGroupHTML(g,'repeated');
+  for(const g of getDisplayOrder()) html+=buildGroupHTML(g,'repeated');
   document.getElementById('repeated-content').innerHTML=html;
+}
+
+/* ══════════════════════════════════════
+   SORT BAR
+══════════════════════════════════════ */
+function sortBarHTML(){
+  const aActive = sortOrder === 'alpha'  ? ' active' : '';
+  const gActive = sortOrder === 'groups' ? ' active' : '';
+  return `<button class="btn-sort${aActive}" onclick="setSortOrder('alpha')">🔤 Ordem Alfabética</button>` +
+         `<button class="btn-sort${gActive}" onclick="setSortOrder('groups')">🏆 Ordem por Grupos</button>`;
+}
+function renderSortBars(){
+  const bar = sortBarHTML();
+  ['sort-bar-overview','sort-bar-list','sort-bar-missing','sort-bar-repeated'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.innerHTML = bar;
+  });
 }
 
 /* ══════════════════════════════════════
@@ -1332,6 +1399,7 @@ function renderAll(){
   renderList();
   renderMissing();
   renderRepeated();
+  renderSortBars();
   autoUpdateSyncCode();
 }
 
@@ -1551,7 +1619,7 @@ function shareRepeatedOnWhatsApp(){
 function exportMissingList(){
   const lines = [];
   let total = 0;
-  for(const g of DISPLAY_ORDER){
+  for(const g of getDisplayOrder()){
     const misNums = g.nums.filter(n => !state.owned.has(chipId(g.sigla, n)));
     if(!misNums.length) continue;
     total += misNums.length;
@@ -1567,7 +1635,7 @@ function exportMissingList(){
 
 function exportRepeatedList(){
   const lines = [];
-  for(const g of DISPLAY_ORDER){
+  for(const g of getDisplayOrder()){
     const repNums = g.nums.filter(n => repCount(chipId(g.sigla, n)) > 0);
     if(!repNums.length) continue;
     const parts = repNums.map(n => {
