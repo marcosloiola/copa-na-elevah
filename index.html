@@ -1964,7 +1964,7 @@ function openQRScanner(){
   setTimeout(startQRScanner, 350);
 }
 
-function startQRScanner(){
+async function startQRScanner(){
   const video = document.getElementById('qr-scan-video');
   const canvas = document.getElementById('qr-scan-canvas');
   const statusEl = document.getElementById('qr-scan-status');
@@ -1975,49 +1975,57 @@ function startQRScanner(){
     return;
   }
 
-  // Request HD resolution for better QR detection
-  const constraints = {
-    video: {
-      facingMode: { ideal: 'environment' },
-      width:  { ideal: 1280, min: 640 },
-      height: { ideal: 720,  min: 480 }
-    }
-  };
-
-  navigator.mediaDevices.getUserMedia(constraints)
-    .then(stream => {
-      qrScanStream = stream;
-      video.srcObject = stream;
-      video.setAttribute('playsinline', 'true'); // iOS Safari
-      video.play();
-      if(statusEl) statusEl.textContent = '🔍 Aponte para o QR Code do amigo...';
-
-      // Wait for video to load before starting scan loop
-      video.addEventListener('loadedmetadata', () => {
-        canvas.width  = video.videoWidth;
-        canvas.height = video.videoHeight;
-      }, { once: true });
-
-      qrScanInterval = setInterval(() => {
-        if(video.readyState === video.HAVE_ENOUGH_DATA && video.videoWidth > 0){
-          if(canvas.width !== video.videoWidth)  canvas.width  = video.videoWidth;
-          if(canvas.height !== video.videoHeight) canvas.height = video.videoHeight;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          // attemptBoth: tries normal + inverted (handles different screen brightness)
-          const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'attemptBoth' });
-          if(code && code.data){
-            stopQRScanner();
-            processQRResult(code.data);
-          }
-        }
-      }, 150);
-    })
-    .catch(err => {
-      console.error('Camera error:', err);
-      if(statusEl) statusEl.textContent = '❌ Sem acesso à câmera. Verifique as permissões do navegador.';
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
     });
+    qrScanStream = stream;
+    video.srcObject = stream;
+    video.setAttribute('playsinline', 'true'); // iOS Safari
+    await video.play();
+    if(statusEl) statusEl.textContent = '🔍 Aponte para o QR Code do amigo...';
+
+    // ── Estratégia 1: BarcodeDetector nativo (Android Chrome, iOS 17+)
+    // Usa o scanner de hardware do dispositivo — muito mais confiável que jsQR
+    if('BarcodeDetector' in window){
+      let detector;
+      try{ detector = new BarcodeDetector({ formats: ['qr_code'] }); }
+      catch(e){ detector = new BarcodeDetector(); } // fallback sem especificar formato
+      qrScanInterval = setInterval(async () => {
+        try{
+          const codes = await detector.detect(video);
+          if(codes.length > 0 && codes[0].rawValue){
+            stopQRScanner();
+            processQRResult(codes[0].rawValue);
+          }
+        } catch(e){ /* frame ainda não pronto */ }
+      }, 200);
+      return;
+    }
+
+    // ── Estratégia 2: jsQR via canvas (fallback para browsers sem BarcodeDetector)
+    video.addEventListener('loadedmetadata', () => {
+      canvas.width  = video.videoWidth  || 640;
+      canvas.height = video.videoHeight || 480;
+    }, { once: true });
+    const ctx = canvas.getContext('2d');
+    qrScanInterval = setInterval(() => {
+      if(video.readyState < 2 || !video.videoWidth) return;
+      if(canvas.width !== video.videoWidth)  canvas.width  = video.videoWidth;
+      if(canvas.height !== video.videoHeight) canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts: 'attemptBoth' });
+      if(code && code.data){
+        stopQRScanner();
+        processQRResult(code.data);
+      }
+    }, 200);
+
+  } catch(err){
+    console.error('Camera error:', err);
+    if(statusEl) statusEl.textContent = '❌ Sem acesso à câmera. Verifique as permissões do navegador.';
+  }
 }
 
 function stopQRScanner(){
