@@ -11,6 +11,8 @@
   <meta name="apple-mobile-web-app-title" content="Álbum Copa">
   <link rel="apple-touch-icon" href="logo.png">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { font-size: 16px; -webkit-tap-highlight-color: transparent; }
@@ -278,6 +280,18 @@
     @keyframes pop { 0%{transform:scale(1)} 40%{transform:scale(1.3)} 100%{transform:scale(1)} }
     .chip.just-toggled { animation:pop .22s ease; }
 
+    /* ─── QR Code ── */
+    .qr-section-label { font-size:.82rem; font-weight:700; color:var(--primary-d); margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+    .qr-divider { border-top:1.5px solid var(--border); margin:20px 0; display:flex; align-items:center; gap:8px; }
+    .qr-divider-label { font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--text-light); white-space:nowrap; padding:0 4px; background:var(--bg-card); margin-top:-1px; }
+    .qr-img-wrap { text-align:center; margin:0 auto 12px; line-height:0; }
+    .qr-img-wrap img { max-width:260px; width:100%; border-radius:var(--radius-sm); border:2px solid var(--border); }
+    .qr-camera-wrap { position:relative; width:100%; max-width:320px; margin:0 auto 12px; border-radius:var(--radius-sm); overflow:hidden; background:#000; aspect-ratio:1/1; }
+    .qr-camera-wrap video { width:100%; height:100%; object-fit:cover; display:block; }
+    .qr-camera-frame { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; }
+    .qr-camera-frame-box { width:62%; height:62%; border:3px solid rgba(255,255,255,.9); border-radius:10px; box-shadow:0 0 0 9999px rgba(0,0,0,.42); }
+    .qr-scan-status { text-align:center; font-size:.82rem; color:var(--text-mid); margin-bottom:16px; min-height:1.4em; }
+
     /* ─── Desktop ── */
     @media (min-width:640px) {
       :root { --chip-size:48px; }
@@ -487,7 +501,20 @@
     <button class="back-btn" onclick="goBackToPerfil()">← Voltar ao Perfil</button>
     <div class="perfil-section-title">Troca de Figurinhas</div>
     <div class="settings-section">
-      <button class="btn btn-gold" onclick="generateExchangeCode()">📤 Gerar Código das Minhas Faltantes</button>
+
+      <!-- ── QR Code (primeira opção) ── -->
+      <div class="qr-section-label">📷 Via QR Code <span style="font-size:.65rem;font-weight:600;background:var(--mint);color:#1E4D36;border-radius:99px;padding:1px 7px">Mais rápido</span></div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <button class="btn btn-primary" style="flex:1;margin-bottom:0" onclick="generateExchangeQR()">📷 Mostrar meu QR</button>
+        <button class="btn btn-mint" style="flex:1;margin-bottom:0" onclick="openQRScanner()">📸 Ler QR do amigo</button>
+      </div>
+      <p class="hint" style="margin-bottom:0">Gere o QR e mostre para o amigo ler — ou leia o QR dele com a câmera para ver quais repetidas você pode dar.</p>
+
+      <!-- ── Divider ── -->
+      <div class="qr-divider"><span class="qr-divider-label">ou via código de texto</span></div>
+
+      <!-- ── Texto (segunda opção) ── -->
+      <button class="btn btn-gold" style="margin-bottom:8px" onclick="generateExchangeCode()">📤 Gerar Código de Texto</button>
       <div class="code-row">
         <textarea id="exchange-out-box" class="code-box" placeholder="Clique em 'Gerar' para criar o código..." readonly onclick="this.select()"></textarea>
         <button class="btn-copy" onclick="copyCode('exchange-out-box')" title="Copiar">
@@ -495,9 +522,9 @@
           Copiar
         </button>
       </div>
-      <p class="hint" style="margin-bottom:16px">Combina faltantes de todos os álbuns. Envie para um amigo ver o que ele pode te dar.</p>
-      <div class="card-title" style="font-size:.75rem;margin-bottom:6px">Verificar Código de um Amigo</div>
-      <textarea id="exchange-in-box" class="code-box" placeholder="Cole aqui o código das faltantes do amigo..."></textarea>
+      <p class="hint" style="margin-bottom:16px">Combina faltantes de todos os álbuns. Envie por WhatsApp.</p>
+      <div class="card-title" style="font-size:.75rem;margin-bottom:6px">Colar Código de Texto do Amigo</div>
+      <textarea id="exchange-in-box" class="code-box" placeholder="Cole aqui o código de texto do amigo..."></textarea>
       <button class="btn btn-mint" style="margin-top:8px" onclick="applyExchangeCode()">🔍 Ver minhas repetidas que ele precisa</button>
       <div id="exchange-result" style="display:none"></div>
     </div>
@@ -601,7 +628,8 @@
   </div>
   <div class="howto-sub">
     <h4>🤝 Troca de Figurinhas</h4>
-    <p>Gere um código com suas figurinhas faltantes e envie para um amigo. Ele cola o código e vê quais repetidas dele podem te ajudar. O código combina faltantes de todos os seus álbuns.</p>
+    <p><strong>Via QR Code (mais rápido):</strong> Toque em "Mostrar meu QR" para gerar um QR Code com suas faltantes — mostre para o amigo ler com a câmera dele. Ou toque em "Ler QR do amigo" e aponte a câmera para o QR dele para ver quais repetidas suas ele precisa.</p>
+    <p><strong>Via código de texto:</strong> Gere o código de texto e envie por WhatsApp. O amigo cola o código e vê as coincidências. Funciona offline após o primeiro acesso.</p>
   </div>
   <div class="howto-sub">
     <h4>📋 Exportar Listas</h4>
@@ -764,6 +792,35 @@
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeModal('modal-delete-album')">Cancelar</button>
       <button class="btn btn-danger" onclick="executeDeleteAlbum()">Sim, excluir</button>
+    </div>
+  </div>
+</div>
+
+<!-- QR Generate Modal -->
+<div class="modal-overlay" id="modal-qr-generate" onclick="closeModalOnOverlay(event,'modal-qr-generate')">
+  <div class="modal-box">
+    <h3>📷 QR Code das Minhas Faltantes</h3>
+    <p id="qr-generate-count" style="font-size:.8rem;color:var(--text-light);margin-bottom:14px;text-align:center"></p>
+    <div id="qr-generate-img" class="qr-img-wrap"></div>
+    <p style="font-size:.75rem;color:var(--text-light);text-align:center;margin-bottom:16px">Mostre este QR Code para o amigo ler com o app dele</p>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="closeModal('modal-qr-generate')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- QR Scan Modal -->
+<div class="modal-overlay" id="modal-qr-scan" onclick="if(event.target===this)stopQRScanner()">
+  <div class="modal-box">
+    <h3>📸 Ler QR Code do Amigo</h3>
+    <div class="qr-camera-wrap">
+      <video id="qr-scan-video" playsinline muted></video>
+      <canvas id="qr-scan-canvas" style="display:none"></canvas>
+      <div class="qr-camera-frame"><div class="qr-camera-frame-box"></div></div>
+    </div>
+    <p id="qr-scan-status" class="qr-scan-status">Iniciando câmera...</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="stopQRScanner()">Cancelar</button>
     </div>
   </div>
 </div>
@@ -1795,6 +1852,167 @@ function checkGroupCompletion(id){
   const a=getActiveAlbum(); if(!a) return;
   const owned=group.nums.filter(n=>a.owned.has(chipId(group.sigla,n))).length;
   if(owned===group.nums.length){ showToast(`🎉 ${group.titulo} completo!`); launchConfetti(); }
+}
+
+/* ── QR CODE ────────────────────────────────────────────── */
+// Compact format: ELQ1*SIGLA:n1.n2.n3*SIGLA2:n1.n2
+// Uses only QR alphanumeric characters: 0-9, A-Z, *, :, .
+function encodeQRMissing(){
+  const parts = [];
+  for(const g of ALBUM_DATA){
+    const misNums = g.nums.filter(n => state.albums.some(a => !a.owned.has(chipId(g.sigla, n))));
+    if(!misNums.length) continue;
+    parts.push(g.sigla + ':' + misNums.join('.'));
+  }
+  if(!parts.length) return '';
+  return 'ELQ1*' + parts.join('*');
+}
+
+function decodeQRMissing(str){
+  const s = str.trim();
+  if(!s.startsWith('ELQ1')) throw new Error('formato inválido');
+  const body = s.replace(/^ELQ1\*?/, '');
+  if(!body) return new Set();
+  const missingSet = new Set();
+  const sections = body.split('*');
+  for(const sec of sections){
+    if(!sec) continue;
+    const colonIdx = sec.indexOf(':');
+    if(colonIdx === -1) continue;
+    const sigla = sec.substring(0, colonIdx);
+    const nums = sec.substring(colonIdx + 1).split('.');
+    for(const num of nums){
+      if(num) missingSet.add(chipId(sigla, num));
+    }
+  }
+  return missingSet;
+}
+
+function generateExchangeQR(){
+  // Calculate missing across all own albums
+  let hasAny = false;
+  for(const g of ALBUM_DATA)
+    for(const n of g.nums)
+      if(state.albums.some(a => !a.owned.has(chipId(g.sigla, n)))){ hasAny = true; break; }
+  if(!hasAny){ alert('🏆 Todos os álbuns completos!'); return; }
+
+  const qrData = encodeQRMissing();
+  const missingCount = [...new Set(
+    ALBUM_DATA.flatMap(g => g.nums.map(n => chipId(g.sigla, n))).filter(id => state.albums.some(a => !a.owned.has(id)))
+  )].length;
+
+  try{
+    const qr = qrcode(0, 'L'); // type 0 = auto-detect version, error correction L = max capacity
+    qr.addData(qrData, 'Alphanumeric');
+    qr.make();
+    const imgTag = qr.createImgTag(4, 4);
+    document.getElementById('qr-generate-img').innerHTML = imgTag;
+    // Make image responsive
+    const img = document.querySelector('#qr-generate-img img');
+    if(img){ img.style.cssText = 'max-width:100%;width:auto;height:auto;border-radius:8px;border:2px solid var(--border);display:block;margin:0 auto'; }
+    document.getElementById('qr-generate-count').textContent = `${missingCount} figurinha${missingCount!==1?'s':''} faltante${missingCount!==1?'s':''}`;
+    openModal('modal-qr-generate');
+  } catch(e){
+    console.error('QR generation error:', e);
+    // Fallback: try with lower data — shouldn't happen since ELQ1 format is ~2700 chars max for alphanumeric
+    alert('❌ Não foi possível gerar o QR Code. Tente usar o código de texto.');
+  }
+}
+
+// QR Scanner state
+let qrScanStream = null;
+let qrScanInterval = null;
+
+function openQRScanner(){
+  openModal('modal-qr-scan');
+  const statusEl = document.getElementById('qr-scan-status');
+  if(statusEl) statusEl.textContent = 'Iniciando câmera...';
+  setTimeout(startQRScanner, 350); // wait for modal animation before requesting camera
+}
+
+function startQRScanner(){
+  const video = document.getElementById('qr-scan-video');
+  const canvas = document.getElementById('qr-scan-canvas');
+  const statusEl = document.getElementById('qr-scan-status');
+  if(!video || !canvas) return;
+
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    if(statusEl) statusEl.textContent = '❌ Câmera não disponível neste navegador.';
+    return;
+  }
+
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } } })
+    .then(stream => {
+      qrScanStream = stream;
+      video.srcObject = stream;
+      video.setAttribute('playsinline', 'true'); // needed for iOS Safari
+      video.play();
+      if(statusEl) statusEl.textContent = '🔍 Aponte para o QR Code do amigo...';
+
+      qrScanInterval = setInterval(() => {
+        if(video.readyState === video.HAVE_ENOUGH_DATA){
+          canvas.height = video.videoHeight;
+          canvas.width  = video.videoWidth;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'dontInvert' });
+          if(code && code.data){
+            stopQRScanner();
+            processQRResult(code.data);
+          }
+        }
+      }, 200);
+    })
+    .catch(err => {
+      console.error('Camera error:', err);
+      if(statusEl) statusEl.textContent = '❌ Sem acesso à câmera. Verifique as permissões do navegador.';
+    });
+}
+
+function stopQRScanner(){
+  if(qrScanInterval){ clearInterval(qrScanInterval); qrScanInterval = null; }
+  if(qrScanStream){ qrScanStream.getTracks().forEach(t => t.stop()); qrScanStream = null; }
+  const video = document.getElementById('qr-scan-video');
+  if(video) video.srcObject = null;
+  closeModal('modal-qr-scan');
+}
+
+function processQRResult(data){
+  // Reuses exchange-result div — same UI as text flow
+  try{
+    const friendMissing = decodeQRMissing(data.trim());
+    const matches = Object.keys(state.repeated).filter(id => friendMissing.has(id));
+    const resEl = document.getElementById('exchange-result');
+    resEl.style.display = 'block';
+
+    // Scroll to result
+    setTimeout(() => resEl.scrollIntoView({ behavior:'smooth', block:'nearest' }), 100);
+
+    if(!matches.length){
+      resEl.className = 'exchange-result no-match';
+      resEl.innerHTML = `<h4>😕 Nenhuma coincidência</h4><p style="font-size:.8rem;color:var(--text-light)">Nenhuma das suas repetidas está na lista do amigo.</p>`;
+      showToast('QR lido! Nenhuma coincidência.');
+      return;
+    }
+    const byGroup = {};
+    for(const id of matches){
+      const [sigla, num] = id.split('-');
+      if(!byGroup[sigla]) byGroup[sigla] = [];
+      byGroup[sigla].push(num);
+    }
+    let chipsHtml = '';
+    for(const [sigla, nums] of Object.entries(byGroup).sort((a,b) => a[0].localeCompare(b[0]))){
+      const group = ALBUM_DATA.find(g => g.sigla === sigla);
+      chipsHtml += `<div style="margin-bottom:10px"><div class="group-label" style="margin-bottom:4px">${sigla} · ${group?.titulo||sigla}</div><div class="chips-grid">${nums.map(n=>`<div class="chip repeated">${n}</div>`).join('')}</div></div>`;
+    }
+    resEl.className = 'exchange-result';
+    resEl.innerHTML = `<h4>✅ ${matches.length} repetida${matches.length!==1?'s':''} que o amigo precisa:</h4>${chipsHtml}`;
+    showToast(`✅ QR lido! ${matches.length} figurinha${matches.length!==1?'s':''} em comum`);
+  } catch(e){
+    console.error('QR decode error:', e);
+    alert('❌ QR Code não reconhecido. Certifique-se de usar o QR gerado pelo Elevah.');
+  }
 }
 
 /* ── INIT ───────────────────────────────────────────────── */

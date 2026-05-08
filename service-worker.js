@@ -7,12 +7,14 @@
    a mudança neste arquivo e baixa os assets novos
    automaticamente. O app recarrega sozinho para o usuário.
 ───────────────────────────────────────────────── */
-const CACHE = 'elevah-copa-v6'; // ← incrementar a cada deploy
+const CACHE = 'elevah-copa-v7'; // ← incrementar a cada deploy
 
 const STATIC_ASSETS = [
   './logo.png',
   './manifest.json',
   'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.js',
 ];
 
 // ── Install: pré-carrega assets estáticos (não o index.html — ele usa network-first) ──
