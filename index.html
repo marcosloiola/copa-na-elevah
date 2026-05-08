@@ -1855,23 +1855,58 @@ function checkGroupCompletion(id){
 }
 
 /* ── QR CODE ────────────────────────────────────────────── */
-// Compact format: ELQ1*SIGLA:n1.n2.n3*SIGLA2:n1.n2
-// Uses only QR alphanumeric characters: 0-9, A-Z, *, :, .
+// Compact format v2: ELQ2*SIGLA:ranges*SIGLA2:ranges
+// Ranges: consecutive numbers compressed as "start-end", singles as "n"
+// Uses only QR alphanumeric characters: 0-9, A-Z, *, :, ., -
+// e.g. all 20 missing → "1-20" (4 chars) instead of "1.2.3...20" (50 chars)
+// Max payload for empty album: ~600 chars → QR version ~10 (scannable)
+// vs old format: ~2700 chars → QR version 40 (too dense)
+
+function numsToRangeStr(numStrs){
+  const sorted = numStrs.map(Number).sort((a,b)=>a-b);
+  const parts = [];
+  let i = 0;
+  while(i < sorted.length){
+    let j = i;
+    while(j+1 < sorted.length && sorted[j+1] === sorted[j]+1) j++;
+    if(j >= i+2) parts.push(sorted[i]+'-'+sorted[j]); // range of 3+
+    else { parts.push(String(sorted[i])); if(j>i) parts.push(String(sorted[j])); }
+    i = j+1;
+  }
+  return parts.join('.');
+}
+
+function rangeStrToNums(str){
+  const nums = [];
+  for(const part of str.split('.')){
+    if(!part) continue;
+    if(part.includes('-')){
+      const [a,b] = part.split('-').map(Number);
+      for(let i=a; i<=b; i++) nums.push(String(i));
+    } else {
+      nums.push(part);
+    }
+  }
+  return nums;
+}
+
 function encodeQRMissing(){
   const parts = [];
   for(const g of ALBUM_DATA){
     const misNums = g.nums.filter(n => state.albums.some(a => !a.owned.has(chipId(g.sigla, n))));
     if(!misNums.length) continue;
-    parts.push(g.sigla + ':' + misNums.join('.'));
+    parts.push(g.sigla + ':' + numsToRangeStr(misNums));
   }
   if(!parts.length) return '';
-  return 'ELQ1*' + parts.join('*');
+  return 'ELQ2*' + parts.join('*');
 }
 
 function decodeQRMissing(str){
   const s = str.trim();
-  if(!s.startsWith('ELQ1')) throw new Error('formato inválido');
-  const body = s.replace(/^ELQ1\*?/, '');
+  // Support both v1 (ELQ1) and v2 (ELQ2) formats
+  if(!s.startsWith('ELQ1') && !s.startsWith('ELQ2')) throw new Error('formato inválido');
+  const isV2 = s.startsWith('ELQ2');
+  const body = s.replace(/^ELQ[12]\*?/, '');
   if(!body) return new Set();
   const missingSet = new Set();
   const sections = body.split('*');
@@ -1880,7 +1915,8 @@ function decodeQRMissing(str){
     const colonIdx = sec.indexOf(':');
     if(colonIdx === -1) continue;
     const sigla = sec.substring(0, colonIdx);
-    const nums = sec.substring(colonIdx + 1).split('.');
+    const numStr = sec.substring(colonIdx + 1);
+    const nums = isV2 ? rangeStrToNums(numStr) : numStr.split('.');
     for(const num of nums){
       if(num) missingSet.add(chipId(sigla, num));
     }
@@ -1889,7 +1925,6 @@ function decodeQRMissing(str){
 }
 
 function generateExchangeQR(){
-  // Calculate missing across all own albums
   let hasAny = false;
   for(const g of ALBUM_DATA)
     for(const n of g.nums)
@@ -1902,19 +1937,18 @@ function generateExchangeQR(){
   )].length;
 
   try{
-    const qr = qrcode(0, 'L'); // type 0 = auto-detect version, error correction L = max capacity
+    const qr = qrcode(0, 'L'); // type 0 = auto, L = max capacity
     qr.addData(qrData, 'Alphanumeric');
     qr.make();
-    const imgTag = qr.createImgTag(4, 4);
+    // Cell size 6px: legível na tela do celular
+    const imgTag = qr.createImgTag(6, 6);
     document.getElementById('qr-generate-img').innerHTML = imgTag;
-    // Make image responsive
     const img = document.querySelector('#qr-generate-img img');
-    if(img){ img.style.cssText = 'max-width:100%;width:auto;height:auto;border-radius:8px;border:2px solid var(--border);display:block;margin:0 auto'; }
+    if(img){ img.style.cssText = 'max-width:min(280px,100%);width:auto;height:auto;border-radius:8px;border:2px solid var(--border);display:block;margin:0 auto'; }
     document.getElementById('qr-generate-count').textContent = `${missingCount} figurinha${missingCount!==1?'s':''} faltante${missingCount!==1?'s':''}`;
     openModal('modal-qr-generate');
   } catch(e){
     console.error('QR generation error:', e);
-    // Fallback: try with lower data — shouldn't happen since ELQ1 format is ~2700 chars max for alphanumeric
     alert('❌ Não foi possível gerar o QR Code. Tente usar o código de texto.');
   }
 }
@@ -1927,7 +1961,7 @@ function openQRScanner(){
   openModal('modal-qr-scan');
   const statusEl = document.getElementById('qr-scan-status');
   if(statusEl) statusEl.textContent = 'Iniciando câmera...';
-  setTimeout(startQRScanner, 350); // wait for modal animation before requesting camera
+  setTimeout(startQRScanner, 350);
 }
 
 function startQRScanner(){
@@ -1941,28 +1975,44 @@ function startQRScanner(){
     return;
   }
 
-  navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } } })
+  // Request HD resolution for better QR detection
+  const constraints = {
+    video: {
+      facingMode: { ideal: 'environment' },
+      width:  { ideal: 1280, min: 640 },
+      height: { ideal: 720,  min: 480 }
+    }
+  };
+
+  navigator.mediaDevices.getUserMedia(constraints)
     .then(stream => {
       qrScanStream = stream;
       video.srcObject = stream;
-      video.setAttribute('playsinline', 'true'); // needed for iOS Safari
+      video.setAttribute('playsinline', 'true'); // iOS Safari
       video.play();
       if(statusEl) statusEl.textContent = '🔍 Aponte para o QR Code do amigo...';
 
+      // Wait for video to load before starting scan loop
+      video.addEventListener('loadedmetadata', () => {
+        canvas.width  = video.videoWidth;
+        canvas.height = video.videoHeight;
+      }, { once: true });
+
       qrScanInterval = setInterval(() => {
-        if(video.readyState === video.HAVE_ENOUGH_DATA){
-          canvas.height = video.videoHeight;
-          canvas.width  = video.videoWidth;
+        if(video.readyState === video.HAVE_ENOUGH_DATA && video.videoWidth > 0){
+          if(canvas.width !== video.videoWidth)  canvas.width  = video.videoWidth;
+          if(canvas.height !== video.videoHeight) canvas.height = video.videoHeight;
           const ctx = canvas.getContext('2d');
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'dontInvert' });
+          // attemptBoth: tries normal + inverted (handles different screen brightness)
+          const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'attemptBoth' });
           if(code && code.data){
             stopQRScanner();
             processQRResult(code.data);
           }
         }
-      }, 200);
+      }, 150);
     })
     .catch(err => {
       console.error('Camera error:', err);
