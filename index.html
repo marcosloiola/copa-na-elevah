@@ -589,6 +589,10 @@
 
 <!-- ═══ ABA 6: AJUDA ════════════════════════════════════════ -->
 <div id="tab-howto" class="tab-panel">
+  <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:20px">
+    <span style="font-size:.72rem;color:var(--text-light);font-weight:600;text-transform:uppercase;letter-spacing:.06em">Versão do app</span>
+    <span id="app-version-badge" style="font-size:.85rem;font-weight:800;color:var(--primary-d)"></span>
+  </div>
   <div class="howto-section">
     <h3>🎴 O que é este app?</h3>
     <p>Gestor do álbum de figurinhas da Copa do Mundo 2026, criado pela <strong>Elevah</strong>. Gerencie até 3 álbuns diferentes, controle o que tem, o que falta e o que está repetido — tudo no celular, sem instalar nada.</p>
@@ -827,6 +831,12 @@
 
 <!-- ═══ SCRIPT ═══════════════════════════════════════════════ -->
 <script>
+/* ─────────────────────────────────────────────────────────
+   VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
+   ───────────────────────────────────────────────────────── */
+const APP_VERSION = 'v19';
+const APP_DATE    = '08/05/2026';
+
 /* ── ALBUM DATA ─────────────────────────────────────────── */
 function range(a,b){ const r=[]; for(let i=a;i<=b;i++) r.push(String(i)); return r; }
 
@@ -2077,6 +2087,10 @@ function processQRResult(data){
 loadState();
 setupDelegation();
 renderAll();
+
+// Exibe versão na aba Ajuda
+const vBadge = document.getElementById('app-version-badge');
+if(vBadge) vBadge.textContent = APP_VERSION + ' · ' + APP_DATE;
 
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
