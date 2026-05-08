@@ -1237,8 +1237,23 @@ function editUserName(){
   if(n !== null){ userName = n.trim(); saveState(); renderPerfil(); }
 }
 
+/* ── NORMALIZE STATE ────────────────────────────────────── */
+// Called before every render to fix any state inconsistencies
+// (e.g. after album deletion, activeAlbumId or missingShowAll can be stale)
+function normalizeState(){
+  // Ensure activeAlbumId always points to a real album
+  if(!getAlbumById(state.activeAlbumId) && state.albums.length > 0){
+    state.activeAlbumId = state.albums[0].id;
+  }
+  // "Todos os Álbuns" mode makes no sense with a single album — reset it
+  if(state.albums.length <= 1 && state.missingShowAll){
+    state.missingShowAll = false;
+  }
+}
+
 /* ── RENDER ALL ─────────────────────────────────────────── */
 function renderAll(){
+  normalizeState();
   renderOverview();
   renderList();
   renderMissing();
@@ -1253,7 +1268,7 @@ function setupDelegation(){
   const map = {'list-content':'list','missing-content':'missing','repeated-content':'repeated'};
   for(const [cid, tabType] of Object.entries(map)){
     document.getElementById(cid).addEventListener('click', e=>{
-      if(tabType==='missing' && state.missingShowAll) return; // read-only in all mode
+      if(tabType==='missing' && state.missingShowAll && state.albums.length > 1) return; // read-only in all mode
       const chip = e.target.closest('.chip[data-id]');
       if(chip) handleChipTap(chip.dataset.id, tabType);
     });
