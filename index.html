@@ -504,11 +504,11 @@
 
       <!-- ── QR Code (primeira opção) ── -->
       <div class="qr-section-label">📷 Via QR Code <span style="font-size:.65rem;font-weight:600;background:var(--mint);color:#1E4D36;border-radius:99px;padding:1px 7px">Mais rápido</span></div>
-      <button class="btn btn-primary" style="margin-bottom:10px" onclick="generateExchangeQR()">📷 Gerar meu QR Code</button>
-      <div style="background:#F0FAF5;border:1.5px solid var(--mint-d);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:0">
-        <p style="font-size:.8rem;font-weight:700;color:var(--mint-d);margin-bottom:6px">📸 Como o amigo lê o seu QR:</p>
-        <p style="font-size:.78rem;color:var(--text-mid);line-height:1.6;margin:0">Use a <strong>câmera nativa</strong> do celular para ler o QR. O app vai abrir automaticamente e mostrar quais repetidas você tem que ele precisa.</p>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <button class="btn btn-primary" style="flex:1;margin-bottom:0" onclick="generateExchangeQR()">📷 Mostrar meu QR</button>
+        <button class="btn btn-mint" style="flex:1;margin-bottom:0" onclick="openQRScanner()">📸 Ler QR do amigo</button>
       </div>
+      <p class="hint" style="margin-bottom:0">Mostre seu QR para o amigo ler com o app dele — ou leia o QR do amigo diretamente pela câmera.</p>
 
       <!-- ── Divider ── -->
       <div class="qr-divider"><span class="qr-divider-label">ou via código de texto</span></div>
@@ -806,7 +806,7 @@
     <h3>📷 QR Code das Minhas Faltantes</h3>
     <p id="qr-generate-count" style="font-size:.8rem;color:var(--text-light);margin-bottom:14px;text-align:center"></p>
     <div id="qr-generate-img" class="qr-img-wrap"></div>
-    <p style="font-size:.75rem;color:var(--text-light);text-align:center;margin-bottom:16px">Mostre para o amigo ler com a <strong>câmera nativa</strong> do celular — o app dele vai abrir com o resultado automaticamente</p>
+    <p style="font-size:.75rem;color:var(--text-light);text-align:center;margin-bottom:16px">Mostre para o amigo ler com o app dele — botão "📸 Ler QR do amigo"</p>
     <div class="modal-actions">
       <button class="btn btn-primary" onclick="closeModal('modal-qr-generate')">Fechar</button>
     </div>
@@ -834,7 +834,7 @@
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v20';
+const APP_VERSION = 'v21';
 const APP_DATE    = '08/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
@@ -1865,71 +1865,62 @@ function checkGroupCompletion(id){
 }
 
 /* ── QR CODE ────────────────────────────────────────────── */
-// Compact format v2: ELQ2*SIGLA:ranges*SIGLA2:ranges
-// Ranges: consecutive numbers compressed as "start-end", singles as "n"
-// Uses only QR alphanumeric characters: 0-9, A-Z, *, :, ., -
-// e.g. all 20 missing → "1-20" (4 chars) instead of "1.2.3...20" (50 chars)
-// Max payload for empty album: ~600 chars → QR version ~10 (scannable)
-// vs old format: ~2700 chars → QR version 40 (too dense)
+// Format v3 (ELQ3): hex bitmask — 1 bit per sticker, 1 = missing
+// 994 stickers → 994 bits → 249 hex chars (uppercase = QR alphanumeric)
+// Total payload: ~254 chars → QR version 10 (57×57 modules) — very scannable
+// Backward compatible: still decodes ELQ1 and ELQ2 formats
 
-function numsToRangeStr(numStrs){
-  const sorted = numStrs.map(Number).sort((a,b)=>a-b);
-  const parts = [];
-  let i = 0;
-  while(i < sorted.length){
-    let j = i;
-    while(j+1 < sorted.length && sorted[j+1] === sorted[j]+1) j++;
-    if(j >= i+2) parts.push(sorted[i]+'-'+sorted[j]); // range of 3+
-    else { parts.push(String(sorted[i])); if(j>i) parts.push(String(sorted[j])); }
-    i = j+1;
-  }
-  return parts.join('.');
-}
-
-function rangeStrToNums(str){
-  const nums = [];
-  for(const part of str.split('.')){
-    if(!part) continue;
-    if(part.includes('-')){
-      const [a,b] = part.split('-').map(Number);
-      for(let i=a; i<=b; i++) nums.push(String(i));
-    } else {
-      nums.push(part);
-    }
-  }
-  return nums;
-}
+// Ordered list of all sticker IDs (same order as ALBUM_DATA) — built once
+const QR_STICKER_IDS = ALBUM_DATA.flatMap(g => g.nums.map(n => chipId(g.sigla, n)));
 
 function encodeQRMissing(){
-  const parts = [];
-  for(const g of ALBUM_DATA){
-    const misNums = g.nums.filter(n => state.albums.some(a => !a.owned.has(chipId(g.sigla, n))));
-    if(!misNums.length) continue;
-    parts.push(g.sigla + ':' + numsToRangeStr(misNums));
+  // Build bitmask: each bit = 1 if sticker is missing in at least one own album
+  const bits = QR_STICKER_IDS.map(id => state.albums.some(a => !a.owned.has(id)) ? 1 : 0);
+  // Convert bits → hex nibbles (4 bits each, uppercase)
+  let hex = '';
+  for(let i = 0; i < bits.length; i += 4){
+    const n = (bits[i]||0)*8 + (bits[i+1]||0)*4 + (bits[i+2]||0)*2 + (bits[i+3]||0);
+    hex += n.toString(16).toUpperCase();
   }
-  if(!parts.length) return '';
-  return 'ELQ2*' + parts.join('*');
+  return 'ELQ3:' + hex;
 }
 
 function decodeQRMissing(str){
   const s = str.trim();
-  // Support both v1 (ELQ1) and v2 (ELQ2) formats
+
+  // ── v3: hex bitmask ──────────────────────────────────────
+  if(s.startsWith('ELQ3:')){
+    const hex = s.slice(5);
+    const bits = [];
+    for(const c of hex){
+      const v = parseInt(c, 16);
+      bits.push((v>>3)&1, (v>>2)&1, (v>>1)&1, v&1);
+    }
+    const missingSet = new Set();
+    QR_STICKER_IDS.forEach((id, i) => { if(bits[i]) missingSet.add(id); });
+    return missingSet;
+  }
+
+  // ── v1 / v2: text formats (backward compat) ──────────────
   if(!s.startsWith('ELQ1') && !s.startsWith('ELQ2')) throw new Error('formato inválido');
   const isV2 = s.startsWith('ELQ2');
   const body = s.replace(/^ELQ[12]\*?/, '');
   if(!body) return new Set();
   const missingSet = new Set();
-  const sections = body.split('*');
-  for(const sec of sections){
+  for(const sec of body.split('*')){
     if(!sec) continue;
-    const colonIdx = sec.indexOf(':');
-    if(colonIdx === -1) continue;
-    const sigla = sec.substring(0, colonIdx);
-    const numStr = sec.substring(colonIdx + 1);
-    const nums = isV2 ? rangeStrToNums(numStr) : numStr.split('.');
-    for(const num of nums){
-      if(num) missingSet.add(chipId(sigla, num));
-    }
+    const ci = sec.indexOf(':');
+    if(ci === -1) continue;
+    const sigla = sec.substring(0, ci);
+    const numStr = sec.substring(ci + 1);
+    const nums = isV2
+      ? numStr.split('.').flatMap(p => {
+          if(!p) return [];
+          if(p.includes('-')){ const [a,b]=p.split('-').map(Number); const r=[]; for(let i=a;i<=b;i++) r.push(String(i)); return r; }
+          return [p];
+        })
+      : numStr.split('.');
+    for(const num of nums) if(num) missingSet.add(chipId(sigla, num));
   }
   return missingSet;
 }
@@ -1941,21 +1932,16 @@ function generateExchangeQR(){
       if(state.albums.some(a => !a.owned.has(chipId(g.sigla, n)))){ hasAny = true; break; }
   if(!hasAny){ alert('🏆 Todos os álbuns completos!'); return; }
 
-  const payload = encodeQRMissing();
-  const missingCount = [...new Set(
-    ALBUM_DATA.flatMap(g => g.nums.map(n => chipId(g.sigla, n))).filter(id => state.albums.some(a => !a.owned.has(id)))
-  )].length;
-
-  // QR contém a URL do app + dados no fragment hash.
-  // A pessoa B escaneia com a câmera NATIVA → browser abre o app → resultado aparece automaticamente.
-  const appUrl = window.location.origin + window.location.pathname;
-  const qrUrl  = appUrl + '#qr=' + payload;
+  const payload = encodeQRMissing(); // ELQ3:XXXX... (~254 chars hex alphanumeric)
+  const missingCount = QR_STICKER_IDS.filter(id => state.albums.some(a => !a.owned.has(id))).length;
 
   try{
-    const qr = qrcode(0, 'M'); // M = error correction médio, mais robusto que L
-    qr.addData(qrUrl);          // URL em modo Byte (auto)
+    // Alphanumeric mode (ELQ3 uses only 0-9 A-F : → QR alphanumeric set)
+    // ~254 chars → QR version 10, error L → 57×57 modules
+    const qr = qrcode(0, 'L');
+    qr.addData(payload, 'Alphanumeric');
     qr.make();
-    const imgTag = qr.createImgTag(5, 4);
+    const imgTag = qr.createImgTag(6, 4); // cell 6px, margin 4 cells
     document.getElementById('qr-generate-img').innerHTML = imgTag;
     const img = document.querySelector('#qr-generate-img img');
     if(img){ img.style.cssText = 'max-width:min(300px,100%);width:auto;height:auto;border-radius:8px;border:2px solid var(--border);display:block;margin:0 auto'; }
