@@ -504,11 +504,11 @@
 
       <!-- ── QR Code (primeira opção) ── -->
       <div class="qr-section-label">📷 Via QR Code <span style="font-size:.65rem;font-weight:600;background:var(--mint);color:#1E4D36;border-radius:99px;padding:1px 7px">Mais rápido</span></div>
-      <div style="display:flex;gap:8px;margin-bottom:10px">
-        <button class="btn btn-primary" style="flex:1;margin-bottom:0" onclick="generateExchangeQR()">📷 Mostrar meu QR</button>
-        <button class="btn btn-mint" style="flex:1;margin-bottom:0" onclick="openQRScanner()">📸 Ler QR do amigo</button>
+      <button class="btn btn-primary" style="margin-bottom:10px" onclick="generateExchangeQR()">📷 Gerar meu QR Code</button>
+      <div style="background:#F0FAF5;border:1.5px solid var(--mint-d);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:0">
+        <p style="font-size:.8rem;font-weight:700;color:var(--mint-d);margin-bottom:6px">📸 Como o amigo lê o seu QR:</p>
+        <p style="font-size:.78rem;color:var(--text-mid);line-height:1.6;margin:0">Use a <strong>câmera nativa</strong> do celular para ler o QR. O app vai abrir automaticamente e mostrar quais repetidas você tem que ele precisa.</p>
       </div>
-      <p class="hint" style="margin-bottom:0">Gere o QR e mostre para o amigo ler — ou leia o QR dele com a câmera para ver quais repetidas você pode dar.</p>
 
       <!-- ── Divider ── -->
       <div class="qr-divider"><span class="qr-divider-label">ou via código de texto</span></div>
@@ -632,7 +632,7 @@
   </div>
   <div class="howto-sub">
     <h4>🤝 Troca de Figurinhas</h4>
-    <p><strong>Via QR Code (mais rápido):</strong> Toque em "Mostrar meu QR" para gerar um QR Code com suas faltantes — mostre para o amigo ler com a câmera dele. Ou toque em "Ler QR do amigo" e aponte a câmera para o QR dele para ver quais repetidas suas ele precisa.</p>
+    <p><strong>Via QR Code (mais rápido):</strong> Toque em "Gerar meu QR Code". Mostre para o amigo ler com a <strong>câmera nativa</strong> do celular dele — o app vai abrir automaticamente e mostrar quais repetidas você tem que ele precisa. Não é necessário nenhum leitor dentro do app.</p>
     <p><strong>Via código de texto:</strong> Gere o código de texto e envie por WhatsApp. O amigo cola o código e vê as coincidências. Funciona offline após o primeiro acesso.</p>
   </div>
   <div class="howto-sub">
@@ -806,7 +806,7 @@
     <h3>📷 QR Code das Minhas Faltantes</h3>
     <p id="qr-generate-count" style="font-size:.8rem;color:var(--text-light);margin-bottom:14px;text-align:center"></p>
     <div id="qr-generate-img" class="qr-img-wrap"></div>
-    <p style="font-size:.75rem;color:var(--text-light);text-align:center;margin-bottom:16px">Mostre este QR Code para o amigo ler com o app dele</p>
+    <p style="font-size:.75rem;color:var(--text-light);text-align:center;margin-bottom:16px">Mostre para o amigo ler com a <strong>câmera nativa</strong> do celular — o app dele vai abrir com o resultado automaticamente</p>
     <div class="modal-actions">
       <button class="btn btn-primary" onclick="closeModal('modal-qr-generate')">Fechar</button>
     </div>
@@ -834,7 +834,7 @@
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v19';
+const APP_VERSION = 'v20';
 const APP_DATE    = '08/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
@@ -1941,20 +1941,24 @@ function generateExchangeQR(){
       if(state.albums.some(a => !a.owned.has(chipId(g.sigla, n)))){ hasAny = true; break; }
   if(!hasAny){ alert('🏆 Todos os álbuns completos!'); return; }
 
-  const qrData = encodeQRMissing();
+  const payload = encodeQRMissing();
   const missingCount = [...new Set(
     ALBUM_DATA.flatMap(g => g.nums.map(n => chipId(g.sigla, n))).filter(id => state.albums.some(a => !a.owned.has(id)))
   )].length;
 
+  // QR contém a URL do app + dados no fragment hash.
+  // A pessoa B escaneia com a câmera NATIVA → browser abre o app → resultado aparece automaticamente.
+  const appUrl = window.location.origin + window.location.pathname;
+  const qrUrl  = appUrl + '#qr=' + payload;
+
   try{
-    const qr = qrcode(0, 'L'); // type 0 = auto, L = max capacity
-    qr.addData(qrData, 'Alphanumeric');
+    const qr = qrcode(0, 'M'); // M = error correction médio, mais robusto que L
+    qr.addData(qrUrl);          // URL em modo Byte (auto)
     qr.make();
-    // Cell size 6px: legível na tela do celular
-    const imgTag = qr.createImgTag(6, 6);
+    const imgTag = qr.createImgTag(5, 4);
     document.getElementById('qr-generate-img').innerHTML = imgTag;
     const img = document.querySelector('#qr-generate-img img');
-    if(img){ img.style.cssText = 'max-width:min(280px,100%);width:auto;height:auto;border-radius:8px;border:2px solid var(--border);display:block;margin:0 auto'; }
+    if(img){ img.style.cssText = 'max-width:min(300px,100%);width:auto;height:auto;border-radius:8px;border:2px solid var(--border);display:block;margin:0 auto'; }
     document.getElementById('qr-generate-count').textContent = `${missingCount} figurinha${missingCount!==1?'s':''} faltante${missingCount!==1?'s':''}`;
     openModal('modal-qr-generate');
   } catch(e){
@@ -2091,6 +2095,22 @@ renderAll();
 // Exibe versão na aba Ajuda
 const vBadge = document.getElementById('app-version-badge');
 if(vBadge) vBadge.textContent = APP_VERSION + ' · ' + APP_DATE;
+
+// Detecta QR Code via URL hash (#qr=ELQ2*...)
+// Ativado quando o amigo escaneia o QR com a câmera nativa e o app abre via link
+(function checkUrlQR(){
+  const hash = window.location.hash;
+  if(!hash || !hash.startsWith('#qr=')) return;
+  const data = hash.slice(4); // remove "#qr="
+  // Limpa o hash da URL sem reload (evita re-processar se o usuário recarregar)
+  history.replaceState(null, '', window.location.pathname + window.location.search);
+  // Navega para Perfil > Troca e mostra resultado
+  switchTab('perfil');
+  setTimeout(()=>{
+    openPerfilSection('perfil-exchange');
+    setTimeout(()=>{ processQRResult(decodeURIComponent(data)); }, 200);
+  }, 150);
+})();
 
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
