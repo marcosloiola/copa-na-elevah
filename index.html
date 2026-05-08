@@ -12,694 +12,281 @@
   <link rel="apple-touch-icon" href="logo.png">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <style>
-    /* ─── Reset & Base ─────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { font-size: 16px; -webkit-tap-highlight-color: transparent; }
     body {
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100dvh;
-      display: flex;
-      flex-direction: column;
+      background: var(--bg); color: var(--text);
+      min-height: 100dvh; display: flex; flex-direction: column;
       overscroll-behavior: none;
     }
-
-    /* ─── Design Tokens (Elevah) ───────────────────────── */
     :root {
-      --primary:   #D4897B;
-      --primary-d: #B8705F;
-      --secondary: #E2A894;
-      --gold:      #D9A164;
-      --gold-d:    #B8824A;
-      --bg:        #FFF3E3;
-      --bg-card:   #FFFFFF;
-      --mauve:     #D5B6AC;
-      --coral:     #EB9491;
-      --mint:      #A0D2B7;
-      --mint-d:    #6BAF94;
-      --peach:     #FFB39C;
-      --text:      #4A2E22;
-      --text-mid:  #7A5244;
-      --text-light:#A88070;
-      --border:    #E8D5C8;
-      --shadow:    rgba(74,46,34,.10);
-
-      --chip-size: 44px;
-      --radius:    12px;
-      --radius-sm: 8px;
-      --nav-h:     66px;
+      --primary:#D4897B; --primary-d:#B8705F; --secondary:#E2A894;
+      --gold:#D9A164; --gold-d:#B8824A;
+      --bg:#FFF3E3; --bg-card:#FFFFFF; --mauve:#D5B6AC;
+      --coral:#EB9491; --mint:#A0D2B7; --mint-d:#6BAF94;
+      --peach:#FFB39C; --text:#4A2E22; --text-mid:#7A5244;
+      --text-light:#A88070; --border:#E8D5C8; --shadow:rgba(74,46,34,.10);
+      --chip-size:44px; --radius:12px; --radius-sm:8px; --nav-h:66px;
     }
 
-    /* ─── Header ───────────────────────────────────────── */
+    /* ─── Header ── */
     .app-header {
-      background: var(--bg-card);
-      border-bottom: 1.5px solid var(--border);
-      padding: 10px 16px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: 0 2px 8px var(--shadow);
+      background:var(--bg-card); border-bottom:1.5px solid var(--border);
+      padding:10px 16px; display:flex; align-items:center; gap:10px;
+      position:sticky; top:0; z-index:100; box-shadow:0 2px 8px var(--shadow);
     }
-    .app-header img { height: 36px; width: auto; }
-    .app-header-title {
-      font-size: .8rem;
-      font-weight: 600;
-      color: var(--text-mid);
-      letter-spacing: .04em;
-      text-transform: uppercase;
-    }
-    .header-progress {
-      margin-left: auto;
-      text-align: right;
-    }
-    .header-progress .pct {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--primary);
-      line-height: 1;
-    }
-    .header-progress .lbl {
-      font-size: .65rem;
-      color: var(--text-light);
-      text-transform: uppercase;
-      letter-spacing: .05em;
-    }
+    .app-header img { height:36px; width:auto; }
+    .app-header-title { font-size:.8rem; font-weight:600; color:var(--text-mid); letter-spacing:.04em; text-transform:uppercase; }
 
-    /* ─── Main / Scrollable Content ───────────────────── */
-    .app-main {
-      flex: 1;
-      overflow-y: auto;
-      padding-bottom: calc(var(--nav-h) + 8px);
-    }
-    .tab-panel { display: none; padding: 16px; }
-    .tab-panel.active { display: block; }
+    /* ─── Main ── */
+    .app-main { flex:1; overflow-y:auto; padding-bottom:calc(var(--nav-h) + 8px); }
+    .tab-panel { display:none; padding:16px; }
+    .tab-panel.active { display:block; }
 
-    /* ─── Bottom Navigation ────────────────────────────── */
+    /* ─── Nav ── */
     .bottom-nav {
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      height: var(--nav-h);
-      background: var(--bg-card);
-      border-top: 1.5px solid var(--border);
-      display: flex;
-      z-index: 200;
-      /* Padding lateral para não cortar nas bordas arredondadas do iPhone */
-      padding: 0 10px env(safe-area-inset-bottom, 0);
-      box-shadow: 0 -2px 12px var(--shadow);
+      position:fixed; bottom:0; left:0; right:0; height:var(--nav-h);
+      background:var(--bg-card); border-top:1.5px solid var(--border);
+      display:flex; z-index:200;
+      padding:0 10px env(safe-area-inset-bottom,0); box-shadow:0 -2px 12px var(--shadow);
     }
     .nav-btn {
-      flex: 1;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 2px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--text-light);
-      transition: color .2s, background .2s;
-      padding: 6px 4px;
-      min-width: 0;
-      border-radius: var(--radius-sm);
+      flex:1; position:relative; display:flex; flex-direction:column;
+      align-items:center; justify-content:center; gap:2px;
+      background:none; border:none; cursor:pointer; color:var(--text-light);
+      transition:color .2s, background .2s; padding:6px 4px; min-width:0; border-radius:var(--radius-sm);
     }
-    .nav-btn.active {
-      color: var(--primary-d);
-      background: rgba(212,137,123,.13);
-    }
+    .nav-btn.active { color:var(--primary-d); background:rgba(212,137,123,.13); }
     .nav-btn.active::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 22%;
-      right: 22%;
-      height: 3px;
-      background: var(--primary);
-      border-radius: 0 0 4px 4px;
+      content:''; position:absolute; top:0; left:22%; right:22%;
+      height:3px; background:var(--primary); border-radius:0 0 4px 4px;
     }
-    .nav-btn svg { width: 22px; height: 22px; flex-shrink: 0; }
-    .nav-btn span {
-      font-size: .6rem;
-      font-weight: 600;
-      letter-spacing: .03em;
-      text-transform: uppercase;
-      line-height: 1;
-      white-space: nowrap;
-    }
-    .nav-btn.active span { font-weight: 800; }
+    .nav-btn svg { width:22px; height:22px; flex-shrink:0; }
+    .nav-btn span { font-size:.6rem; font-weight:600; letter-spacing:.03em; text-transform:uppercase; line-height:1; white-space:nowrap; }
+    .nav-btn.active span { font-weight:800; }
 
-    /* ─── Section headers ──────────────────────────────── */
-    .section-header {
-      margin: 20px 0 10px;
-      display: flex;
-      align-items: baseline;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .section-header:first-child { margin-top: 0; }
-    .section-title {
-      font-size: .85rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      color: var(--primary-d);
-    }
-    .section-badge {
-      font-size: .7rem;
-      background: var(--border);
-      color: var(--text-mid);
-      border-radius: 99px;
-      padding: 1px 8px;
-      font-weight: 600;
-    }
-    .section-badge.done { background: var(--mint); color: #2D5A42; }
-    .group-label {
-      font-size: .65rem;
-      font-weight: 700;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      color: var(--text-light);
-    }
+    /* ─── Section headers ── */
+    .section-header { margin:20px 0 10px; display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; }
+    .section-header:first-child { margin-top:0; }
+    .section-title { font-size:.85rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--primary-d); }
+    .section-badge { font-size:.7rem; background:var(--border); color:var(--text-mid); border-radius:99px; padding:1px 8px; font-weight:600; }
+    .section-badge.done { background:var(--mint); color:#2D5A42; }
+    .group-label { font-size:.65rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-light); }
 
-    /* ─── Sticker chips ────────────────────────────────── */
-    .chips-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 8px;
-    }
+    /* ─── Chips ── */
+    .chips-grid { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
     .chip {
-      position: relative;
-      width: var(--chip-size);
-      height: var(--chip-size);
-      border-radius: var(--radius-sm);
-      border: 2px solid var(--border);
-      background: var(--bg-card);
-      color: var(--text-mid);
-      font-size: .78rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      user-select: none;
-      transition: background .15s, border-color .15s, color .15s, transform .08s;
-      -webkit-user-select: none;
+      position:relative; width:var(--chip-size); height:var(--chip-size);
+      border-radius:var(--radius-sm); border:2px solid var(--border);
+      background:var(--bg-card); color:var(--text-mid);
+      font-size:.78rem; font-weight:700; display:flex; align-items:center; justify-content:center;
+      cursor:pointer; user-select:none; -webkit-user-select:none;
+      transition:background .15s, border-color .15s, color .15s, transform .08s;
     }
     .chip-rep-cnt {
-      position: absolute;
-      top: -5px;
-      right: -5px;
-      background: var(--primary-d);
-      color: #fff;
-      border-radius: 99px;
-      font-size: .5rem;
-      font-weight: 800;
-      min-width: 15px;
-      height: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 3px;
-      line-height: 1;
-      pointer-events: none;
+      position:absolute; top:-5px; right:-5px; background:var(--primary-d); color:#fff;
+      border-radius:99px; font-size:.5rem; font-weight:800; min-width:15px; height:15px;
+      display:flex; align-items:center; justify-content:center; padding:0 3px; line-height:1;
+      pointer-events:none;
     }
-    .chip:active { transform: scale(.92); }
-    .chip.owned {
-      background: var(--mint);
-      border-color: var(--mint-d);
-      color: #1E4D36;
-    }
-    .chip.repeated {
-      background: var(--gold);
-      border-color: var(--gold-d);
-      color: #4A2800;
-    }
-    .chip.wide { width: auto; padding: 0 14px; }
+    .chip:active { transform:scale(.92); }
+    .chip.owned { background:var(--mint); border-color:var(--mint-d); color:#1E4D36; }
+    .chip.repeated { background:var(--gold); border-color:var(--gold-d); color:#4A2800; }
+    .chip.wide { width:auto; padding:0 14px; }
+    .chip.shiny:not(.owned):not(.repeated) { border-color:var(--gold-d); background:linear-gradient(145deg,#FFFCEE 0%,#FFF0C0 100%); color:var(--gold-d); }
+    .chip.shiny.owned { border-color:var(--gold-d); }
+    .chip.shiny::after { content:'★'; position:absolute; bottom:1px; right:2px; font-size:6px; color:var(--gold); line-height:1; pointer-events:none; opacity:.85; }
+    .chip.shiny.owned::after { color:var(--gold-d); opacity:.4; }
+    .chip.shiny.repeated::after { opacity:.2; }
+    .chip.team-photo:not(.owned):not(.repeated) { border-color:var(--primary); border-style:dashed; background:#FFF7F4; color:var(--primary-d); }
+    .chip.team-photo.owned { border-style:dashed; border-color:var(--mint-d); }
+    .chip.team-photo.repeated { border-style:dashed; }
 
-    /* ─── Figurinhas brilhantes (FWC + nº 1 dos países) ── */
-    .chip.shiny:not(.owned):not(.repeated) {
-      border-color: var(--gold-d);
-      background: linear-gradient(145deg, #FFFCEE 0%, #FFF0C0 100%);
-      color: var(--gold-d);
-    }
-    .chip.shiny.owned  { border-color: var(--gold-d); }
-    .chip.shiny::after {
-      content: '★';
-      position: absolute;
-      bottom: 1px;
-      right: 2px;
-      font-size: 6px;
-      color: var(--gold);
-      line-height: 1;
-      pointer-events: none;
-      opacity: .85;
-    }
-    .chip.shiny.owned::after    { color: var(--gold-d); opacity: .4; }
-    .chip.shiny.repeated::after { opacity: .2; }
+    /* ─── Cards ── */
+    .card { background:var(--bg-card); border-radius:var(--radius); border:1.5px solid var(--border); padding:16px; margin-bottom:12px; box-shadow:0 1px 4px var(--shadow); }
+    .card-title { font-size:.8rem; font-weight:700; color:var(--text-mid); text-transform:uppercase; letter-spacing:.05em; margin-bottom:12px; }
 
-    /* ─── Foto do time (nº 13 dos países) ───────────────── */
-    .chip.team-photo:not(.owned):not(.repeated) {
-      border-color: var(--primary);
-      border-style: dashed;
-      background: #FFF7F4;
-      color: var(--primary-d);
-    }
-    .chip.team-photo.owned    { border-style: dashed; border-color: var(--mint-d); }
-    .chip.team-photo.repeated { border-style: dashed; }
+    /* ─── Overview stats ── */
+    .stat-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
+    .stat-box { background:var(--bg-card); border-radius:var(--radius); border:1.5px solid var(--border); padding:14px 10px; text-align:center; box-shadow:0 1px 4px var(--shadow); }
+    .stat-box .val { font-size:1.5rem; font-weight:800; color:var(--primary); line-height:1; }
+    .stat-box .val.green { color:var(--mint-d); }
+    .stat-box .lbl { font-size:.6rem; color:var(--text-light); text-transform:uppercase; letter-spacing:.06em; margin-top:4px; }
+    .chart-wrap { position:relative; width:100%; max-width:260px; margin:0 auto 8px; }
+    .donut-center { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; pointer-events:none; }
+    .donut-center .pct-big { font-size:1.8rem; font-weight:800; color:var(--primary); line-height:1; }
+    .donut-center .pct-lbl { font-size:.6rem; color:var(--text-light); text-transform:uppercase; letter-spacing:.05em; }
+    .progress-item { margin-bottom:10px; }
+    .progress-item-header { display:flex; justify-content:space-between; font-size:.75rem; color:var(--text-mid); margin-bottom:4px; }
+    .progress-item-header strong { font-weight:700; color:var(--text); }
+    .progress-bar { height:8px; background:var(--border); border-radius:99px; overflow:hidden; }
+    .progress-fill { height:100%; background:var(--primary); border-radius:99px; transition:width .4s ease; min-width:0; }
+    .progress-fill.full { background:var(--mint-d); }
+    .progress-fill.near { background:var(--gold); }
 
-    /* ─── Cards ────────────────────────────────────────── */
-    .card {
-      background: var(--bg-card);
-      border-radius: var(--radius);
-      border: 1.5px solid var(--border);
-      padding: 16px;
-      margin-bottom: 12px;
-      box-shadow: 0 1px 4px var(--shadow);
+    /* ─── Album cards (Visão Geral) ── */
+    .album-cards { display:flex; flex-direction:column; gap:12px; margin-bottom:16px; }
+    .album-card {
+      background:var(--bg-card); border-radius:var(--radius); border:1.5px solid var(--border);
+      padding:16px; box-shadow:0 1px 4px var(--shadow);
     }
-    .card-title {
-      font-size: .8rem;
-      font-weight: 700;
-      color: var(--text-mid);
-      text-transform: uppercase;
-      letter-spacing: .05em;
-      margin-bottom: 12px;
-    }
+    .album-card.clickable { cursor:pointer; transition:border-color .15s, box-shadow .15s, transform .1s; }
+    .album-card.clickable:hover { border-color:var(--primary); box-shadow:0 3px 16px var(--shadow); }
+    .album-card.clickable:active { transform:scale(.985); }
+    .album-card.combined { border-style:dashed; }
+    .album-card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
+    .album-card-name { font-size:.95rem; font-weight:700; color:var(--text); }
+    .album-card-stats { font-size:.75rem; color:var(--text-light); margin-bottom:8px; }
+    .album-card-footer { display:flex; justify-content:flex-end; font-size:.72rem; color:var(--primary); font-weight:700; margin-top:8px; letter-spacing:.02em; }
 
-    /* ─── Overview ─────────────────────────────────────── */
-    .stat-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 16px;
+    /* ─── Album selector pills ── */
+    .album-selector { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
+    .btn-album {
+      padding:6px 14px; border-radius:99px; font-size:.78rem; font-weight:700;
+      cursor:pointer; border:1.5px solid var(--border); background:var(--bg-card); color:var(--text-mid);
+      transition:background .15s, color .15s, border-color .15s; white-space:nowrap;
     }
-    .stat-box {
-      background: var(--bg-card);
-      border-radius: var(--radius);
-      border: 1.5px solid var(--border);
-      padding: 14px 10px;
-      text-align: center;
-      box-shadow: 0 1px 4px var(--shadow);
-    }
-    .stat-box .val {
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: var(--primary);
-      line-height: 1;
-    }
-    .stat-box .val.green { color: var(--mint-d); }
-    .stat-box .lbl {
-      font-size: .6rem;
-      color: var(--text-light);
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      margin-top: 4px;
-    }
-    .chart-wrap {
-      position: relative;
-      width: 100%;
-      max-width: 260px;
-      margin: 0 auto 8px;
-    }
-    .donut-center {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-      pointer-events: none;
-    }
-    .donut-center .pct-big {
-      font-size: 1.8rem;
-      font-weight: 800;
-      color: var(--primary);
-      line-height: 1;
-    }
-    .donut-center .pct-lbl {
-      font-size: .6rem;
-      color: var(--text-light);
-      text-transform: uppercase;
-      letter-spacing: .05em;
-    }
-    .progress-item { margin-bottom: 10px; }
-    .progress-item-header {
-      display: flex;
-      justify-content: space-between;
-      font-size: .75rem;
-      color: var(--text-mid);
-      margin-bottom: 4px;
-    }
-    .progress-item-header strong { font-weight: 700; color: var(--text); }
-    .progress-bar {
-      height: 8px;
-      background: var(--border);
-      border-radius: 99px;
-      overflow: hidden;
-    }
-    .progress-fill {
-      height: 100%;
-      background: var(--primary);
-      border-radius: 99px;
-      transition: width .4s ease;
-      min-width: 0;
-    }
-    .progress-fill.full { background: var(--mint-d); }
+    .btn-album.active { background:var(--primary); border-color:var(--primary-d); color:#fff; }
+    .btn-album.all-mode { border-color:var(--gold-d); color:var(--gold-d); }
+    .btn-album.all-mode.active { background:var(--gold); border-color:var(--gold-d); color:#4A2800; }
 
-    /* ─── Empty state ──────────────────────────────────── */
-    .empty-state {
-      text-align: center;
-      padding: 48px 16px;
-      color: var(--text-light);
-    }
-    .empty-state .emoji { font-size: 2.5rem; margin-bottom: 12px; }
-    .empty-state p { font-size: .9rem; }
+    /* ─── Sort bar ── */
+    .sort-bar { display:flex; gap:6px; margin-bottom:14px; }
+    .btn-sort { flex:1; padding:8px 12px; border-radius:var(--radius-sm); font-size:.75rem; font-weight:700; cursor:pointer; border:1.5px solid var(--border); background:var(--bg-card); color:var(--text-mid); transition:background .15s, color .15s, border-color .15s, transform .1s; }
+    .btn-sort.active { background:var(--primary); border-color:var(--primary-d); color:#fff; }
+    .btn-sort:active { transform:scale(.97); }
 
-    /* ─── Settings ─────────────────────────────────────── */
-    .settings-section { margin-bottom: 24px; }
-    .settings-section-title {
-      font-size: .7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      color: var(--text-light);
-      margin-bottom: 10px;
-      padding-bottom: 6px;
-      border-bottom: 1px solid var(--border);
+    /* ─── Perfil sub-nav ── */
+    .back-btn { display:inline-flex; align-items:center; gap:6px; background:none; border:none; cursor:pointer; color:var(--primary); font-size:.88rem; font-weight:700; padding:0 0 18px 0; }
+    .perfil-section-title { font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--text-light); margin:0 0 8px 0; padding-bottom:6px; border-bottom:1px solid var(--border); }
+    .perfil-menu { display:flex; flex-direction:column; gap:6px; }
+    .perfil-row {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 16px; background:var(--bg-card); border-radius:var(--radius-sm);
+      cursor:pointer; border:1.5px solid var(--border); transition:background .15s;
     }
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 12px 18px;
-      border-radius: var(--radius-sm);
-      font-size: .85rem;
-      font-weight: 700;
-      cursor: pointer;
-      border: none;
-      transition: opacity .15s, transform .1s;
-      width: 100%;
-      margin-bottom: 8px;
-    }
-    .btn:active { transform: scale(.97); }
-    .btn-primary { background: var(--primary); color: #fff; }
-    .btn-gold    { background: var(--gold);    color: #4A2800; }
-    .btn-mint    { background: var(--mint);    color: #1E4D36; }
-    .btn-danger  { background: #e74c3c;        color: #fff; }
-    .btn-outline {
-      background: transparent;
-      border: 2px solid var(--primary);
-      color: var(--primary);
-    }
-    .btn-whatsapp { background: #25D366; color: #fff; }
+    .perfil-row:active { background:var(--bg); }
+    .perfil-row-left { display:flex; align-items:center; gap:10px; font-size:.9rem; font-weight:600; color:var(--text); }
+    .perfil-row-chevron { font-size:1.1rem; color:var(--text-light); }
+    .perfil-group-label { font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--text-light); margin:16px 0 8px; }
+    .perfil-group-label:first-child { margin-top:0; }
 
-    /* ─── Toast de celebração ──────────────────────────── */
-    .celebration-toast {
-      position: fixed;
-      top: 80px;
-      left: 50%;
-      transform: translateX(-50%) translateY(-16px);
-      background: var(--bg-card);
-      border: 2px solid var(--mint-d);
-      border-radius: var(--radius);
-      padding: 12px 24px;
-      font-size: .95rem;
-      font-weight: 700;
-      color: var(--mint-d);
-      box-shadow: 0 4px 24px var(--shadow);
-      z-index: 9998;
-      opacity: 0;
-      transition: opacity .25s, transform .25s;
-      white-space: nowrap;
-      pointer-events: none;
-    }
-    .celebration-toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
+    /* ─── User section ── */
+    .user-section { background:var(--bg-card); border-radius:var(--radius); border:1.5px solid var(--border); padding:16px; margin-bottom:20px; display:flex; align-items:center; gap:12px; }
+    .user-avatar { width:48px; height:48px; border-radius:99px; background:var(--primary); display:flex; align-items:center; justify-content:center; font-size:1.3rem; color:#fff; font-weight:700; flex-shrink:0; }
+    .user-info { flex:1; }
+    .user-name { font-size:1rem; font-weight:700; color:var(--text); }
+    .user-hint { font-size:.72rem; color:var(--text-light); margin-top:2px; }
 
-    /* ─── Progresso quase completo / completo ─────────── */
-    .progress-fill.near { background: var(--gold); }
-    .near-badge {
-      display: inline-flex;
-      align-items: center;
-      background: #FFF3D0;
-      color: var(--gold-d);
-      border-radius: 99px;
-      padding: 1px 7px;
-      font-size: .62rem;
-      font-weight: 700;
-    }
-    .complete-badge {
-      display: inline-flex;
-      align-items: center;
-      background: #E0F5EC;
-      color: var(--mint-d);
-      border-radius: 99px;
-      padding: 1px 7px;
-      font-size: .62rem;
-      font-weight: 700;
-    }
+    /* ─── Album items in Perfil ── */
+    .album-item { background:var(--bg-card); border-radius:var(--radius); border:1.5px solid var(--border); padding:14px 16px; margin-bottom:8px; display:flex; align-items:center; gap:10px; }
+    .album-item.is-active { border-color:var(--mint-d); background:#F0FAF5; }
+    .album-item-info { flex:1; }
+    .album-item-name { font-weight:700; color:var(--text); font-size:.9rem; }
+    .album-item-pct { font-size:.72rem; color:var(--text-light); margin-top:2px; }
+    .album-item-actions { display:flex; gap:6px; align-items:center; }
+    .btn-icon { width:34px; height:34px; border-radius:var(--radius-sm); border:1.5px solid var(--border); background:var(--bg-card); cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--text-mid); transition:background .15s; flex-shrink:0; }
+    .btn-icon:active { background:var(--border); }
+    .btn-icon svg { width:15px; height:15px; }
+    .btn-icon.danger { color:#e74c3c; border-color:#fbb; }
+    .active-badge { font-size:.62rem; background:var(--mint); color:#1E4D36; border-radius:99px; padding:2px 8px; font-weight:700; white-space:nowrap; }
 
-    /* ─── Sort bar ─────────────────────────────────────── */
-    .sort-bar {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 14px;
-    }
-    .btn-sort {
-      flex: 1;
-      padding: 8px 12px;
-      border-radius: var(--radius-sm);
-      font-size: .75rem;
-      font-weight: 700;
-      cursor: pointer;
-      border: 1.5px solid var(--border);
-      background: var(--bg-card);
-      color: var(--text-mid);
-      transition: background .15s, color .15s, border-color .15s, transform .1s;
-    }
-    .btn-sort.active {
-      background: var(--primary);
-      border-color: var(--primary-d);
-      color: #fff;
-    }
-    .btn-sort:active { transform: scale(.97); }
+    /* ─── Buttons ── */
+    .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:12px 18px; border-radius:var(--radius-sm); font-size:.85rem; font-weight:700; cursor:pointer; border:none; transition:opacity .15s, transform .1s; width:100%; margin-bottom:8px; }
+    .btn:active { transform:scale(.97); }
+    .btn:disabled { opacity:.45; cursor:not-allowed; transform:none; }
+    .btn-primary { background:var(--primary); color:#fff; }
+    .btn-gold    { background:var(--gold); color:#4A2800; }
+    .btn-mint    { background:var(--mint); color:#1E4D36; }
+    .btn-danger  { background:#e74c3c; color:#fff; }
+    .btn-outline { background:transparent; border:2px solid var(--primary); color:var(--primary); }
+    .btn-whatsapp { background:#25D366; color:#fff; }
 
-    textarea.code-box {
-      width: 100%;
-      height: 80px;
-      font-family: monospace;
-      font-size: .7rem;
-      background: #f5ede6;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 10px;
-      color: var(--text);
-      resize: vertical;
-      margin-top: 8px;
-    }
-    .qr-output { display: flex; justify-content: center; padding: 16px 0; }
-    #qr-canvas-container canvas,
-    #qr-canvas-container img { border-radius: var(--radius-sm); }
+    /* ─── Badges ── */
+    .near-badge { display:inline-flex; align-items:center; background:#FFF3D0; color:var(--gold-d); border-radius:99px; padding:1px 7px; font-size:.62rem; font-weight:700; }
+    .complete-badge { display:inline-flex; align-items:center; background:#E0F5EC; color:var(--mint-d); border-radius:99px; padding:1px 7px; font-size:.62rem; font-weight:700; }
 
-    .qr-result {
-      margin-top: 12px;
-      background: var(--bg-card);
-      border: 1.5px solid var(--mint-d);
-      border-radius: var(--radius-sm);
-      padding: 12px;
-    }
-    .qr-result h4 {
-      font-size: .8rem;
-      font-weight: 700;
-      color: var(--mint-d);
-      margin-bottom: 8px;
-    }
-    #scan-area {
-      width: 100%;
-      max-width: 320px;
-      margin: 12px auto;
-      border-radius: var(--radius);
-      overflow: hidden;
-      background: #000;
-      display: none;
-    }
-    #scan-area video { width: 100%; display: block; }
+    /* ─── Empty state ── */
+    .empty-state { text-align:center; padding:48px 16px; color:var(--text-light); }
+    .empty-state .emoji { font-size:2.5rem; margin-bottom:12px; }
+    .empty-state p { font-size:.9rem; }
 
-    /* ─── How-to ───────────────────────────────────────── */
-    .howto-section { margin-bottom: 20px; }
-    .howto-section h3 {
-      font-size: .95rem;
-      font-weight: 700;
-      color: var(--primary-d);
-      margin-bottom: 8px;
-    }
-    .howto-section p, .howto-section li {
-      font-size: .85rem;
-      color: var(--text-mid);
-      line-height: 1.6;
-      margin-bottom: 6px;
-    }
-    .howto-section ul { padding-left: 18px; }
-    .howto-chip-demo {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin: 10px 0;
-      flex-wrap: wrap;
-    }
-    .demo-chip {
-      width: 40px; height: 40px;
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: .78rem; font-weight: 700;
-    }
-    .demo-chip.d-empty  { border: 2px solid var(--border); background: var(--bg-card); color: var(--text-mid); }
-    .demo-chip.d-owned  { border: 2px solid var(--mint-d); background: var(--mint);    color: #1E4D36; }
-    .demo-chip.d-repeat { border: 2px solid var(--gold-d); background: var(--gold);    color: #4A2800; }
-    .demo-label { font-size: .78rem; color: var(--text-mid); }
+    /* ─── Settings elements ── */
+    .settings-section { margin-bottom:24px; }
+    textarea.code-box { width:100%; height:80px; font-family:monospace; font-size:.7rem; background:#f5ede6; border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:10px; color:var(--text); resize:vertical; margin-top:8px; }
+    .code-row { display:flex; gap:8px; align-items:flex-start; margin-top:8px; }
+    .code-row textarea { flex:1; margin-top:0; }
+    .btn-copy { flex-shrink:0; width:44px; height:80px; padding:0; border-radius:var(--radius-sm); background:var(--border); border:1.5px solid var(--mauve); color:var(--text-mid); font-size:.65rem; font-weight:700; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; transition:background .15s, color .15s; }
+    .btn-copy:active { background:var(--mint); color:#1E4D36; }
+    .btn-copy svg { width:18px; height:18px; }
+    .exchange-result { margin-top:12px; border-radius:var(--radius-sm); padding:14px; border:1.5px solid var(--mint-d); background:#F0FAF5; }
+    .exchange-result h4 { font-size:.82rem; font-weight:700; color:var(--mint-d); margin-bottom:10px; }
+    .exchange-result.no-match { border-color:var(--mauve); background:var(--bg-card); }
+    .exchange-result.no-match h4 { color:var(--text-light); }
 
-    /* ─── Modals ───────────────────────────────────────── */
-    .modal-overlay {
-      position: fixed; inset: 0;
-      background: rgba(74,46,34,.45);
-      z-index: 500;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .2s;
-    }
-    .modal-overlay.open { opacity: 1; pointer-events: all; }
-    .modal-box {
-      background: var(--bg-card);
-      border-radius: var(--radius) var(--radius) 0 0;
-      padding: 24px 20px;
-      width: 100%; max-width: 480px;
-      transform: translateY(40px);
-      transition: transform .25s ease;
-    }
-    .modal-overlay.open .modal-box { transform: translateY(0); }
-    .modal-box h3 { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 10px; }
-    .modal-box p  { font-size: .85rem; color: var(--text-mid); margin-bottom: 20px; line-height: 1.5; }
-    .modal-actions { display: flex; gap: 10px; }
-    .modal-actions .btn { flex: 1; margin-bottom: 0; }
+    /* ─── Toast ── */
+    .celebration-toast { position:fixed; top:80px; left:50%; transform:translateX(-50%) translateY(-16px); background:var(--bg-card); border:2px solid var(--mint-d); border-radius:var(--radius); padding:12px 24px; font-size:.95rem; font-weight:700; color:var(--mint-d); box-shadow:0 4px 24px var(--shadow); z-index:9998; opacity:0; transition:opacity .25s, transform .25s; white-space:nowrap; pointer-events:none; }
+    .celebration-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
-    /* ─── Animations ───────────────────────────────────── */
-    @keyframes pop {
-      0%   { transform: scale(1); }
-      40%  { transform: scale(1.3); }
-      100% { transform: scale(1); }
-    }
-    .chip.just-toggled { animation: pop .22s ease; }
+    /* ─── Modals ── */
+    .modal-overlay { position:fixed; inset:0; background:rgba(74,46,34,.45); z-index:500; display:flex; align-items:flex-end; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s; }
+    .modal-overlay.open { opacity:1; pointer-events:all; }
+    .modal-box { background:var(--bg-card); border-radius:var(--radius) var(--radius) 0 0; padding:24px 20px; width:100%; max-width:480px; transform:translateY(40px); transition:transform .25s ease; }
+    .modal-overlay.open .modal-box { transform:translateY(0); }
+    .modal-box h3 { font-size:1rem; font-weight:700; color:var(--text); margin-bottom:10px; }
+    .modal-box p { font-size:.85rem; color:var(--text-mid); margin-bottom:20px; line-height:1.5; }
+    .modal-actions { display:flex; gap:10px; }
+    .modal-actions .btn { flex:1; margin-bottom:0; }
+    .modal-input { width:100%; padding:12px; border-radius:var(--radius-sm); border:1.5px solid var(--border); font-size:.9rem; color:var(--text); background:var(--bg-card); margin-bottom:16px; }
+    .modal-input:focus { outline:none; border-color:var(--primary); }
 
-    /* ─── Utility ──────────────────────────────────────── */
-    .hint {
-      font-size: .72rem;
-      color: var(--text-light);
-      margin-top: 4px;
-      line-height: 1.4;
-    }
+    /* ─── How-to ── */
+    .howto-section { margin-bottom:20px; }
+    .howto-section h3 { font-size:.95rem; font-weight:700; color:var(--primary-d); margin-bottom:8px; }
+    .howto-category { margin:28px 0 14px; padding:10px 14px; background:var(--primary); color:#fff; border-radius:var(--radius-sm); font-size:.9rem; font-weight:700; letter-spacing:.04em; }
+    .howto-sub { margin-left:0; padding-left:12px; border-left:3px solid var(--border); margin-bottom:16px; }
+    .howto-sub h4 { font-size:.85rem; font-weight:700; color:var(--text); margin-bottom:4px; }
+    .howto-sub p, .howto-sub li { font-size:.82rem; color:var(--text-mid); line-height:1.6; }
+    .howto-section p, .howto-section li { font-size:.85rem; color:var(--text-mid); line-height:1.6; margin-bottom:6px; }
+    .howto-section ul { padding-left:18px; }
+    .howto-chip-demo { display:flex; align-items:center; gap:8px; margin:10px 0; flex-wrap:wrap; }
+    .demo-chip { width:40px; height:40px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:.78rem; font-weight:700; }
+    .demo-chip.d-empty  { border:2px solid var(--border); background:var(--bg-card); color:var(--text-mid); }
+    .demo-chip.d-owned  { border:2px solid var(--mint-d); background:var(--mint); color:#1E4D36; }
+    .demo-chip.d-repeat { border:2px solid var(--gold-d); background:var(--gold); color:#4A2800; }
+    .demo-label { font-size:.78rem; color:var(--text-mid); }
 
-    .code-row {
-      display: flex;
-      gap: 8px;
-      align-items: flex-start;
-      margin-top: 8px;
-    }
-    .code-row textarea { flex: 1; margin-top: 0; }
-    .btn-copy {
-      flex-shrink: 0;
-      width: 44px;
-      height: 80px;
-      padding: 0;
-      border-radius: var(--radius-sm);
-      background: var(--border);
-      border: 1.5px solid var(--mauve);
-      color: var(--text-mid);
-      font-size: .65rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      transition: background .15s, color .15s;
-    }
-    .btn-copy:active { background: var(--mint); color: #1E4D36; }
-    .btn-copy svg { width: 18px; height: 18px; }
+    /* ─── Misc ── */
+    .hint { font-size:.72rem; color:var(--text-light); margin-top:4px; line-height:1.4; }
+    @keyframes pop { 0%{transform:scale(1)} 40%{transform:scale(1.3)} 100%{transform:scale(1)} }
+    .chip.just-toggled { animation:pop .22s ease; }
 
-    .exchange-result {
-      margin-top: 12px;
-      border-radius: var(--radius-sm);
-      padding: 14px;
-      border: 1.5px solid var(--mint-d);
-      background: #F0FAF5;
-    }
-    .exchange-result h4 {
-      font-size: .82rem;
-      font-weight: 700;
-      color: var(--mint-d);
-      margin-bottom: 10px;
-    }
-    .exchange-result.no-match {
-      border-color: var(--mauve);
-      background: var(--bg-card);
-    }
-    .exchange-result.no-match h4 { color: var(--text-light); }
-
-    /* ─── Desktop overrides ────────────────────────────── */
-    @media (min-width: 640px) {
-      :root { --chip-size: 48px; }
-      .bottom-nav {
-        position: static;
-        height: auto;
-        border: none;
-        border-bottom: 1.5px solid var(--border);
-        box-shadow: none;
-        justify-content: center;
-        gap: 4px;
-        padding: 8px 16px;
-        order: -1;
-      }
-      .app-main { padding-bottom: 16px; }
-      body { flex-direction: column; }
-      .nav-btn {
-        flex: none;
-        flex-direction: row;
-        gap: 6px;
-        border-radius: 8px;
-        padding: 8px 14px;
-      }
-      .nav-btn span { font-size: .75rem; }
-      .nav-btn.active { background: rgba(212,137,123,.13); }
-      .nav-btn.active::after { display: none; }
-      .stat-row { grid-template-columns: repeat(3,1fr); max-width: 400px; }
-      .tab-panel { padding: 20px 24px; max-width: 860px; margin: 0 auto; }
-      .app-header { order: -2; }
+    /* ─── Desktop ── */
+    @media (min-width:640px) {
+      :root { --chip-size:48px; }
+      .bottom-nav { position:static; height:auto; border:none; border-bottom:1.5px solid var(--border); box-shadow:none; justify-content:center; gap:4px; padding:8px 16px; order:-1; }
+      .app-main { padding-bottom:16px; }
+      body { flex-direction:column; }
+      .nav-btn { flex:none; flex-direction:row; gap:6px; border-radius:8px; padding:8px 14px; }
+      .nav-btn span { font-size:.75rem; }
+      .nav-btn.active { background:rgba(212,137,123,.13); }
+      .nav-btn.active::after { display:none; }
+      .stat-row { grid-template-columns:repeat(3,1fr); max-width:400px; }
+      .tab-panel { padding:20px 24px; max-width:860px; margin:0 auto; }
+      .app-header { order:-2; }
+      .album-cards { flex-direction:row; flex-wrap:wrap; }
+      .album-card { flex:1; min-width:220px; }
     }
   </style>
 </head>
 <body>
 
-<!-- ═══ HEADER ═══════════════════════════════════════════ -->
 <header class="app-header">
   <img src="logo.png" alt="Elevah" onerror="this.style.display='none'">
   <div class="app-header-title">Álbum Copa 2026</div>
-  <div class="header-progress">
-    <div class="pct" id="hdr-pct">0%</div>
-    <div class="lbl">completo</div>
-  </div>
 </header>
 
-<!-- ═══ NAV ══════════════════════════════════════════════ -->
 <nav class="bottom-nav">
   <button class="nav-btn active" data-tab="overview">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
@@ -717,9 +304,9 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
     <span>Repetidas</span>
   </button>
-  <button class="nav-btn" data-tab="settings">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-    <span>Config</span>
+  <button class="nav-btn" data-tab="perfil">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>Perfil</span>
   </button>
   <button class="nav-btn" data-tab="howto">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
@@ -727,24 +314,26 @@
   </button>
 </nav>
 
-<!-- ═══ MAIN ══════════════════════════════════════════════ -->
 <main class="app-main">
 
-  <!-- ABA 1: VISÃO GERAL -->
-  <div id="tab-overview" class="tab-panel active">
+<!-- ═══ ABA 1: VISÃO GERAL ══════════════════════════════════ -->
+<div id="tab-overview" class="tab-panel active">
+
+  <!-- Cards view (default) -->
+  <div id="overview-cards-view">
+    <div id="overview-cards-content" class="album-cards"></div>
+  </div>
+
+  <!-- Detail view (drill-down) -->
+  <div id="overview-detail-view" style="display:none">
+    <button class="back-btn" onclick="closeAlbumDetail()">
+      ← Voltar aos álbuns
+    </button>
+    <div style="font-size:1rem;font-weight:700;color:var(--text);margin-bottom:14px" id="detail-album-name"></div>
     <div class="stat-row">
-      <div class="stat-box">
-        <div class="val" id="st-total">0</div>
-        <div class="lbl">Total</div>
-      </div>
-      <div class="stat-box">
-        <div class="val green" id="st-owned">0</div>
-        <div class="lbl">Tenho</div>
-      </div>
-      <div class="stat-box">
-        <div class="val" style="color:var(--coral)" id="st-missing">0</div>
-        <div class="lbl">Faltam</div>
-      </div>
+      <div class="stat-box"><div class="val" id="st-total">0</div><div class="lbl">Total</div></div>
+      <div class="stat-box"><div class="val green" id="st-owned">0</div><div class="lbl">Tenho</div></div>
+      <div class="stat-box"><div class="val" style="color:var(--coral)" id="st-missing">0</div><div class="lbl">Faltam</div></div>
     </div>
     <div class="card">
       <div class="card-title">Progresso Geral</div>
@@ -762,72 +351,102 @@
       <div id="progress-list"></div>
     </div>
   </div>
+</div>
 
-  <!-- ABA 2: LISTA GERAL -->
-  <div id="tab-list" class="tab-panel">
-    <p class="hint" style="margin-bottom:6px">
-      <strong>1 toque</strong> = tenho &nbsp;·&nbsp; <strong>2 toques rápidos</strong> = não tenho (desfaz)
-    </p>
-    <p class="hint" style="margin-bottom:14px">
-      <span style="display:inline-flex;align-items:center;gap:3px;margin-right:10px">
-        <span style="position:relative;display:inline-flex;width:20px;height:20px;border:1.5px solid var(--gold-d);background:linear-gradient(145deg,#FFFCEE,#FFF0C0);border-radius:4px;align-items:center;justify-content:center;font-size:.6rem;color:var(--gold-d);font-weight:700">1<span style="position:absolute;bottom:0;right:1px;font-size:5px;color:var(--gold);line-height:1">★</span></span>
-        brilhante (FWC + nº 1)
-      </span>
-      <span style="display:inline-flex;align-items:center;gap:3px">
-        <span style="display:inline-flex;width:20px;height:20px;border:1.5px dashed var(--primary);background:#FFF7F4;border-radius:4px;align-items:center;justify-content:center;font-size:.6rem;color:var(--primary-d);font-weight:700">13</span>
-        foto do time
-      </span>
-    </p>
-    <div id="sort-bar-list" class="sort-bar"></div>
-    <div id="list-content"></div>
+<!-- ═══ ABA 2: LISTA ════════════════════════════════════════ -->
+<div id="tab-list" class="tab-panel">
+  <p class="hint" style="margin-bottom:10px">
+    <strong>1 toque</strong> = tenho &nbsp;·&nbsp; <strong>2 toques rápidos</strong> = desfaz
+  </p>
+  <div id="list-album-selector" class="album-selector"></div>
+  <div id="sort-bar-list" class="sort-bar"></div>
+  <div id="list-content"></div>
+</div>
+
+<!-- ═══ ABA 3: FALTAM ═══════════════════════════════════════ -->
+<div id="tab-missing" class="tab-panel">
+  <p class="hint" style="margin-bottom:10px">
+    Figurinhas faltantes. No modo <strong>Todos</strong>, o número no canto indica quantos álbuns precisam daquela figurinha.
+  </p>
+  <div id="missing-album-selector" class="album-selector"></div>
+  <div id="sort-bar-missing" class="sort-bar"></div>
+  <div id="missing-all-banner" style="display:none;background:#FFF8EE;border:1.5px solid var(--gold-d);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:12px;color:var(--gold-d);font-size:.82rem;font-weight:600;line-height:1.5">
+    👁️ Visualização geral de todos os álbuns — os <strong>toques nas figurinhas estão desativados</strong> neste modo. Selecione um álbum acima para editar.
+  </div>
+  <div id="missing-content"></div>
+</div>
+
+<!-- ═══ ABA 4: REPETIDAS ════════════════════════════════════ -->
+<div id="tab-repeated" class="tab-panel">
+  <p class="hint" style="margin-bottom:10px">
+    Lista única de repetidas compartilhada entre todos os álbuns.<br>
+    <strong>1 toque</strong> = +1 repetida &nbsp;·&nbsp; <strong>2 toques rápidos</strong> = −1 repetida
+  </p>
+  <div id="sort-bar-repeated" class="sort-bar"></div>
+  <div id="repeated-content"></div>
+</div>
+
+<!-- ═══ ABA 5: PERFIL ═══════════════════════════════════════ -->
+<div id="tab-perfil" class="tab-panel">
+
+  <!-- Tela principal -->
+  <div id="perfil-main">
+    <div class="user-section">
+      <div class="user-avatar" id="user-avatar">?</div>
+      <div class="user-info">
+        <div class="user-name" id="perfil-user-name">Meu Perfil</div>
+        <div class="user-hint">Toque no lápis para editar o nome</div>
+      </div>
+      <button class="btn-icon" onclick="editUserName()" style="margin-left:auto" title="Editar nome">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </button>
+    </div>
+
+    <div class="perfil-group-label">Meus Álbuns</div>
+    <div class="perfil-menu">
+      <div class="perfil-row" onclick="openPerfilSection('perfil-albuns')">
+        <div class="perfil-row-left">🏆 Gerenciar Álbuns</div>
+        <div class="perfil-row-chevron">›</div>
+      </div>
+    </div>
+
+    <div class="perfil-group-label">Configurações</div>
+    <div class="perfil-menu">
+      <div class="perfil-row" onclick="openPerfilSection('perfil-sync')">
+        <div class="perfil-row-left">🔄 Sincronização</div>
+        <div class="perfil-row-chevron">›</div>
+      </div>
+      <div class="perfil-row" onclick="openPerfilSection('perfil-exchange')">
+        <div class="perfil-row-left">🤝 Troca de Figurinhas</div>
+        <div class="perfil-row-chevron">›</div>
+      </div>
+      <div class="perfil-row" onclick="openPerfilSection('perfil-export')">
+        <div class="perfil-row-left">📋 Exportar Listas</div>
+        <div class="perfil-row-chevron">›</div>
+      </div>
+      <div class="perfil-row" style="border-color:#fcc" onclick="openPerfilSection('perfil-danger')">
+        <div class="perfil-row-left" style="color:#e74c3c">⚠️ Zona de Perigo</div>
+        <div class="perfil-row-chevron" style="color:#e74c3c">›</div>
+      </div>
+    </div>
   </div>
 
-  <!-- ABA 3: FALTANTES -->
-  <div id="tab-missing" class="tab-panel">
-    <p class="hint" style="margin-bottom:6px">
-      Figurinhas que ainda faltam. <strong>1 toque</strong> = marquei que já tenho.
-    </p>
-    <p class="hint" style="margin-bottom:14px">
-      <span style="display:inline-flex;align-items:center;gap:3px;margin-right:10px">
-        <span style="position:relative;display:inline-flex;width:20px;height:20px;border:1.5px solid var(--gold-d);background:linear-gradient(145deg,#FFFCEE,#FFF0C0);border-radius:4px;align-items:center;justify-content:center;font-size:.6rem;color:var(--gold-d);font-weight:700">1<span style="position:absolute;bottom:0;right:1px;font-size:5px;color:var(--gold);line-height:1">★</span></span>
-        brilhante (FWC + nº 1)
-      </span>
-      <span style="display:inline-flex;align-items:center;gap:3px">
-        <span style="display:inline-flex;width:20px;height:20px;border:1.5px dashed var(--primary);background:#FFF7F4;border-radius:4px;align-items:center;justify-content:center;font-size:.6rem;color:var(--primary-d);font-weight:700">13</span>
-        foto do time
-      </span>
-    </p>
-    <div id="sort-bar-missing" class="sort-bar"></div>
-    <div id="missing-content"></div>
+  <!-- Sub: Álbuns -->
+  <div id="perfil-albuns" style="display:none">
+    <button class="back-btn" onclick="goBackToPerfil()">← Voltar ao Perfil</button>
+    <div class="perfil-section-title">Meus Álbuns (máx. 3)</div>
+    <div id="perfil-albums-list"></div>
+    <button class="btn btn-primary" id="btn-create-album" onclick="openModal('modal-create-album')" style="margin-top:8px">
+      + Criar Novo Álbum
+    </button>
+    <button class="back-btn" onclick="goBackToPerfil()" style="margin-top:24px">← Voltar ao Perfil</button>
   </div>
 
-  <!-- ABA 4: REPETIDAS -->
-  <div id="tab-repeated" class="tab-panel">
-    <p class="hint" style="margin-bottom:6px">
-      Marque figurinhas que você tem repetidas para facilitar trocas.<br>
-      <strong>1 toque</strong> = adiciona uma repetida &nbsp;·&nbsp; <strong>2 toques rápidos</strong> = remove uma repetida
-    </p>
-    <p class="hint" style="margin-bottom:14px">
-      <span style="display:inline-flex;align-items:center;gap:3px;margin-right:10px">
-        <span style="position:relative;display:inline-flex;width:20px;height:20px;border:1.5px solid var(--gold-d);background:linear-gradient(145deg,#FFFCEE,#FFF0C0);border-radius:4px;align-items:center;justify-content:center;font-size:.6rem;color:var(--gold-d);font-weight:700">1<span style="position:absolute;bottom:0;right:1px;font-size:5px;color:var(--gold);line-height:1">★</span></span>
-        brilhante (FWC + nº 1)
-      </span>
-      <span style="display:inline-flex;align-items:center;gap:3px">
-        <span style="display:inline-flex;width:20px;height:20px;border:1.5px dashed var(--primary);background:#FFF7F4;border-radius:4px;align-items:center;justify-content:center;font-size:.6rem;color:var(--primary-d);font-weight:700">13</span>
-        foto do time
-      </span>
-    </p>
-    <div id="sort-bar-repeated" class="sort-bar"></div>
-    <div id="repeated-content"></div>
-  </div>
-
-  <!-- ABA 5: CONFIGURAÇÕES -->
-  <div id="tab-settings" class="tab-panel">
-
-    <!-- SINCRONIZAÇÃO -->
+  <!-- Sub: Sincronização -->
+  <div id="perfil-sync" style="display:none">
+    <button class="back-btn" onclick="goBackToPerfil()">← Voltar ao Perfil</button>
+    <div class="perfil-section-title">Sincronizar entre dispositivos</div>
     <div class="settings-section">
-      <div class="settings-section-title">🔄 Sincronizar entre dispositivos</div>
-
       <div class="code-row">
         <textarea id="export-code-box" class="code-box" placeholder="Atualizado automaticamente..." readonly onclick="this.select()"></textarea>
         <button class="btn-copy" onclick="copyCode('export-code-box')" title="Copiar código">
@@ -835,184 +454,180 @@
           Copiar
         </button>
       </div>
-      <p class="hint" style="margin-bottom:16px">Código atualizado automaticamente a cada marcação. Copie e cole via WhatsApp em outro dispositivo.</p>
-
-      <div class="card-title" style="font-size:.75rem; margin-bottom:6px">Importar via Código</div>
-      <textarea id="import-code-box" class="code-box" placeholder="Cole aqui o código de sincronização de outro dispositivo..."></textarea>
-      <button class="btn btn-outline" style="margin-top:8px" onclick="importCode()">
-        Aplicar Código
-      </button>
+      <p class="hint" style="margin-bottom:16px">Inclui todos os álbuns e nome do usuário. Cole via WhatsApp no outro dispositivo.</p>
+      <div class="card-title" style="font-size:.75rem;margin-bottom:6px">Importar via Código</div>
+      <textarea id="import-code-box" class="code-box" placeholder="Cole aqui o código de sincronização..."></textarea>
+      <button class="btn btn-primary" style="margin-top:8px" onclick="importCode()">✅ Aplicar Código</button>
     </div>
+    <button class="back-btn" onclick="goBackToPerfil()" style="margin-top:24px">← Voltar ao Perfil</button>
+  </div>
 
-    <!-- TROCA DE FIGURINHAS -->
+  <!-- Sub: Troca -->
+  <div id="perfil-exchange" style="display:none">
+    <button class="back-btn" onclick="goBackToPerfil()">← Voltar ao Perfil</button>
+    <div class="perfil-section-title">Troca de Figurinhas</div>
     <div class="settings-section">
-      <div class="settings-section-title">🤝 Troca de Figurinhas</div>
-
-      <button class="btn btn-gold" onclick="generateExchangeCode()">
-        📤 Gerar Código das Minhas Faltantes
-      </button>
+      <button class="btn btn-gold" onclick="generateExchangeCode()">📤 Gerar Código das Minhas Faltantes</button>
       <div class="code-row">
-        <textarea id="exchange-out-box" class="code-box" placeholder="Clique em 'Gerar' para criar o código das suas faltantes..." readonly onclick="this.select()"></textarea>
-        <button class="btn-copy" onclick="copyCode('exchange-out-box')" title="Copiar código">
+        <textarea id="exchange-out-box" class="code-box" placeholder="Clique em 'Gerar' para criar o código..." readonly onclick="this.select()"></textarea>
+        <button class="btn-copy" onclick="copyCode('exchange-out-box')" title="Copiar">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
           Copiar
         </button>
       </div>
-      <p class="hint" style="margin-bottom:16px">Envie este código para um amigo. Ele vai ver quais das repetidas dele você precisa.</p>
-
-      <div class="card-title" style="font-size:.75rem; margin-bottom:6px">Verificar Código de um Amigo</div>
-      <textarea id="exchange-in-box" class="code-box" placeholder="Cole aqui o código das faltantes do seu amigo..."></textarea>
-      <button class="btn btn-mint" style="margin-top:8px" onclick="applyExchangeCode()">
-        🔍 Ver minhas repetidas que ele precisa
-      </button>
+      <p class="hint" style="margin-bottom:16px">Combina faltantes de todos os álbuns. Envie para um amigo ver o que ele pode te dar.</p>
+      <div class="card-title" style="font-size:.75rem;margin-bottom:6px">Verificar Código de um Amigo</div>
+      <textarea id="exchange-in-box" class="code-box" placeholder="Cole aqui o código das faltantes do amigo..."></textarea>
+      <button class="btn btn-mint" style="margin-top:8px" onclick="applyExchangeCode()">🔍 Ver minhas repetidas que ele precisa</button>
       <div id="exchange-result" style="display:none"></div>
     </div>
+    <button class="back-btn" onclick="goBackToPerfil()" style="margin-top:24px">← Voltar ao Perfil</button>
+  </div>
 
-    <!-- LISTAS EM TEXTO -->
+  <!-- Sub: Exportar -->
+  <div id="perfil-export" style="display:none">
+    <button class="back-btn" onclick="goBackToPerfil()">← Voltar ao Perfil</button>
+    <div class="perfil-section-title">Exportar Listas</div>
     <div class="settings-section">
-      <div class="settings-section-title">📋 Exportar Listas</div>
-
+      <div class="perfil-section-title" style="margin-bottom:10px">Figurinhas Faltantes</div>
       <div style="display:flex;gap:8px;margin-bottom:8px">
-        <button class="btn btn-outline" style="flex:1;margin-bottom:0" onclick="exportMissingList()">🔍 Gerar Lista</button>
+        <button class="btn btn-primary" style="flex:1;margin-bottom:0" onclick="exportMissingList()">🔍 Gerar Lista de Faltantes</button>
         <button class="btn btn-whatsapp" style="flex:1;margin-bottom:0" onclick="shareMissingOnWhatsApp()">
-          <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15" style="flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.554 4.121 1.522 5.857L.057 23.882a.5.5 0 0 0 .613.613l6.101-1.457A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.953 9.953 0 0 1-5.33-1.538l-.38-.23-3.938.94.957-3.854-.247-.393A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.554 4.121 1.522 5.857L.057 23.882a.5.5 0 0 0 .613.613l6.101-1.457A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.953 9.953 0 0 1-5.33-1.538l-.38-.23-3.938.94.957-3.854-.247-.393A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
           WhatsApp
         </button>
       </div>
       <div class="code-row">
-        <textarea id="missing-list-box" class="code-box" placeholder="Clique em 'Gerar Lista' para ver as figurinhas faltantes..." readonly onclick="this.select()" style="height:120px"></textarea>
-        <button class="btn-copy" style="height:120px" onclick="copyCode('missing-list-box')" title="Copiar lista">
+        <textarea id="missing-list-box" class="code-box" placeholder="Clique em 'Gerar Lista'..." readonly onclick="this.select()" style="height:120px"></textarea>
+        <button class="btn-copy" style="height:120px" onclick="copyCode('missing-list-box')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
           Copiar
         </button>
       </div>
-      <p class="hint" style="margin-bottom:16px">Lista formatada para compartilhar no WhatsApp com os números que faltam por seleção.</p>
+      <p class="hint" style="margin-bottom:16px">Combina faltantes de todos os álbuns. (×N) indica quantos álbuns precisam.</p>
 
+      <div class="perfil-section-title" style="margin:16px 0 10px">Figurinhas Repetidas</div>
       <div style="display:flex;gap:8px;margin-bottom:8px">
-        <button class="btn btn-outline" style="flex:1;margin-bottom:0;border-color:var(--gold-d);color:var(--gold-d)" onclick="exportRepeatedList()">🔄 Gerar Lista</button>
+        <button class="btn btn-gold" style="flex:1;margin-bottom:0" onclick="exportRepeatedList()">🔄 Gerar Lista de Repetidas</button>
         <button class="btn btn-whatsapp" style="flex:1;margin-bottom:0" onclick="shareRepeatedOnWhatsApp()">
-          <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15" style="flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.554 4.121 1.522 5.857L.057 23.882a.5.5 0 0 0 .613.613l6.101-1.457A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.953 9.953 0 0 1-5.33-1.538l-.38-.23-3.938.94.957-3.854-.247-.393A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.554 4.121 1.522 5.857L.057 23.882a.5.5 0 0 0 .613.613l6.101-1.457A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.953 9.953 0 0 1-5.33-1.538l-.38-.23-3.938.94.957-3.854-.247-.393A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
           WhatsApp
         </button>
       </div>
       <div class="code-row">
-        <textarea id="repeated-list-box" class="code-box" placeholder="Clique em 'Gerar Lista' para ver as figurinhas repetidas..." readonly onclick="this.select()" style="height:120px"></textarea>
-        <button class="btn-copy" style="height:120px" onclick="copyCode('repeated-list-box')" title="Copiar lista">
+        <textarea id="repeated-list-box" class="code-box" placeholder="Clique em 'Gerar Lista'..." readonly onclick="this.select()" style="height:120px"></textarea>
+        <button class="btn-copy" style="height:120px" onclick="copyCode('repeated-list-box')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
           Copiar
         </button>
       </div>
-      <p class="hint">Lista formatada para compartilhar no WhatsApp com suas figurinhas repetidas.</p>
+      <p class="hint">Lista de repetidas para compartilhar.</p>
     </div>
+    <button class="back-btn" onclick="goBackToPerfil()" style="margin-top:24px">← Voltar ao Perfil</button>
+  </div>
 
-    <!-- ZONA DE PERIGO -->
+  <!-- Sub: Zona de Perigo -->
+  <div id="perfil-danger" style="display:none">
+    <button class="back-btn" onclick="goBackToPerfil()">← Voltar ao Perfil</button>
+    <div class="perfil-section-title">Zona de Perigo</div>
     <div class="settings-section">
-      <div class="settings-section-title">⚠️ Zona de Perigo</div>
-      <button class="btn btn-danger" onclick="openModal('modal-clear-album')">
-        🗑️ Apagar Álbum Completo
-      </button>
-      <button class="btn btn-danger" style="background:#c0392b; margin-top:4px" onclick="openModal('modal-clear-repeated')">
-        🗑️ Apagar Lista de Repetidas
-      </button>
+      <button class="btn btn-danger" onclick="openClearAlbumModal()">🗑️ Apagar Figurinhas do Álbum Ativo</button>
+      <button class="btn btn-danger" style="background:#c0392b;margin-top:4px" onclick="openModal('modal-clear-all-albums')">🗑️ Apagar Figurinhas de Todos os Álbuns</button>
+      <button class="btn btn-danger" style="background:#7b0a0a;margin-top:4px" onclick="openModal('modal-clear-repeated')">🗑️ Apagar Lista de Repetidas</button>
     </div>
+    <button class="back-btn" onclick="goBackToPerfil()" style="margin-top:24px">← Voltar ao Perfil</button>
   </div>
 
-  <!-- ABA 6: COMO FUNCIONA -->
-  <div id="tab-howto" class="tab-panel">
+</div><!-- /tab-perfil -->
 
-    <div class="howto-section">
-      <h3>🎴 O que é este app?</h3>
-      <p>Gestor do álbum de figurinhas da Copa do Mundo 2026, criado pela <strong>Elevah</strong>. Controle quais figurinhas você tem, quais faltam e quais estão repetidas — tudo no celular ou computador, sem instalar nada.</p>
-    </div>
-
-    <div class="howto-section">
-      <h3>👆 Como marcar figurinhas</h3>
-      <p>As figurinhas aparecem como botões numerados nas abas Lista, Faltam e Repetidas:</p>
-      <div class="howto-chip-demo">
-        <div class="demo-chip d-empty">7</div>
-        <span class="demo-label">Não tenho</span>
-        <div class="demo-chip d-owned">7</div>
-        <span class="demo-label">Tenho ✓</span>
-        <div class="demo-chip d-repeat">7</div>
-        <span class="demo-label">Repetida</span>
-      </div>
-      <ul>
-        <li><strong>1 toque</strong> → marca que você tem (ou adiciona +1 repetida na aba Repetidas)</li>
-        <li><strong>2 toques rápidos</strong> → desfaz a marcação (ou remove -1 repetida)</li>
-        <li>Na aba Repetidas você pode ter mais de uma cópia da mesma figurinha — o número aparece como badge no canto do chip</li>
-        <li>Todas as abas atualizam automaticamente após cada marcação</li>
-      </ul>
-    </div>
-
-    <div class="howto-section">
-      <h3>✨ Figurinhas especiais</h3>
-      <div class="howto-chip-demo">
-        <div class="demo-chip" style="position:relative;border:1.5px solid var(--gold-d);background:linear-gradient(145deg,#FFFCEE,#FFF0C0);color:var(--gold-d)">1<span style="position:absolute;bottom:1px;right:2px;font-size:6px;color:var(--gold)">★</span></div>
-        <span class="demo-label">Brilhante (FWC + nº 1 dos países)</span>
-      </div>
-      <div class="howto-chip-demo">
-        <div class="demo-chip" style="border:1.5px dashed var(--primary);background:#FFF7F4;color:var(--primary-d)">13</div>
-        <span class="demo-label">Foto do time (nº 13 dos países)</span>
-      </div>
-      <ul>
-        <li>Todas as figurinhas <strong>FWC</strong> e os <strong>números 1</strong> de cada país são impressas em papel brilhante — identificadas pelo fundo dourado e a estrela ★</li>
-        <li>O <strong>número 13</strong> de cada país é a foto do time em formação (11 jogadores) — identificado pela borda tracejada</li>
-      </ul>
-    </div>
-
-    <div class="howto-section">
-      <h3>📊 Visão Geral</h3>
-      <p>A primeira aba mostra o progresso geral e por seleção. As barras mudam de cor conforme você avança:</p>
-      <ul>
-        <li>Barra terracota → em andamento</li>
-        <li>Barra dourada + badge <strong>🔥 Quase!</strong> → 90% ou mais completo</li>
-        <li>Barra verde + badge <strong>✓ Completo</strong> → todos os 20 números marcados</li>
-      </ul>
-      <p>Ao marcar a última figurinha de um país, o app dispara uma animação de confetti e um aviso de parabéns! 🎉</p>
-    </div>
-
-    <div class="howto-section">
-      <h3>🔄 Sincronizar entre dispositivos</h3>
-      <p>Na aba <strong>Configurações → Sincronizar</strong>, o código de sincronização é gerado automaticamente a cada marcação — é só copiar e mandar pelo WhatsApp para o outro dispositivo. No outro aparelho, cole o código em <em>Importar via Código</em> e toque em Aplicar.</p>
-    </div>
-
-    <div class="howto-section">
-      <h3>🤝 Troca de Figurinhas</h3>
-      <ul>
-        <li><strong>Gerar Código das Minhas Faltantes</strong>: cria um código com as figurinhas que você precisa. Envie para um amigo.</li>
-        <li>O amigo cola esse código em <em>Verificar Código de um Amigo</em> → o app mostra quais das repetidas dele você precisa, facilitando a negociação!</li>
-      </ul>
-    </div>
-
-    <div class="howto-section">
-      <h3>📋 Exportar Listas</h3>
-      <p>Na aba Configurações, os botões <strong>Gerar Lista de Faltantes</strong> e <strong>Gerar Lista de Repetidas</strong> criam um texto formatado por seleção (ex: <em>BRA: 3, 7, 12</em>). Use o botão <strong>WhatsApp</strong> para abrir o app diretamente com a mensagem pronta para enviar.</p>
-    </div>
-
-    <div class="howto-section">
-      <h3>📱 Instalar como app no celular</h3>
-      <p><strong>iPhone (Safari):</strong> toque no ícone de compartilhar ↑ na barra inferior → role a lista → toque em <em>Adicionar à Tela de Início</em> → confirme. O app abrirá em tela cheia sem a barra do Safari.</p>
-      <p><strong>Android (Chrome):</strong> o Chrome exibirá automaticamente um banner perguntando se deseja instalar. Ou acesse o menu ⋮ → <em>Adicionar à tela inicial</em>.</p>
-      <p>Após instalado, o app funciona 100% offline.</p>
-    </div>
-
-    <div class="howto-section">
-      <h3>💾 Onde ficam os dados?</h3>
-      <p>Tudo é salvo no <em>localStorage</em> do seu navegador — fica no dispositivo e não depende de internet. Para transferir para outro aparelho, use o Código de Sincronização na aba Configurações.</p>
-    </div>
-
+<!-- ═══ ABA 6: AJUDA ════════════════════════════════════════ -->
+<div id="tab-howto" class="tab-panel">
+  <div class="howto-section">
+    <h3>🎴 O que é este app?</h3>
+    <p>Gestor do álbum de figurinhas da Copa do Mundo 2026, criado pela <strong>Elevah</strong>. Gerencie até 3 álbuns diferentes, controle o que tem, o que falta e o que está repetido — tudo no celular, sem instalar nada.</p>
   </div>
+  <div class="howto-section">
+    <h3>👆 Como marcar figurinhas</h3>
+    <div class="howto-chip-demo">
+      <div class="demo-chip d-empty">7</div><span class="demo-label">Não tenho</span>
+      <div class="demo-chip d-owned">7</div><span class="demo-label">Tenho ✓</span>
+      <div class="demo-chip d-repeat">7</div><span class="demo-label">Repetida</span>
+    </div>
+    <ul>
+      <li><strong>1 toque</strong> → marca que você tem (ou +1 repetida na aba Repetidas)</li>
+      <li><strong>2 toques rápidos</strong> → desfaz (ou −1 repetida)</li>
+    </ul>
+  </div>
+  <div class="howto-section">
+    <h3>✨ Figurinhas especiais</h3>
+    <div class="howto-chip-demo">
+      <div class="demo-chip" style="position:relative;border:1.5px solid var(--gold-d);background:linear-gradient(145deg,#FFFCEE,#FFF0C0);color:var(--gold-d)">1<span style="position:absolute;bottom:1px;right:2px;font-size:6px;color:var(--gold)">★</span></div>
+      <span class="demo-label">Brilhante (FWC + nº 1 dos países)</span>
+    </div>
+    <div class="howto-chip-demo">
+      <div class="demo-chip" style="border:1.5px dashed var(--primary);background:#FFF7F4;color:var(--primary-d)">13</div>
+      <span class="demo-label">Foto do time (nº 13 dos países)</span>
+    </div>
+  </div>
+  <div class="howto-category">⚙️ Aba Perfil</div>
+
+  <div class="howto-sub">
+    <h4>🏆 Gerenciar Álbuns</h4>
+    <p>Crie até 3 álbuns (um por pessoa, por exemplo). O álbum <strong>ativo</strong> é o que está sendo editado nas abas Lista e Faltam. Você pode renomear ou excluir álbuns, mas não é possível excluir o único álbum.</p>
+  </div>
+  <div class="howto-sub">
+    <h4>🔄 Sincronização</h4>
+    <p>Transfere todos os seus álbuns entre dispositivos. O código é gerado automaticamente — copie e cole via WhatsApp no outro celular, depois clique em <strong>Aplicar Código</strong>.</p>
+  </div>
+  <div class="howto-sub">
+    <h4>🤝 Troca de Figurinhas</h4>
+    <p>Gere um código com suas figurinhas faltantes e envie para um amigo. Ele cola o código e vê quais repetidas dele podem te ajudar. O código combina faltantes de todos os seus álbuns.</p>
+  </div>
+  <div class="howto-sub">
+    <h4>📋 Exportar Listas</h4>
+    <p>Gera listas de texto das figurinhas faltantes ou repetidas para compartilhar via WhatsApp ou copiar. A lista de faltantes combina todos os álbuns e indica com <em>(×N)</em> quantos precisam de cada figurinha.</p>
+  </div>
+  <div class="howto-sub">
+    <h4>⚠️ Zona de Perigo</h4>
+    <p>Permite apagar as figurinhas de um álbum específico, de todos os álbuns de uma vez, ou limpar a lista de repetidas. Os álbuns em si não são excluídos ao apagar as figurinhas — apenas as marcações são removidas.</p>
+  </div>
+
+  <div class="howto-section" style="margin-top:8px">
+    <h3>📊 Visão Geral</h3>
+    <p>Mostra o progresso do álbum. Se você tiver mais de um álbum, exibe um card por álbum (toque para ver detalhes por seleção) e um card "Total" com a soma de todos. Com apenas um álbum, abre diretamente no detalhamento.</p>
+  </div>
+  <div class="howto-section">
+    <h3>📱 Instalar como app</h3>
+    <p><strong>iPhone (Safari):</strong> botão compartilhar ↑ → Adicionar à Tela de Início.</p>
+    <p><strong>Android (Chrome):</strong> menu ⋮ → Adicionar à tela inicial.</p>
+  </div>
+  <div class="howto-section">
+    <h3>💾 Onde ficam os dados?</h3>
+    <p>Tudo salvo no <em>localStorage</em> do navegador — no dispositivo, sem depender de internet. Para transferir, use o Código de Sincronização.</p>
+  </div>
+</div>
 
 </main>
 
-<!-- ═══ MODAIS ════════════════════════════════════════════ -->
+<!-- ═══ MODAIS ═══════════════════════════════════════════════ -->
 <div class="modal-overlay" id="modal-clear-album" onclick="closeModalOnOverlay(event,'modal-clear-album')">
   <div class="modal-box">
-    <h3>🗑️ Apagar Álbum Completo?</h3>
-    <p>Isso vai remover <strong>todas</strong> as figurinhas marcadas como "tenho". Esta ação não pode ser desfeita.</p>
+    <h3>🗑️ Apagar figurinhas do álbum?</h3>
+    <p>Vai remover todas as figurinhas marcadas do álbum <strong id="modal-clear-album-name">ativo</strong>. O álbum em si não será excluído. Esta ação não pode ser desfeita.</p>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeModal('modal-clear-album')">Cancelar</button>
-      <button class="btn btn-danger" onclick="clearAlbum()">Sim, apagar tudo</button>
+      <button class="btn btn-danger" onclick="clearAlbum()">Sim, apagar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-clear-all-albums" onclick="closeModalOnOverlay(event,'modal-clear-all-albums')">
+  <div class="modal-box">
+    <h3>🗑️ Apagar figurinhas de todos os álbuns?</h3>
+    <p>Vai remover <strong>todas</strong> as figurinhas marcadas de <strong>todos</strong> os seus álbuns. Os álbuns em si não serão excluídos. Esta ação não pode ser desfeita.</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modal-clear-all-albums')">Cancelar</button>
+      <button class="btn btn-danger" onclick="clearAllAlbums()">Sim, apagar tudo</button>
     </div>
   </div>
 </div>
@@ -1020,7 +635,7 @@
 <div class="modal-overlay" id="modal-clear-repeated" onclick="closeModalOnOverlay(event,'modal-clear-repeated')">
   <div class="modal-box">
     <h3>🗑️ Apagar Lista de Repetidas?</h3>
-    <p>Isso vai remover <strong>todas</strong> as marcações de repetidas. Esta ação não pode ser desfeita.</p>
+    <p>Remove <strong>todas</strong> as marcações de repetidas. Esta ação não pode ser desfeita.</p>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeModal('modal-clear-repeated')">Cancelar</button>
       <button class="btn btn-danger" onclick="clearRepeated()">Sim, apagar</button>
@@ -1028,131 +643,215 @@
   </div>
 </div>
 
-<!-- ═══ SCRIPTS ═══════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-create-album" onclick="closeModalOnOverlay(event,'modal-create-album')">
+  <div class="modal-box">
+    <h3>➕ Criar Novo Álbum</h3>
+    <p>Dê um nome para identificar este álbum (ex: "Álbum da Maria").</p>
+    <input id="new-album-name" class="modal-input" type="text" placeholder="Nome do álbum" maxlength="30"
+      onkeydown="if(event.key==='Enter') createAlbumFromModal()">
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modal-create-album')">Cancelar</button>
+      <button class="btn btn-primary" onclick="createAlbumFromModal()">Criar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-delete-album" onclick="closeModalOnOverlay(event,'modal-delete-album')">
+  <div class="modal-box">
+    <h3>🗑️ Excluir álbum?</h3>
+    <p>Vai excluir permanentemente o álbum <strong id="modal-delete-album-name"></strong> e todas as suas figurinhas marcadas.</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modal-delete-album')">Cancelar</button>
+      <button class="btn btn-danger" onclick="executeDeleteAlbum()">Sim, excluir</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCRIPT ═══════════════════════════════════════════════ -->
 <script>
-/* ══════════════════════════════════════
-   DADOS DO ÁLBUM
-══════════════════════════════════════ */
+/* ── ALBUM DATA ─────────────────────────────────────────── */
 function range(a,b){ const r=[]; for(let i=a;i<=b;i++) r.push(String(i)); return r; }
 
 const ALBUM_DATA = [
   { titulo:'Panini',           grupo:null, sigla:'PANINI',             nums:['00'] },
   { titulo:'FWC',              grupo:null, sigla:'FWC',                nums:range(1,19) },
-  { titulo:'México',           grupo:'A',  sigla:'MEX',  order:1,     nums:range(1,20) },
-  { titulo:'África do Sul',    grupo:'A',  sigla:'RSA',  order:2,     nums:range(1,20) },
-  { titulo:'Coreia do Sul',    grupo:'A',  sigla:'KOR',  order:3,     nums:range(1,20) },
-  { titulo:'República Tcheca', grupo:'A',  sigla:'CZE',  order:4,     nums:range(1,20) },
-  { titulo:'Canadá',           grupo:'B',  sigla:'CAN',  order:5,     nums:range(1,20) },
-  { titulo:'Bósnia',           grupo:'B',  sigla:'BIH',  order:6,     nums:range(1,20) },
-  { titulo:'Catar',            grupo:'B',  sigla:'QAT',  order:7,     nums:range(1,20) },
-  { titulo:'Suíça',            grupo:'B',  sigla:'SUI',  order:8,     nums:range(1,20) },
-  { titulo:'Brasil',           grupo:'C',  sigla:'BRA',  order:9,     nums:range(1,20) },
-  { titulo:'Marrocos',         grupo:'C',  sigla:'MAR',  order:10,    nums:range(1,20) },
-  { titulo:'Haiti',            grupo:'C',  sigla:'HAI',  order:11,    nums:range(1,20) },
-  { titulo:'Escócia',          grupo:'C',  sigla:'SCO',  order:12,    nums:range(1,20) },
-  { titulo:'Estados Unidos',   grupo:'D',  sigla:'USA',  order:13,    nums:range(1,20) },
-  { titulo:'Paraguai',         grupo:'D',  sigla:'PAR',  order:14,    nums:range(1,20) },
-  { titulo:'Austrália',        grupo:'D',  sigla:'AUS',  order:15,    nums:range(1,20) },
-  { titulo:'Turquia',          grupo:'D',  sigla:'TUR',  order:16,    nums:range(1,20) },
-  { titulo:'Alemanha',         grupo:'E',  sigla:'GER',  order:17,    nums:range(1,20) },
-  { titulo:'Curaçao',          grupo:'E',  sigla:'CUW',  order:18,    nums:range(1,20) },
-  { titulo:'Costa do Marfim',  grupo:'E',  sigla:'CIV',  order:19,    nums:range(1,20) },
-  { titulo:'Equador',          grupo:'E',  sigla:'ECU',  order:20,    nums:range(1,20) },
-  { titulo:'Holanda',          grupo:'F',  sigla:'NED',  order:21,    nums:range(1,20) },
-  { titulo:'Japão',            grupo:'F',  sigla:'JPN',  order:22,    nums:range(1,20) },
-  { titulo:'Suécia',           grupo:'F',  sigla:'SWE',  order:23,    nums:range(1,20) },
-  { titulo:'Tunísia',          grupo:'F',  sigla:'TUN',  order:24,    nums:range(1,20) },
-  { titulo:'Bélgica',          grupo:'G',  sigla:'BEL',  order:25,    nums:range(1,20) },
-  { titulo:'Egito',            grupo:'G',  sigla:'EGY',  order:26,    nums:range(1,20) },
-  { titulo:'Irã',              grupo:'G',  sigla:'IRN',  order:27,    nums:range(1,20) },
-  { titulo:'Nova Zelândia',    grupo:'G',  sigla:'NZL',  order:28,    nums:range(1,20) },
-  { titulo:'Espanha',          grupo:'H',  sigla:'ESP',  order:29,    nums:range(1,20) },
-  { titulo:'Cabo Verde',       grupo:'H',  sigla:'CPV',  order:30,    nums:range(1,20) },
-  { titulo:'Arábia Saudita',   grupo:'H',  sigla:'KSA',  order:31,    nums:range(1,20) },
-  { titulo:'Uruguai',          grupo:'H',  sigla:'URU',  order:32,    nums:range(1,20) },
-  { titulo:'França',           grupo:'I',  sigla:'FRA',  order:33,    nums:range(1,20) },
-  { titulo:'Senegal',          grupo:'I',  sigla:'SEN',  order:34,    nums:range(1,20) },
-  { titulo:'Iraque',           grupo:'I',  sigla:'IRQ',  order:35,    nums:range(1,20) },
-  { titulo:'Noruega',          grupo:'I',  sigla:'NOR',  order:36,    nums:range(1,20) },
-  { titulo:'Argentina',        grupo:'J',  sigla:'ARG',  order:37,    nums:range(1,20) },
-  { titulo:'Argélia',          grupo:'J',  sigla:'ALG',  order:38,    nums:range(1,20) },
-  { titulo:'Áustria',          grupo:'J',  sigla:'AUT',  order:39,    nums:range(1,20) },
-  { titulo:'Jordânia',         grupo:'J',  sigla:'JOR',  order:40,    nums:range(1,20) },
-  { titulo:'Portugal',         grupo:'K',  sigla:'POR',  order:41,    nums:range(1,20) },
-  { titulo:'Congo',            grupo:'K',  sigla:'COD',  order:42,    nums:range(1,20) },
-  { titulo:'Uzbequistão',      grupo:'K',  sigla:'UZB',  order:43,    nums:range(1,20) },
-  { titulo:'Colômbia',         grupo:'K',  sigla:'COL',  order:44,    nums:range(1,20) },
-  { titulo:'Inglaterra',       grupo:'L',  sigla:'ENG',  order:45,    nums:range(1,20) },
-  { titulo:'Croácia',          grupo:'L',  sigla:'CRO',  order:46,    nums:range(1,20) },
-  { titulo:'Gana',             grupo:'L',  sigla:'GHA',  order:47,    nums:range(1,20) },
-  { titulo:'Panamá',           grupo:'L',  sigla:'PAN',  order:48,    nums:range(1,20) },
-  { titulo:'Coca-Cola',        grupo:null, sigla:'CC',                nums:range(1,14) },
+  { titulo:'México',           grupo:'A',  sigla:'MEX',  order:1,      nums:range(1,20) },
+  { titulo:'África do Sul',    grupo:'A',  sigla:'RSA',  order:2,      nums:range(1,20) },
+  { titulo:'Coreia do Sul',    grupo:'A',  sigla:'KOR',  order:3,      nums:range(1,20) },
+  { titulo:'República Tcheca', grupo:'A',  sigla:'CZE',  order:4,      nums:range(1,20) },
+  { titulo:'Canadá',           grupo:'B',  sigla:'CAN',  order:5,      nums:range(1,20) },
+  { titulo:'Bósnia',           grupo:'B',  sigla:'BIH',  order:6,      nums:range(1,20) },
+  { titulo:'Catar',            grupo:'B',  sigla:'QAT',  order:7,      nums:range(1,20) },
+  { titulo:'Suíça',            grupo:'B',  sigla:'SUI',  order:8,      nums:range(1,20) },
+  { titulo:'Brasil',           grupo:'C',  sigla:'BRA',  order:9,      nums:range(1,20) },
+  { titulo:'Marrocos',         grupo:'C',  sigla:'MAR',  order:10,     nums:range(1,20) },
+  { titulo:'Haiti',            grupo:'C',  sigla:'HAI',  order:11,     nums:range(1,20) },
+  { titulo:'Escócia',          grupo:'C',  sigla:'SCO',  order:12,     nums:range(1,20) },
+  { titulo:'Estados Unidos',   grupo:'D',  sigla:'USA',  order:13,     nums:range(1,20) },
+  { titulo:'Paraguai',         grupo:'D',  sigla:'PAR',  order:14,     nums:range(1,20) },
+  { titulo:'Austrália',        grupo:'D',  sigla:'AUS',  order:15,     nums:range(1,20) },
+  { titulo:'Turquia',          grupo:'D',  sigla:'TUR',  order:16,     nums:range(1,20) },
+  { titulo:'Alemanha',         grupo:'E',  sigla:'GER',  order:17,     nums:range(1,20) },
+  { titulo:'Curaçao',          grupo:'E',  sigla:'CUW',  order:18,     nums:range(1,20) },
+  { titulo:'Costa do Marfim',  grupo:'E',  sigla:'CIV',  order:19,     nums:range(1,20) },
+  { titulo:'Equador',          grupo:'E',  sigla:'ECU',  order:20,     nums:range(1,20) },
+  { titulo:'Holanda',          grupo:'F',  sigla:'NED',  order:21,     nums:range(1,20) },
+  { titulo:'Japão',            grupo:'F',  sigla:'JPN',  order:22,     nums:range(1,20) },
+  { titulo:'Suécia',           grupo:'F',  sigla:'SWE',  order:23,     nums:range(1,20) },
+  { titulo:'Tunísia',          grupo:'F',  sigla:'TUN',  order:24,     nums:range(1,20) },
+  { titulo:'Bélgica',          grupo:'G',  sigla:'BEL',  order:25,     nums:range(1,20) },
+  { titulo:'Egito',            grupo:'G',  sigla:'EGY',  order:26,     nums:range(1,20) },
+  { titulo:'Irã',              grupo:'G',  sigla:'IRN',  order:27,     nums:range(1,20) },
+  { titulo:'Nova Zelândia',    grupo:'G',  sigla:'NZL',  order:28,     nums:range(1,20) },
+  { titulo:'Espanha',          grupo:'H',  sigla:'ESP',  order:29,     nums:range(1,20) },
+  { titulo:'Cabo Verde',       grupo:'H',  sigla:'CPV',  order:30,     nums:range(1,20) },
+  { titulo:'Arábia Saudita',   grupo:'H',  sigla:'KSA',  order:31,     nums:range(1,20) },
+  { titulo:'Uruguai',          grupo:'H',  sigla:'URU',  order:32,     nums:range(1,20) },
+  { titulo:'França',           grupo:'I',  sigla:'FRA',  order:33,     nums:range(1,20) },
+  { titulo:'Senegal',          grupo:'I',  sigla:'SEN',  order:34,     nums:range(1,20) },
+  { titulo:'Iraque',           grupo:'I',  sigla:'IRQ',  order:35,     nums:range(1,20) },
+  { titulo:'Noruega',          grupo:'I',  sigla:'NOR',  order:36,     nums:range(1,20) },
+  { titulo:'Argentina',        grupo:'J',  sigla:'ARG',  order:37,     nums:range(1,20) },
+  { titulo:'Argélia',          grupo:'J',  sigla:'ALG',  order:38,     nums:range(1,20) },
+  { titulo:'Áustria',          grupo:'J',  sigla:'AUT',  order:39,     nums:range(1,20) },
+  { titulo:'Jordânia',         grupo:'J',  sigla:'JOR',  order:40,     nums:range(1,20) },
+  { titulo:'Portugal',         grupo:'K',  sigla:'POR',  order:41,     nums:range(1,20) },
+  { titulo:'Congo',            grupo:'K',  sigla:'COD',  order:42,     nums:range(1,20) },
+  { titulo:'Uzbequistão',      grupo:'K',  sigla:'UZB',  order:43,     nums:range(1,20) },
+  { titulo:'Colômbia',         grupo:'K',  sigla:'COL',  order:44,     nums:range(1,20) },
+  { titulo:'Inglaterra',       grupo:'L',  sigla:'ENG',  order:45,     nums:range(1,20) },
+  { titulo:'Croácia',          grupo:'L',  sigla:'CRO',  order:46,     nums:range(1,20) },
+  { titulo:'Gana',             grupo:'L',  sigla:'GHA',  order:47,     nums:range(1,20) },
+  { titulo:'Panamá',           grupo:'L',  sigla:'PAN',  order:48,     nums:range(1,20) },
+  { titulo:'Coca-Cola',        grupo:null, sigla:'CC',                  nums:range(1,14) },
 ];
 
 const TOTAL = ALBUM_DATA.reduce((s,g) => s + g.nums.length, 0);
-
-// Grupos base (fixos)
 const G_PANINI    = ALBUM_DATA.find(g => g.sigla === 'PANINI');
 const G_FWC       = ALBUM_DATA.find(g => g.sigla === 'FWC');
 const G_EXTRA     = ALBUM_DATA.find(g => g.sigla === 'CC');
 const G_COUNTRIES = ALBUM_DATA.filter(g => g.grupo !== null);
 
-// Ordem dinâmica: PANINI e FWC sempre primeiro, Coca-Cola sempre último
-// sortOrder === 'alpha'  → países por sigla (padrão)
-// sortOrder === 'groups' → países pelo índice do álbum (campo order)
 function getDisplayOrder(){
   const sorted = [...G_COUNTRIES].sort((a,b) =>
-    sortOrder === 'groups'
-      ? a.order - b.order
-      : a.sigla.localeCompare(b.sigla)
+    sortOrder === 'groups' ? a.order - b.order : a.sigla.localeCompare(b.sigla)
   );
   return [G_PANINI, G_FWC, ...sorted, G_EXTRA];
 }
+function chipId(sigla, num){ return sigla + '-' + num; }
 
-function chipId(sigla,num){ return sigla+'-'+num; }
+/* ── STATE ──────────────────────────────────────────────── */
+const state = {
+  albums: [],           // [{id, name, owned: Set}]
+  activeAlbumId: null,  // active for Lista & marking
+  repeated: {},         // {chipId: count} — global pool
+  missingShowAll: false,// Faltam "Todos os Álbuns" mode
+  detailAlbumId: null,  // Visão Geral drill-down
+};
+let sortOrder = 'alpha';
+let userName  = '';
+let pendingDeleteAlbumId = null;
 
-/* ══════════════════════════════════════
-   ESTADO
-══════════════════════════════════════ */
-const state = { owned: new Set(), repeated: {} };
-let sortOrder = 'alpha'; // 'alpha' | 'groups' — carregado em loadState()
+function generateId(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,5); }
+function getActiveAlbum(){ return state.albums.find(a => a.id === state.activeAlbumId) || state.albums[0] || null; }
+function getAlbumById(id){ return state.albums.find(a => a.id === id); }
+function pctForAlbum(a){ return TOTAL ? Math.round(a.owned.size / TOTAL * 100) : 0; }
 
-function saveSortOrder(){
-  localStorage.setItem('elevah_sort', sortOrder);
-}
-function setSortOrder(order){
-  if(sortOrder === order) return;
-  sortOrder = order;
-  saveSortOrder();
-  renderAll();
+/* ── SAVE / LOAD ────────────────────────────────────────── */
+function saveState(){
+  localStorage.setItem('elevah_albums',    JSON.stringify(state.albums.map(a => ({id:a.id, name:a.name, owned:[...a.owned]}))));
+  localStorage.setItem('elevah_repeated',  JSON.stringify(state.repeated));
+  localStorage.setItem('elevah_active',    state.activeAlbumId || '');
+  localStorage.setItem('elevah_miss_all',  state.missingShowAll ? '1' : '0');
+  localStorage.setItem('elevah_username',  userName);
+  localStorage.setItem('elevah_sort',      sortOrder);
 }
 
 function loadState(){
   try {
-    const o = localStorage.getItem('elevah_owned');
-    const r = localStorage.getItem('elevah_repeated');
-    if(o) state.owned = new Set(JSON.parse(o));
-    if(r){
-      const rParsed = JSON.parse(r);
-      // Compatibilidade: se for array (formato antigo Set), converte para objeto com contagem 1
-      if(Array.isArray(rParsed)){
-        state.repeated = {};
-        for(const id of rParsed) state.repeated[id] = 1;
-      } else {
-        state.repeated = rParsed || {};
-      }
+    // Albums (new format)
+    const albumsRaw = localStorage.getItem('elevah_albums');
+    if(albumsRaw){
+      state.albums = JSON.parse(albumsRaw).map(a => ({id:a.id, name:a.name, owned:new Set(a.owned||[])}));
     }
+    // Migration from old single-album format
+    if(state.albums.length === 0){
+      const oldOwned = localStorage.getItem('elevah_owned');
+      const album = {id: generateId(), name: 'Meu Álbum', owned: new Set()};
+      if(oldOwned){ try{ album.owned = new Set(JSON.parse(oldOwned)); }catch(e){} }
+      state.albums = [album];
+      localStorage.removeItem('elevah_owned');
+    }
+    // Repeated
+    const r = localStorage.getItem('elevah_repeated');
+    if(r){
+      const rp = JSON.parse(r);
+      state.repeated = Array.isArray(rp) ? Object.fromEntries(rp.map(id=>[id,1])) : (rp||{});
+    }
+    // Active album
+    const activeId = localStorage.getItem('elevah_active');
+    state.activeAlbumId = (activeId && getAlbumById(activeId)) ? activeId : (state.albums[0]?.id || null);
+    // Misc
+    state.missingShowAll = localStorage.getItem('elevah_miss_all') === '1';
     sortOrder = localStorage.getItem('elevah_sort') || 'alpha';
+    userName  = localStorage.getItem('elevah_username') || '';
   } catch(e){ console.warn('loadState error', e); }
 }
-function saveState(){
-  localStorage.setItem('elevah_owned',    JSON.stringify([...state.owned]));
-  localStorage.setItem('elevah_repeated', JSON.stringify(state.repeated));
+
+/* ── ALBUM MANAGEMENT ───────────────────────────────────── */
+function createAlbum(name){
+  if(state.albums.length >= 3){ alert('Limite de 3 álbuns atingido.'); return; }
+  const album = {id: generateId(), name: (name||'').trim() || `Álbum ${state.albums.length+1}`, owned: new Set()};
+  state.albums.push(album);
+  state.activeAlbumId = album.id;
+  saveState(); renderAll();
+}
+function renameAlbum(id, newName){
+  const a = getAlbumById(id);
+  if(a && newName.trim()){ a.name = newName.trim(); saveState(); renderAll(); }
+}
+function deleteAlbum(id){
+  if(state.albums.length <= 1){ alert('Não é possível excluir o único álbum.'); return; }
+  state.albums = state.albums.filter(a => a.id !== id);
+  if(state.activeAlbumId === id) state.activeAlbumId = state.albums[0].id;
+  saveState(); renderAll();
+}
+function setActiveAlbum(id){
+  if(getAlbumById(id)){ state.activeAlbumId = id; saveState(); renderAll(); }
+}
+function createAlbumFromModal(){
+  const inp = document.getElementById('new-album-name');
+  createAlbum(inp?.value || '');
+  if(inp) inp.value = '';
+  closeModal('modal-create-album');
+  renderPerfilAlbuns();
+}
+function confirmDeleteAlbum(id){
+  pendingDeleteAlbumId = id;
+  const a = getAlbumById(id);
+  const el = document.getElementById('modal-delete-album-name');
+  if(el) el.textContent = a?.name || 'este álbum';
+  openModal('modal-delete-album');
+}
+function executeDeleteAlbum(){
+  if(pendingDeleteAlbumId){ deleteAlbum(pendingDeleteAlbumId); pendingDeleteAlbumId = null; renderPerfilAlbuns(); }
+  closeModal('modal-delete-album');
+}
+function promptRenameAlbum(id){
+  const a = getAlbumById(id);
+  if(!a) return;
+  const newName = prompt('Novo nome para o álbum:', a.name);
+  if(newName !== null && newName.trim()){ renameAlbum(id, newName); renderPerfilAlbuns(); }
 }
 
-/* ══════════════════════════════════════
-   HELPERS: REPETIDAS (com contagem)
-══════════════════════════════════════ */
+/* ── SORT ORDER ─────────────────────────────────────────── */
+function saveSortOrder(){ localStorage.setItem('elevah_sort', sortOrder); }
+function setSortOrder(order){
+  if(sortOrder === order) return;
+  sortOrder = order; saveSortOrder(); renderAll();
+}
+
+/* ── REPEATED HELPERS ───────────────────────────────────── */
 function repCount(id){ return state.repeated[id] || 0; }
 function addRepeat(id){ state.repeated[id] = (state.repeated[id]||0)+1; }
 function removeRepeat(id){
@@ -1161,61 +860,60 @@ function removeRepeat(id){
 }
 function totalRepeatCount(){ return Object.values(state.repeated).reduce((s,c)=>s+c,0); }
 
-/* ══════════════════════════════════════
-   TAP (single / double) — funciona no mobile e desktop
-══════════════════════════════════════ */
+/* ── TAP HANDLER ────────────────────────────────────────── */
 const tapMap = {};
 function handleChipTap(id, tabType){
   if(!tapMap[id]) tapMap[id] = {c:0, t:null};
-  const s = tapMap[id];
-  s.c++;
+  const s = tapMap[id]; s.c++;
   clearTimeout(s.t);
   s.t = setTimeout(()=>{
-    if(s.c===1) doSingle(id,tabType);
-    else         doDouble(id,tabType);
+    if(s.c===1) doSingle(id, tabType);
+    else        doDouble(id, tabType);
     s.c=0; s.t=null;
   }, 270);
 }
-
-function doSingle(id,tabType){
+function doSingle(id, tabType){
   if(tabType==='repeated'){
+    // Warn if this sticker is in the missing list of any album
+    const albumsMissing = state.albums.filter(a => !a.owned.has(id));
+    if(albumsMissing.length > 0){
+      const names = albumsMissing.map(a => `"${a.name}"`).join(', ');
+      const albumWord = albumsMissing.length === 1 ? 'álbum' : 'álbuns';
+      const confirmed = confirm(`⚠️ A figurinha ${id} ainda está na lista de faltantes do ${albumWord}: ${names}.\n\nDeseja mesmo marcá-la como repetida?`);
+      if(!confirmed) return;
+    }
     addRepeat(id);
-  } else {
-    state.owned.add(id);
-    checkGroupCompletion(id); // Celebra se completou o time
   }
-  saveState(); renderAll(); flashChip(id,tabType);
+  else {
+    const a = getActiveAlbum();
+    if(a){ a.owned.add(id); checkGroupCompletion(id); }
+  }
+  saveState(); renderAll(); flashChip(id, tabType);
 }
-function doDouble(id,tabType){
-  if(tabType==='repeated') removeRepeat(id);
-  else                     state.owned.delete(id);
+function doDouble(id, tabType){
+  if(tabType==='repeated'){ removeRepeat(id); }
+  else { const a = getActiveAlbum(); if(a) a.owned.delete(id); }
   saveState(); renderAll();
 }
-
 function flashChip(id, tabType){
   const sfx = tabType==='repeated'?'-r': tabType==='missing'?'-m':'-l';
   const el = document.querySelector(`[data-cid="${id}${sfx}"]`);
   if(el){ el.classList.add('just-toggled'); el.addEventListener('animationend',()=>el.classList.remove('just-toggled'),{once:true}); }
 }
 
-/* ══════════════════════════════════════
-   RENDER HELPERS
-══════════════════════════════════════ */
-function buildGroupHTML(group, tabType){
+/* ── BUILD GROUP HTML ───────────────────────────────────── */
+function buildGroupHTML(group, tabType, ownedSet){
+  if(!ownedSet) ownedSet = getActiveAlbum()?.owned || new Set();
   const sfx = tabType==='repeated'?'-r': tabType==='missing'?'-m':'-l';
   const isWide = group.sigla==='PANINI';
-  const ownedCount = group.nums.filter(n=>state.owned.has(chipId(group.sigla,n))).length;
+  const ownedCount = group.nums.filter(n=>ownedSet.has(chipId(group.sigla,n))).length;
   const total = group.nums.length;
   const allDone = ownedCount===total && total>0;
+  const displayTitle = (group.sigla===group.titulo||group.sigla===group.titulo.toUpperCase())
+    ? group.sigla : `${group.sigla} - ${group.titulo}`;
 
-  const displayTitle = (group.sigla === group.titulo || group.sigla === group.titulo.toUpperCase())
-    ? group.sigla
-    : `${group.sigla} - ${group.titulo}`;
-
-  let html = `<div class="section-header">
-    <div class="section-title">${displayTitle}</div>`;
+  let html = `<div class="section-header"><div class="section-title">${displayTitle}</div>`;
   if(tabType==='missing'){
-    // Na aba Faltam, mostrar apenas a quantidade que falta (group.nums já são só as faltantes)
     html += `<span class="section-badge">${total}</span>`;
   } else if(tabType!=='repeated'){
     html += `<span class="section-badge${allDone?' done':''}">${ownedCount}/${total}</span>`;
@@ -1224,508 +922,545 @@ function buildGroupHTML(group, tabType){
   html += `</div><div class="chips-grid">`;
 
   for(const num of group.nums){
-    const id = chipId(group.sigla,num);
-    const isOwned = state.owned.has(id);
-    const cnt     = repCount(id);
-
+    const id = chipId(group.sigla, num);
+    const isOwned = ownedSet.has(id);
+    const cnt = repCount(id);
     if(tabType==='missing' && isOwned) continue;
-
-    let cls='chip';
-    if(isWide) cls+=' wide';
-
+    let cls = 'chip';
+    if(isWide) cls += ' wide';
     let innerLabel = isWide ? `PANINI ${num}` : num;
-
     if(tabType==='repeated'){
-      if(cnt > 0){
-        cls += ' repeated';
-        if(cnt > 1) innerLabel += `<span class="chip-rep-cnt">${cnt}</span>`;
-      }
+      if(cnt>0){ cls+=' repeated'; if(cnt>1) innerLabel+=`<span class="chip-rep-cnt">${cnt}</span>`; }
     } else {
       if(isOwned) cls+=' owned';
     }
-
-    // Figurinhas especiais: brilhantes (FWC completo + nº1 dos países)
-    const isShiny = (group.sigla === 'FWC') ||
-                    (group.grupo !== null && num === '1');
-    // Foto do time: nº13 dos países
-    const isTeamPhoto = group.grupo !== null && num === '13';
-    if(isShiny)    cls += ' shiny';
-    if(isTeamPhoto) cls += ' team-photo';
-
+    const isShiny = (group.sigla==='FWC') || (group.grupo!==null && num==='1');
+    const isTeamPhoto = group.grupo!==null && num==='13';
+    if(isShiny)    cls+=' shiny';
+    if(isTeamPhoto) cls+=' team-photo';
     html += `<div class="${cls}" data-cid="${id}${sfx}" data-id="${id}" data-tab="${tabType}">${innerLabel}</div>`;
   }
   html += `</div>`;
   return html;
 }
 
-/* ══════════════════════════════════════
-   RENDER: VISÃO GERAL
-══════════════════════════════════════ */
+/* ── RENDER: VISÃO GERAL ────────────────────────────────── */
 let donutChart = null;
 
 function renderOverview(){
-  const owned   = state.owned.size;
-  const missing = TOTAL - owned;
-  const pct     = TOTAL ? Math.round(owned/TOTAL*100) : 0;
+  // Single album → always show its detail directly (no cards view)
+  if(state.albums.length === 1){
+    renderAlbumDetail(state.albums[0].id);
+  } else if(state.detailAlbumId){
+    renderAlbumDetail(state.detailAlbumId);
+  } else {
+    renderAlbumCards();
+  }
+}
 
+function renderAlbumCards(){
+  document.getElementById('overview-cards-view').style.display = '';
+  document.getElementById('overview-detail-view').style.display = 'none';
+  let html = '';
+  for(const album of state.albums){
+    const owned = album.owned.size;
+    const pct = pctForAlbum(album);
+    const isFull = owned === TOTAL;
+    const isNear = pct >= 90 && !isFull;
+    const fillClass = isFull?' full':isNear?' near':'';
+    const badge = isFull
+      ? `<span class="complete-badge">✓ Completo</span>`
+      : isNear ? `<span class="near-badge">🔥 Quase!</span>` : '';
+    html += `<div class="album-card clickable" onclick="openAlbumDetail('${album.id}')">
+      <div class="album-card-header">
+        <div class="album-card-name">🏆 ${album.name}</div>
+        <div>${badge}</div>
+      </div>
+      <div class="album-card-stats">${owned}/${TOTAL} figurinhas · ${pct}%</div>
+      <div class="progress-bar"><div class="progress-fill${fillClass}" style="width:${pct}%"></div></div>
+      <div class="album-card-footer">Ver detalhes →</div>
+    </div>`;
+  }
+  if(state.albums.length > 1){
+    const totalOwned2 = state.albums.reduce((s,a)=>s+a.owned.size,0);
+    const totalPoss2  = TOTAL * state.albums.length;
+    const cpct = totalPoss2 ? Math.round(totalOwned2/totalPoss2*100) : 0;
+    html += `<div class="album-card combined">
+      <div class="album-card-header">
+        <div class="album-card-name" style="color:var(--text-mid)">📊 Total geral</div>
+        <div style="font-size:.7rem;color:var(--text-light)">${state.albums.length} álbuns</div>
+      </div>
+      <div class="album-card-stats">${totalOwned2}/${totalPoss2} figurinhas · ${cpct}%</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${cpct}%"></div></div>
+    </div>`;
+  }
+  document.getElementById('overview-cards-content').innerHTML = html;
+}
+
+function openAlbumDetail(albumId){
+  state.detailAlbumId = albumId;
+  state.activeAlbumId = albumId;
+  saveState(); renderAll();
+}
+function closeAlbumDetail(){
+  state.detailAlbumId = null;
+  renderAll();
+}
+
+function renderAlbumDetail(albumId){
+  const album = getAlbumById(albumId);
+  if(!album){ closeAlbumDetail(); return; }
+  document.getElementById('overview-cards-view').style.display = 'none';
+  document.getElementById('overview-detail-view').style.display = '';
+  document.getElementById('detail-album-name').textContent = '🏆 ' + album.name;
+  // Hide back button when only 1 album (no cards view to go back to)
+  const detailBackBtn = document.querySelector('#overview-detail-view .back-btn');
+  if(detailBackBtn) detailBackBtn.style.display = state.albums.length === 1 ? 'none' : '';
+
+  const owned = album.owned.size;
+  const missing = TOTAL - owned;
+  const pct = TOTAL ? Math.round(owned/TOTAL*100) : 0;
   document.getElementById('st-total').textContent   = TOTAL;
   document.getElementById('st-owned').textContent   = owned;
   document.getElementById('st-missing').textContent = missing;
-  document.getElementById('donut-pct').textContent  = pct+'%';
-  document.getElementById('hdr-pct').textContent    = pct+'%';
+  document.getElementById('donut-pct').textContent  = pct + '%';
 
   const ctx = document.getElementById('donut-chart').getContext('2d');
-  if(donutChart){
-    donutChart.data.datasets[0].data = [owned, missing];
-    donutChart.update('none');
-  } else {
+  if(donutChart){ donutChart.data.datasets[0].data=[owned,missing]; donutChart.update('none'); }
+  else {
     donutChart = new Chart(ctx,{
       type:'doughnut',
-      data:{
-        labels:['Tenho','Faltam'],
-        datasets:[{
-          data:[owned,missing],
-          backgroundColor:['#A0D2B7','#E8D5C8'],
-          borderColor:['#6BAF94','#D5B6AC'],
-          borderWidth:2,
-          hoverOffset:4,
-        }]
-      },
-      options:{
-        cutout:'72%',
-        plugins:{
-          legend:{display:false},
-          tooltip:{callbacks:{label:c=>` ${c.label}: ${c.parsed} (${Math.round(c.parsed/TOTAL*100)}%)`}}
-        },
-        animation:{duration:500,easing:'easeOutCubic'}
-      }
+      data:{labels:['Tenho','Faltam'],datasets:[{data:[owned,missing],backgroundColor:['#A0D2B7','#E8D5C8'],borderColor:['#6BAF94','#D5B6AC'],borderWidth:2,hoverOffset:4}]},
+      options:{cutout:'72%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.label}: ${c.parsed} (${Math.round(c.parsed/TOTAL*100)}%)`}}},animation:{duration:500,easing:'easeOutCubic'}}
     });
   }
 
-  // Progress bars por título (usando getDisplayOrder())
-  let html='';
+  let html = '';
   for(const g of getDisplayOrder()){
-    const gOwned = g.nums.filter(n=>state.owned.has(chipId(g.sigla,n))).length;
+    const gOwned = g.nums.filter(n=>album.owned.has(chipId(g.sigla,n))).length;
     const gTotal = g.nums.length;
     const gPct   = gTotal ? Math.round(gOwned/gTotal*100) : 0;
     const isFull = gOwned===gTotal && gTotal>0;
-    const isNear = gPct >= 90 && !isFull;
+    const isNear = gPct>=90 && !isFull;
     const sublabel = g.grupo
       ? ` <span style="font-size:.65rem;color:var(--text-light);font-weight:400">${g.sigla} · Grupo ${g.grupo}</span>`
       : ` <span style="font-size:.65rem;color:var(--text-light);font-weight:400">${g.sigla}</span>`;
-    const badge = isFull
-      ? `<span class="complete-badge">✓ Completo</span> `
-      : isNear ? `<span class="near-badge">🔥 Quase!</span> ` : '';
-    const fillClass = isFull ? ' full' : isNear ? ' near' : '';
-    html+=`<div class="progress-item">
+    const badge = isFull ? `<span class="complete-badge">✓ Completo</span> ` : isNear ? `<span class="near-badge">🔥 Quase!</span> ` : '';
+    const fillClass = isFull?' full':isNear?' near':'';
+    html += `<div class="progress-item">
       <div class="progress-item-header">
         <strong>${g.titulo}</strong>${sublabel}
         <span style="display:flex;align-items:center;gap:5px">${badge}<span>${gOwned}/${gTotal} · ${gPct}%</span></span>
       </div>
-      <div class="progress-bar">
-        <div class="progress-fill${fillClass}" style="width:${gPct}%"></div>
-      </div>
+      <div class="progress-bar"><div class="progress-fill${fillClass}" style="width:${gPct}%"></div></div>
     </div>`;
   }
   document.getElementById('progress-list').innerHTML = html;
+  renderSortBars();
 }
 
-/* ══════════════════════════════════════
-   RENDER: LISTA GERAL
-══════════════════════════════════════ */
+/* ── RENDER: LISTA ──────────────────────────────────────── */
 function renderList(){
-  let html='';
-  for(const g of getDisplayOrder()) html+=buildGroupHTML(g,'list');
-  document.getElementById('list-content').innerHTML=html;
+  const album = getActiveAlbum();
+  if(!album){ document.getElementById('list-content').innerHTML=''; return; }
+  let html = '';
+  for(const g of getDisplayOrder()) html += buildGroupHTML(g, 'list', album.owned);
+  document.getElementById('list-content').innerHTML = html;
 }
 
-/* ══════════════════════════════════════
-   RENDER: FALTANTES
-══════════════════════════════════════ */
+/* ── RENDER: FALTAM ─────────────────────────────────────── */
 function renderMissing(){
-  if(state.owned.size===TOTAL){
-    document.getElementById('missing-content').innerHTML=`
-      <div class="empty-state">
-        <div class="emoji">🏆</div>
-        <p><strong>Parabéns!</strong> Álbum completo!</p>
-      </div>`;
+  const banner = document.getElementById('missing-all-banner');
+  if(banner) banner.style.display = (state.missingShowAll && state.albums.length > 1) ? 'block' : 'none';
+  if(state.missingShowAll && state.albums.length > 1){
+    renderMissingAll(); return;
+  }
+  const album = getActiveAlbum();
+  if(!album){ document.getElementById('missing-content').innerHTML=''; return; }
+  if(album.owned.size === TOTAL){
+    document.getElementById('missing-content').innerHTML=`<div class="empty-state"><div class="emoji">🏆</div><p><strong>Parabéns!</strong> Álbum completo!</p></div>`;
     return;
   }
-  let html='';
+  let html = '';
   for(const g of getDisplayOrder()){
-    const misNums=g.nums.filter(n=>!state.owned.has(chipId(g.sigla,n)));
+    const misNums = g.nums.filter(n => !album.owned.has(chipId(g.sigla,n)));
     if(!misNums.length) continue;
-    html+=buildGroupHTML({...g,nums:misNums},'missing');
+    html += buildGroupHTML({...g, nums:misNums}, 'missing', album.owned);
   }
-  document.getElementById('missing-content').innerHTML=html;
+  document.getElementById('missing-content').innerHTML = html;
 }
 
-/* ══════════════════════════════════════
-   RENDER: REPETIDAS
-══════════════════════════════════════ */
+function renderMissingAll(){
+  const allComplete = state.albums.every(a => a.owned.size === TOTAL);
+  if(allComplete){
+    document.getElementById('missing-content').innerHTML=`<div class="empty-state"><div class="emoji">🏆</div><p><strong>Parabéns!</strong> Todos os álbuns completos!</p></div>`;
+    return;
+  }
+  let html = '';
+  for(const g of getDisplayOrder()){
+    const neededNums = g.nums.filter(n => {
+      const id = chipId(g.sigla,n);
+      return state.albums.some(a => !a.owned.has(id));
+    });
+    if(!neededNums.length) continue;
+    const displayTitle = (g.sigla===g.titulo||g.sigla===g.titulo.toUpperCase()) ? g.sigla : `${g.sigla} - ${g.titulo}`;
+    html += `<div class="section-header"><div class="section-title">${displayTitle}</div><span class="section-badge">${neededNums.length}</span>`;
+    if(g.grupo) html += `<span class="group-label">Grupo ${g.grupo}</span>`;
+    html += `</div><div class="chips-grid">`;
+    for(const num of neededNums){
+      const id = chipId(g.sigla,num);
+      const count = state.albums.filter(a => !a.owned.has(id)).length;
+      let cls = 'chip';
+      if(g.sigla==='PANINI') cls+=' wide';
+      const isShiny = (g.sigla==='FWC')||(g.grupo!==null&&num==='1');
+      const isTeamPhoto = g.grupo!==null&&num==='13';
+      if(isShiny)    cls+=' shiny';
+      if(isTeamPhoto) cls+=' team-photo';
+      let innerLabel = g.sigla==='PANINI' ? `PANINI ${num}` : num;
+      if(count > 1) innerLabel += `<span class="chip-rep-cnt">${count}</span>`;
+      html += `<div class="${cls}" style="cursor:default">${innerLabel}</div>`;
+    }
+    html += `</div>`;
+  }
+  document.getElementById('missing-content').innerHTML = html;
+}
+
+/* ── RENDER: REPETIDAS ──────────────────────────────────── */
 function renderRepeated(){
   const rc    = Object.keys(state.repeated).length;
   const total = totalRepeatCount();
-  let html = rc ? `<div class="card" style="background:#FFF8EE;border-color:var(--gold-d);margin-bottom:16px">
-    <div style="font-size:.85rem;color:var(--gold-d);font-weight:700">
-      🔄 ${total} figurinha${total!==1?'s':''} repetida${total!==1?'s':''} · ${rc} número${rc!==1?'s':''} diferentes
-    </div></div>` : '';
-  for(const g of getDisplayOrder()) html+=buildGroupHTML(g,'repeated');
-  document.getElementById('repeated-content').innerHTML=html;
+  let html = rc ? `<div class="card" style="background:#FFF8EE;border-color:var(--gold-d);margin-bottom:16px"><div style="font-size:.85rem;color:var(--gold-d);font-weight:700">🔄 ${total} figurinha${total!==1?'s':''} repetida${total!==1?'s':''} · ${rc} número${rc!==1?'s':''} diferentes</div></div>` : '';
+  for(const g of getDisplayOrder()) html += buildGroupHTML(g, 'repeated');
+  document.getElementById('repeated-content').innerHTML = html;
 }
 
-/* ══════════════════════════════════════
-   SORT BAR
-══════════════════════════════════════ */
+/* ── SORT BAR ───────────────────────────────────────────── */
 function sortBarHTML(){
-  const aActive = sortOrder === 'alpha'  ? ' active' : '';
-  const gActive = sortOrder === 'groups' ? ' active' : '';
-  return `<button class="btn-sort${aActive}" onclick="setSortOrder('alpha')">🔤 Ordem Alfabética</button>` +
-         `<button class="btn-sort${gActive}" onclick="setSortOrder('groups')">🏆 Ordem por Grupos</button>`;
+  const aA = sortOrder==='alpha'  ? ' active':'';
+  const gA = sortOrder==='groups' ? ' active':'';
+  return `<button class="btn-sort${aA}" onclick="setSortOrder('alpha')">🔤 Ordem Alfabética</button><button class="btn-sort${gA}" onclick="setSortOrder('groups')">🏆 Ordem por Grupos</button>`;
 }
 function renderSortBars(){
   const bar = sortBarHTML();
-  ['sort-bar-overview','sort-bar-list','sort-bar-missing','sort-bar-repeated'].forEach(id => {
-    const el = document.getElementById(id);
-    if(el) el.innerHTML = bar;
+  ['sort-bar-overview','sort-bar-list','sort-bar-missing','sort-bar-repeated'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.innerHTML=bar;
   });
 }
 
-/* ══════════════════════════════════════
-   RENDER ALL
-══════════════════════════════════════ */
+/* ── ALBUM SELECTORS ────────────────────────────────────── */
+function renderAlbumSelectors(){
+  // Lista selector
+  const listSel = document.getElementById('list-album-selector');
+  if(listSel){
+    listSel.innerHTML = state.albums.map(a =>
+      `<button class="btn-album${a.id===state.activeAlbumId?' active':''}" onclick="setActiveAlbum('${a.id}')">${a.name}</button>`
+    ).join('');
+  }
+  // Faltam selector
+  const missSel = document.getElementById('missing-album-selector');
+  if(missSel){
+    let html = state.albums.map(a =>
+      `<button class="btn-album${a.id===state.activeAlbumId&&!state.missingShowAll?' active':''}" onclick="setMissingAlbum('${a.id}')">${a.name}</button>`
+    ).join('');
+    if(state.albums.length > 1){
+      html += `<button class="btn-album all-mode${state.missingShowAll?' active':''}" onclick="setMissingAll()">Todos os Álbuns</button>`;
+    }
+    missSel.innerHTML = html;
+  }
+}
+function setMissingAlbum(id){
+  state.activeAlbumId = id; state.missingShowAll = false; saveState(); renderAll();
+}
+function setMissingAll(){
+  state.missingShowAll = true; saveState(); renderAll();
+}
+
+/* ── RENDER: PERFIL ─────────────────────────────────────── */
+function renderPerfil(){
+  const nameEl = document.getElementById('perfil-user-name');
+  if(nameEl) nameEl.textContent = userName || 'Meu Perfil';
+  const avatarEl = document.getElementById('user-avatar');
+  if(avatarEl) avatarEl.textContent = (userName||'M')[0].toUpperCase();
+  renderPerfilAlbuns();
+  autoUpdateSyncCode();
+}
+
+function renderPerfilAlbuns(){
+  const container = document.getElementById('perfil-albums-list');
+  if(!container) return;
+  let html = '';
+  for(const album of state.albums){
+    const pct = pctForAlbum(album);
+    const isActive = album.id === state.activeAlbumId;
+    html += `<div class="album-item${isActive?' is-active':''}">
+      <div class="album-item-info">
+        <div class="album-item-name">${album.name}</div>
+        <div class="album-item-pct">${album.owned.size}/${TOTAL} · ${pct}%</div>
+      </div>
+      <div class="album-item-actions">
+        ${isActive ? '<span class="active-badge">✓ Ativo</span>' : `<button class="btn-icon" onclick="setActiveAlbum('${album.id}')" title="Tornar ativo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>`}
+        <button class="btn-icon" onclick="promptRenameAlbum('${album.id}')" title="Renomear"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+        ${state.albums.length>1?`<button class="btn-icon danger" onclick="confirmDeleteAlbum('${album.id}')" title="Excluir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>`:''}
+      </div>
+    </div>`;
+  }
+  container.innerHTML = html;
+  const btn = document.getElementById('btn-create-album');
+  if(btn) btn.disabled = state.albums.length >= 3;
+}
+
+function openPerfilSection(sectionId){
+  document.getElementById('perfil-main').style.display = 'none';
+  ['perfil-albuns','perfil-sync','perfil-exchange','perfil-export','perfil-danger'].forEach(id=>{
+    document.getElementById(id).style.display = 'none';
+  });
+  document.getElementById(sectionId).style.display = 'block';
+  if(sectionId==='perfil-albuns') renderPerfilAlbuns();
+}
+function goBackToPerfil(){
+  ['perfil-albuns','perfil-sync','perfil-exchange','perfil-export','perfil-danger'].forEach(id=>{
+    document.getElementById(id).style.display = 'none';
+  });
+  document.getElementById('perfil-main').style.display = 'block';
+}
+function editUserName(){
+  const n = prompt('Seu nome:', userName);
+  if(n !== null){ userName = n.trim(); saveState(); renderPerfil(); }
+}
+
+/* ── RENDER ALL ─────────────────────────────────────────── */
 function renderAll(){
   renderOverview();
   renderList();
   renderMissing();
   renderRepeated();
   renderSortBars();
-  autoUpdateSyncCode();
+  renderAlbumSelectors();
+  renderPerfil();
 }
 
-/* ══════════════════════════════════════
-   EVENT DELEGATION
-══════════════════════════════════════ */
+/* ── EVENT DELEGATION ───────────────────────────────────── */
 function setupDelegation(){
-  const map={'list-content':'list','missing-content':'missing','repeated-content':'repeated'};
-  for(const [cid,tabType] of Object.entries(map)){
-    document.getElementById(cid).addEventListener('click',e=>{
-      const chip=e.target.closest('.chip[data-id]');
+  const map = {'list-content':'list','missing-content':'missing','repeated-content':'repeated'};
+  for(const [cid, tabType] of Object.entries(map)){
+    document.getElementById(cid).addEventListener('click', e=>{
+      if(tabType==='missing' && state.missingShowAll) return; // read-only in all mode
+      const chip = e.target.closest('.chip[data-id]');
       if(chip) handleChipTap(chip.dataset.id, tabType);
     });
   }
 }
 
-/* ══════════════════════════════════════
-   TAB NAVIGATION
-══════════════════════════════════════ */
+/* ── TAB NAVIGATION ─────────────────────────────────────── */
 function switchTab(id){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('active');
   document.querySelector(`.nav-btn[data-tab="${id}"]`).classList.add('active');
-  document.querySelector('.app-main').scrollTop=0;
+  document.querySelector('.app-main').scrollTop = 0;
 }
 document.querySelectorAll('.nav-btn').forEach(btn=>{
-  btn.addEventListener('click',()=>switchTab(btn.dataset.tab));
+  btn.addEventListener('click', ()=> switchTab(btn.dataset.tab));
 });
 
-/* ══════════════════════════════════════
-   SINCRONIZAÇÃO (código completo)
-══════════════════════════════════════ */
+/* ── SYNC ───────────────────────────────────────────────── */
 function getPayload(){
-  return {v:1, owned:[...state.owned], repeated:state.repeated, at:new Date().toISOString()};
+  return {
+    v: 2,
+    user: userName,
+    albums: state.albums.map(a => ({id:a.id, name:a.name, owned:[...a.owned]})),
+    repeated: state.repeated,
+    at: new Date().toISOString()
+  };
 }
 function applyPayload(p){
-  if(!p||p.v!==1) throw new Error('invalid');
-  state.owned = new Set(p.owned||[]);
-  // Compatibilidade: suporte a formato antigo (array) e novo (objeto com contagem)
-  if(Array.isArray(p.repeated)){
-    state.repeated = {};
-    for(const id of p.repeated) state.repeated[id] = 1;
-  } else {
-    state.repeated = p.repeated || {};
-  }
+  if(!p) throw new Error('invalid');
+  if(p.v === 1){
+    // Old single-album code → import into active album
+    const a = getActiveAlbum();
+    if(a) a.owned = new Set(p.owned||[]);
+    const rp = p.repeated;
+    state.repeated = Array.isArray(rp) ? Object.fromEntries(rp.map(id=>[id,1])) : (rp||{});
+  } else if(p.v === 2){
+    state.albums = p.albums.map(a => ({id:a.id, name:a.name, owned:new Set(a.owned||[])}));
+    const rp = p.repeated;
+    state.repeated = Array.isArray(rp) ? Object.fromEntries(rp.map(id=>[id,1])) : (rp||{});
+    if(!state.activeAlbumId || !getAlbumById(state.activeAlbumId))
+      state.activeAlbumId = state.albums[0]?.id || null;
+    if(p.user !== undefined && p.user !== null) userName = p.user;
+  } else { throw new Error('invalid version'); }
   saveState(); renderAll();
 }
-function exportCode(){ autoUpdateSyncCode(); }
 function autoUpdateSyncCode(){
   const box = document.getElementById('export-code-box');
   if(!box) return;
-  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(getPayload()))));
-  box.value = encoded;
+  box.value = btoa(unescape(encodeURIComponent(JSON.stringify(getPayload()))));
 }
 function importCode(){
-  const encoded=document.getElementById('import-code-box').value.trim();
-  if(!encoded){alert('Cole o código no campo acima.');return;}
+  const encoded = document.getElementById('import-code-box').value.trim();
+  if(!encoded){ alert('Cole o código no campo acima.'); return; }
   try{
     applyPayload(JSON.parse(decodeURIComponent(escape(atob(encoded)))));
     alert('✅ Sincronização aplicada com sucesso!');
-    document.getElementById('import-code-box').value='';
+    document.getElementById('import-code-box').value = '';
   } catch{ alert('❌ Código inválido. Verifique se copiou tudo.'); }
 }
 
-/* ══════════════════════════════════════
-   TROCA DE FIGURINHAS (código de faltantes)
-══════════════════════════════════════ */
+/* ── EXCHANGE ───────────────────────────────────────────── */
 function generateExchangeCode(){
-  const missing=[];
+  const missingSet = new Set();
   for(const g of ALBUM_DATA)
     for(const n of g.nums){
-      const id=chipId(g.sigla,n);
-      if(!state.owned.has(id)) missing.push(id);
+      const id = chipId(g.sigla,n);
+      if(state.albums.some(a => !a.owned.has(id))) missingSet.add(id);
     }
-  if(!missing.length){
-    alert('🏆 Você não tem nenhuma figurinha faltando!');
-    return;
-  }
-  // Formato compacto: prefixo ELV2 + base64 dos IDs separados por vírgula
-  const encoded = btoa(unescape(encodeURIComponent('ELV2:'+missing.join(','))));
-  document.getElementById('exchange-out-box').value = encoded;
+  if(!missingSet.size){ alert('🏆 Todos os álbuns completos!'); return; }
+  document.getElementById('exchange-out-box').value = btoa(unescape(encodeURIComponent('ELV2:'+[...missingSet].join(','))));
 }
-
 function applyExchangeCode(){
-  const encoded=document.getElementById('exchange-in-box').value.trim();
-  if(!encoded){alert('Cole o código do amigo no campo acima.');return;}
+  const encoded = document.getElementById('exchange-in-box').value.trim();
+  if(!encoded){ alert('Cole o código do amigo acima.'); return; }
   try{
     const raw = decodeURIComponent(escape(atob(encoded)));
     if(!raw.startsWith('ELV2:')) throw new Error('formato inválido');
     const friendMissing = new Set(raw.replace('ELV2:','').split(',').filter(Boolean));
-
-    // Minhas repetidas que o amigo precisa
     const matches = Object.keys(state.repeated).filter(id => friendMissing.has(id));
-
     const resEl = document.getElementById('exchange-result');
     resEl.style.display = 'block';
-
     if(!matches.length){
-      resEl.className = 'exchange-result no-match';
-      resEl.innerHTML = `<h4>😕 Nenhuma coincidência encontrada</h4>
-        <p style="font-size:.8rem;color:var(--text-light)">Nenhuma das suas figurinhas repetidas está na lista de faltantes do amigo.</p>`;
+      resEl.className='exchange-result no-match';
+      resEl.innerHTML=`<h4>😕 Nenhuma coincidência</h4><p style="font-size:.8rem;color:var(--text-light)">Nenhuma das suas repetidas está na lista do amigo.</p>`;
       return;
     }
-
-    // Agrupar por sigla para exibir
     const byGroup = {};
-    for(const id of matches){
-      const [sigla, num] = id.split('-');
-      if(!byGroup[sigla]) byGroup[sigla]=[];
-      byGroup[sigla].push(num);
+    for(const id of matches){ const [sigla,num]=id.split('-'); if(!byGroup[sigla]) byGroup[sigla]=[]; byGroup[sigla].push(num); }
+    let chipsHtml='';
+    for(const [sigla,nums] of Object.entries(byGroup).sort((a,b)=>a[0].localeCompare(b[0]))){
+      const group=ALBUM_DATA.find(g=>g.sigla===sigla);
+      chipsHtml+=`<div style="margin-bottom:10px"><div class="group-label" style="margin-bottom:4px">${sigla} · ${group?.titulo||sigla}</div><div class="chips-grid">${nums.map(n=>`<div class="chip repeated">${n}</div>`).join('')}</div></div>`;
     }
-    let chipsHtml = '';
-    for(const [sigla, nums] of Object.entries(byGroup).sort((a,b)=>a[0].localeCompare(b[0]))){
-      const group = ALBUM_DATA.find(g=>g.sigla===sigla);
-      const titulo = group ? group.titulo : sigla;
-      chipsHtml += `<div style="margin-bottom:10px">
-        <div class="group-label" style="margin-bottom:4px">${sigla} · ${titulo}</div>
-        <div class="chips-grid">
-          ${nums.map(n=>`<div class="chip repeated">${n}</div>`).join('')}
-        </div>
-      </div>`;
-    }
-
-    resEl.className = 'exchange-result';
-    resEl.innerHTML = `<h4>✅ ${matches.length} repetida${matches.length!==1?'s':''} que o amigo precisa:</h4>${chipsHtml}`;
-  } catch(e){
-    alert('❌ Código inválido. Verifique se o amigo gerou o código corretamente.');
-  }
+    resEl.className='exchange-result';
+    resEl.innerHTML=`<h4>✅ ${matches.length} repetida${matches.length!==1?'s':''} que o amigo precisa:</h4>${chipsHtml}`;
+  } catch{ alert('❌ Código inválido.'); }
 }
 
-/* ══════════════════════════════════════
-   CELEBRAÇÃO
-══════════════════════════════════════ */
-function launchConfetti(){
-  const canvas = document.createElement('canvas');
-  canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9997';
-  canvas.width  = window.innerWidth;
-  canvas.height = window.innerHeight;
-  document.body.appendChild(canvas);
-  const ctx  = canvas.getContext('2d');
-  const cols = ['#D4897B','#D9A164','#A0D2B7','#E2A894','#D5B6AC','#EB9491','#6BAF94','#B8705F','#FFD8C8'];
-  const pieces = Array.from({length:120}, () => ({
-    x:   Math.random() * canvas.width,
-    y:  -10 - Math.random() * 60,
-    w:   Math.random() * 11 + 5,
-    h:   Math.random() * 6  + 3,
-    col: cols[Math.floor(Math.random() * cols.length)],
-    rot: Math.random() * Math.PI * 2,
-    vx:  (Math.random() - .5) * 5,
-    vy:  Math.random() * 3.5 + 2,
-    vr:  (Math.random() - .5) * .15,
-  }));
-  let t = 0;
-  (function tick(){
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    pieces.forEach(p => {
-      p.x  += p.vx;
-      p.vy += .1;
-      p.y  += p.vy;
-      p.rot += p.vr;
-      ctx.save();
-      ctx.globalAlpha = Math.max(0, 1 - t / 140);
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.rot);
-      ctx.fillStyle = p.col;
-      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
-      ctx.restore();
-    });
-    if(++t < 165) requestAnimationFrame(tick);
-    else canvas.remove();
-  })();
-}
-
-function showToast(msg){
-  const el = document.createElement('div');
-  el.className = 'celebration-toast';
-  el.textContent = msg;
-  document.body.appendChild(el);
-  requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show')));
-  setTimeout(() => {
-    el.classList.remove('show');
-    setTimeout(() => el.remove(), 300);
-  }, 3200);
-}
-
-function checkGroupCompletion(id){
-  const sigla = id.split('-')[0];
-  const group = ALBUM_DATA.find(g => g.sigla === sigla);
-  if(!group || !group.grupo) return; // Só celebra países
-  const owned = group.nums.filter(n => state.owned.has(chipId(group.sigla, n))).length;
-  if(owned === group.nums.length){
-    showToast(`🎉 ${group.titulo} completo!`);
-    launchConfetti();
-  }
-}
-
-/* ══════════════════════════════════════
-   WHATSAPP
-══════════════════════════════════════ */
-function shareMissingOnWhatsApp(){
-  exportMissingList();
-  const text = document.getElementById('missing-list-box').value;
-  if(!text || text.startsWith('🏆')){ alert('Nenhuma figurinha faltando!'); return; }
-  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
-}
-function shareRepeatedOnWhatsApp(){
-  exportRepeatedList();
-  const text = document.getElementById('repeated-list-box').value;
-  if(!text || text.startsWith('😅')){ alert('Nenhuma figurinha repetida registrada.'); return; }
-  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
-}
-
-/* ══════════════════════════════════════
-   EXPORTAR LISTAS EM TEXTO
-══════════════════════════════════════ */
+/* ── EXPORT LISTS ───────────────────────────────────────── */
 function exportMissingList(){
-  const lines = [];
-  let total = 0;
+  const lines=[]; let total=0;
   for(const g of getDisplayOrder()){
-    const misNums = g.nums.filter(n => !state.owned.has(chipId(g.sigla, n)));
-    if(!misNums.length) continue;
-    total += misNums.length;
-    lines.push(`${g.sigla}: ${misNums.join(', ')}`);
+    const items=[];
+    for(const num of g.nums){
+      const id=chipId(g.sigla,num);
+      const cnt=state.albums.filter(a=>!a.owned.has(id)).length;
+      if(cnt>0){ items.push(cnt>1?`${num}(×${cnt})`:num); total+=cnt; }
+    }
+    if(items.length) lines.push(`${g.sigla}: ${items.join(', ')}`);
   }
-  const box = document.getElementById('missing-list-box');
-  if(!lines.length){
-    box.value = '🏆 Álbum completo! Nenhuma figurinha faltando.';
-    return;
-  }
-  box.value = `📋 Minhas Figurinhas Faltantes (${total} no total)\n\n` + lines.join('\n');
+  const box=document.getElementById('missing-list-box');
+  if(!lines.length){ box.value='🏆 Todos os álbuns completos!'; return; }
+  const names=state.albums.map(a=>a.name).join(', ');
+  box.value=`📋 Figurinhas Faltantes - Todos os Álbuns (${total} no total)\n${names}\n\n`+lines.join('\n');
 }
-
 function exportRepeatedList(){
-  const lines = [];
+  const lines=[];
   for(const g of getDisplayOrder()){
-    const repNums = g.nums.filter(n => repCount(chipId(g.sigla, n)) > 0);
+    const repNums=g.nums.filter(n=>repCount(chipId(g.sigla,n))>0);
     if(!repNums.length) continue;
-    const parts = repNums.map(n => {
-      const cnt = repCount(chipId(g.sigla, n));
-      return cnt > 1 ? `${n}(×${cnt})` : String(n);
-    });
+    const parts=repNums.map(n=>{ const c=repCount(chipId(g.sigla,n)); return c>1?`${n}(×${c})`:String(n); });
     lines.push(`${g.sigla}: ${parts.join(', ')}`);
   }
-  const box = document.getElementById('repeated-list-box');
-  if(!lines.length){
-    box.value = '😅 Nenhuma figurinha repetida registrada.';
-    return;
-  }
-  const total = totalRepeatCount();
-  box.value = `🔄 Minhas Figurinhas Repetidas (${total} no total)\n\n` + lines.join('\n');
+  const box=document.getElementById('repeated-list-box');
+  if(!lines.length){ box.value='😅 Nenhuma figurinha repetida.'; return; }
+  box.value=`🔄 Minhas Figurinhas Repetidas (${totalRepeatCount()} no total)\n\n`+lines.join('\n');
 }
 
-/* ══════════════════════════════════════
-   COPIAR CÓDIGO
-══════════════════════════════════════ */
+/* ── WHATSAPP ───────────────────────────────────────────── */
+function shareMissingOnWhatsApp(){ exportMissingList(); const t=document.getElementById('missing-list-box').value; if(!t||t.startsWith('🏆')){alert('Nenhuma figurinha faltando!');return;} window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank'); }
+function shareRepeatedOnWhatsApp(){ exportRepeatedList(); const t=document.getElementById('repeated-list-box').value; if(!t||t.startsWith('😅')){alert('Nenhuma figurinha repetida.');return;} window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank'); }
+
+/* ── COPY ───────────────────────────────────────────────── */
 function copyCode(boxId){
-  const box = document.getElementById(boxId);
-  const text = box.value;
-  if(!text){ alert('Gere o código primeiro.'); return; }
-  if(navigator.clipboard){
-    navigator.clipboard.writeText(text).then(()=>{
-      showCopyFeedback(boxId);
-    }).catch(()=> fallbackCopy(box));
-  } else {
-    fallbackCopy(box);
-  }
+  const box=document.getElementById(boxId); const text=box.value;
+  if(!text){alert('Gere o conteúdo primeiro.');return;}
+  if(navigator.clipboard){ navigator.clipboard.writeText(text).then(()=>showCopyFeedback(boxId)).catch(()=>fallbackCopy(box)); }
+  else fallbackCopy(box);
 }
-function fallbackCopy(box){
-  box.select();
-  document.execCommand('copy');
-  showCopyFeedback(box.id);
-}
+function fallbackCopy(box){ box.select(); document.execCommand('copy'); showCopyFeedback(box.id); }
 function showCopyFeedback(boxId){
-  // Flash the copy button green briefly
-  const btn = document.querySelector(`[onclick="copyCode('${boxId}')"]`);
-  if(btn){
-    const orig = btn.innerHTML;
-    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Copiado`;
-    btn.style.background = 'var(--mint)';
-    btn.style.color = '#1E4D36';
-    setTimeout(()=>{ btn.innerHTML=orig; btn.style.background=''; btn.style.color=''; }, 1800);
-  }
+  const btn=document.querySelector(`[onclick="copyCode('${boxId}')"]`);
+  if(btn){ const orig=btn.innerHTML; btn.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Copiado`; btn.style.background='var(--mint)'; btn.style.color='#1E4D36'; setTimeout(()=>{btn.innerHTML=orig;btn.style.background='';btn.style.color='';},1800); }
 }
 
-/* ══════════════════════════════════════
-   MODAIS
-══════════════════════════════════════ */
+/* ── MODALS ─────────────────────────────────────────────── */
 function openModal(id){ document.getElementById(id).classList.add('open'); }
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 function closeModalOnOverlay(e,id){ if(e.target===document.getElementById(id)) closeModal(id); }
+function openClearAlbumModal(){
+  const a=getActiveAlbum();
+  const el=document.getElementById('modal-clear-album-name');
+  if(el) el.textContent=a?.name||'ativo';
+  openModal('modal-clear-album');
+}
 function clearAlbum(){
-  state.owned.clear();
-  saveState();
-  renderAll(); // autoUpdateSyncCode é chamado dentro de renderAll
-  document.getElementById('exchange-out-box').value = '';
-  document.getElementById('missing-list-box').value = '';
+  const a=getActiveAlbum(); if(a) a.owned.clear();
+  saveState(); renderAll();
+  document.getElementById('exchange-out-box').value='';
+  document.getElementById('missing-list-box').value='';
   closeModal('modal-clear-album');
 }
 function clearRepeated(){
-  state.repeated = {};
-  saveState(); renderAll();
-  document.getElementById('repeated-list-box').value = '';
+  state.repeated={}; saveState(); renderAll();
+  document.getElementById('repeated-list-box').value='';
   closeModal('modal-clear-repeated');
 }
+function clearAllAlbums(){
+  state.albums.forEach(a => a.owned.clear());
+  saveState(); renderAll();
+  document.getElementById('exchange-out-box').value='';
+  document.getElementById('missing-list-box').value='';
+  closeModal('modal-clear-all-albums');
+}
 
-/* ══════════════════════════════════════
-   INIT
-══════════════════════════════════════ */
+/* ── CELEBRATION ────────────────────────────────────────── */
+function launchConfetti(){
+  const canvas=document.createElement('canvas');
+  canvas.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9997';
+  canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+  document.body.appendChild(canvas);
+  const ctx=canvas.getContext('2d');
+  const cols=['#D4897B','#D9A164','#A0D2B7','#E2A894','#D5B6AC','#EB9491','#6BAF94','#B8705F','#FFD8C8'];
+  const pieces=Array.from({length:120},()=>({x:Math.random()*canvas.width,y:-10-Math.random()*60,w:Math.random()*11+5,h:Math.random()*6+3,col:cols[Math.floor(Math.random()*cols.length)],rot:Math.random()*Math.PI*2,vx:(Math.random()-.5)*5,vy:Math.random()*3.5+2,vr:(Math.random()-.5)*.15}));
+  let t=0;
+  (function tick(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p=>{p.x+=p.vx;p.vy+=.1;p.y+=p.vy;p.rot+=p.vr;ctx.save();ctx.globalAlpha=Math.max(0,1-t/140);ctx.translate(p.x,p.y);ctx.rotate(p.rot);ctx.fillStyle=p.col;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore();});
+    if(++t<165) requestAnimationFrame(tick); else canvas.remove();
+  })();
+}
+function showToast(msg){
+  const el=document.createElement('div'); el.className='celebration-toast'; el.textContent=msg;
+  document.body.appendChild(el);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('show')));
+  setTimeout(()=>{ el.classList.remove('show'); setTimeout(()=>el.remove(),300); },3200);
+}
+function checkGroupCompletion(id){
+  const sigla=id.split('-')[0];
+  const group=ALBUM_DATA.find(g=>g.sigla===sigla);
+  if(!group||!group.grupo) return;
+  const a=getActiveAlbum(); if(!a) return;
+  const owned=group.nums.filter(n=>a.owned.has(chipId(group.sigla,n))).length;
+  if(owned===group.nums.length){ showToast(`🎉 ${group.titulo} completo!`); launchConfetti(); }
+}
+
+/* ── INIT ───────────────────────────────────────────────── */
 loadState();
 setupDelegation();
 renderAll();
 
-// PWA: registra service worker e escuta atualizações
 if('serviceWorker' in navigator){
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./service-worker.js')
-      .catch(err => console.warn('SW registration failed:', err));
-
-    // Quando o SW envia mensagem NEW_VERSION (nova versão ativada),
-    // recarrega a página automaticamente para o usuário ver a versão nova.
-    navigator.serviceWorker.addEventListener('message', e => {
-      if(e.data && e.data.type === 'NEW_VERSION'){
-        window.location.reload();
-      }
-    });
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('./service-worker.js').catch(err=>console.warn('SW failed:',err));
+    navigator.serviceWorker.addEventListener('message',e=>{ if(e.data?.type==='NEW_VERSION') window.location.reload(); });
   });
 }
 </script>
