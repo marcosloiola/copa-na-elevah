@@ -10692,7 +10692,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     </div>
     <button class="btn btn-primary" style="width:100%;margin-bottom:8px" onclick="saveDadosPessoais()">💾 Salvar Dados</button>
     <div id="dados-status" style="display:none;text-align:center;font-size:.8rem;padding:8px;border-radius:var(--radius-sm);margin-top:4px"></div>
-    <p class="hint" style="margin-top:12px;font-size:.72rem;color:var(--text-light)">Seus dados são salvos no dispositivo e enviados de forma segura para a equipe Elevah.</p>
+    <p class="hint" id="uid-tap-hint" style="margin-top:12px;font-size:.72rem;color:var(--text-light);cursor:default;user-select:none" onclick="handleUidTap()">Seus dados são salvos no dispositivo e enviados de forma segura para a equipe Elevah.</p>
+    <div id="uid-reveal" style="display:none;margin-top:8px;background:var(--bg);border:1px dashed var(--border);border-radius:var(--radius-sm);padding:8px 12px;font-family:monospace;font-size:.75rem;color:var(--text-light);word-break:break-all"></div>
     <button class="back-btn" onclick="goBackToPerfil()" style="margin-top:24px">← Voltar ao Perfil</button>
   </div>
 
@@ -11110,7 +11111,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v37';
+const APP_VERSION = 'v38';
 const APP_DATE    = '09/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
@@ -11984,6 +11985,7 @@ function saveDadosPessoais(){
   params.append('email', email);
   params.append('whatsapp', whatsapp);
   params.append('app_version', APP_VERSION);
+  params.append('uid', getOrCreateUserId());
   params.append('timestamp', new Date().toISOString());
 
   fetch(LEADS_URL, {
@@ -11996,6 +11998,22 @@ function saveDadosPessoais(){
     trackEvent('dados_saved', { nome: nome ? 'sim' : 'nao', email: email ? 'sim' : 'nao', whatsapp: whatsapp ? 'sim' : 'nao' });
     updateGA4UserProperties(); // atualiza user properties com novos dados
   }).catch(() => showDadosStatus('✅ Dados salvos localmente.', 'success'));
+}
+
+let _uidTapCount = 0, _uidTapTimer = null;
+function handleUidTap(){
+  _uidTapCount++;
+  clearTimeout(_uidTapTimer);
+  _uidTapTimer = setTimeout(() => { _uidTapCount = 0; }, 1500);
+  if(_uidTapCount >= 5){
+    _uidTapCount = 0;
+    const uid = getOrCreateUserId();
+    const revealEl = document.getElementById('uid-reveal');
+    if(revealEl){
+      revealEl.style.display = revealEl.style.display === 'none' ? 'block' : 'none';
+      revealEl.textContent = '🔑 User ID: ' + uid;
+    }
+  }
 }
 
 function showDadosStatus(msg, type){
@@ -12084,6 +12102,7 @@ function getPayload(){
   return {
     v: 2,
     user: userName,
+    uid: getOrCreateUserId(),
     albums: state.albums.map(a => ({id:a.id, name:a.name, owned:[...a.owned]})),
     repeated: state.repeated,
     at: new Date().toISOString()
@@ -12104,6 +12123,8 @@ function applyPayload(p){
     if(!state.activeAlbumId || !getAlbumById(state.activeAlbumId))
       state.activeAlbumId = state.albums[0]?.id || null;
     if(p.user !== undefined && p.user !== null) userName = p.user;
+    // Restaura o mesmo uid do dispositivo de origem
+    if(p.uid){ localStorage.setItem('elevah_uid', p.uid); setupGA4Identity(); }
   } else { throw new Error('invalid version'); }
   saveState(); renderAll();
 }
@@ -12629,6 +12650,7 @@ function exportBackup(){
   const data = {
     version: 2,
     date: new Date().toISOString(),
+    uid: getOrCreateUserId(),
     albums: state.albums.map(a => ({id:a.id, name:a.name, owned:[...a.owned]})),
     repeated: state.repeated,
     activeAlbumId: state.activeAlbumId,
@@ -12669,6 +12691,8 @@ function importBackup(inputEl){
         ...data.friendAlbum, owned: new Set(data.friendAlbum.owned||[])
       } : null;
       if(data.userName) userName = data.userName;
+      // Restaura o mesmo uid do dispositivo de origem
+      if(data.uid){ localStorage.setItem('elevah_uid', data.uid); setupGA4Identity(); }
       if(data.sortOrder) sortOrder = data.sortOrder;
       if(typeof data.darkMode !== 'undefined') toggleDarkMode(data.darkMode);
       if(typeof data.sideIndexEnabled !== 'undefined'){ _sideIndexEnabled = data.sideIndexEnabled; localStorage.setItem('elevah_sideindex', data.sideIndexEnabled ? '1' : '0'); }
