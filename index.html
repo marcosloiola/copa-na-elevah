@@ -10307,6 +10307,35 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     .user-name { font-size:1rem; font-weight:700; color:var(--text); }
     .user-hint { font-size:.72rem; color:var(--text-light); margin-top:2px; }
 
+    /* ─── Banner Elevah ── */
+    .elevah-banner-card {
+      display:block; width:100%; margin-top:16px; border-radius:var(--radius);
+      overflow:hidden; text-decoration:none; cursor:pointer;
+      border:1.5px solid var(--border); box-shadow:0 2px 8px var(--shadow);
+      transition:opacity .15s, transform .15s;
+    }
+    .elevah-banner-card:active { opacity:.85; transform:scale(.99); }
+    .elevah-banner-card img {
+      width:100%; height:auto; display:block;
+      object-fit:cover;
+    }
+    .elevah-banner-placeholder {
+      background:linear-gradient(135deg,#C4392B 0%,#8B1A10 100%);
+      padding:20px 16px; text-align:center;
+    }
+    .elevah-banner-placeholder .elevah-banner-title {
+      font-size:1.1rem; font-weight:800; color:#fff; letter-spacing:.04em;
+      margin-bottom:4px;
+    }
+    .elevah-banner-placeholder .elevah-banner-sub {
+      font-size:.78rem; color:rgba(255,255,255,.85);
+    }
+    .elevah-banner-placeholder .elevah-banner-cta {
+      display:inline-block; margin-top:10px; padding:6px 18px;
+      background:#fff; color:#C4392B; border-radius:99px;
+      font-size:.78rem; font-weight:700;
+    }
+
     /* ─── Album items in Perfil ── */
     .album-item { background:var(--bg-card); border-radius:var(--radius); border:1.5px solid var(--border); padding:14px 16px; margin-bottom:8px; display:flex; align-items:center; gap:10px; }
     .album-item.is-active { border-color:var(--mint-d); background:#F0FAF5; }
@@ -10731,6 +10760,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       + Criar Novo Álbum
     </button>
     <div id="perfil-friend-section" style="margin-top:20px"></div>
+    <!-- Banner Elevah -->
+    <a id="elevah-store-banner" class="elevah-banner-card" href="https://loja.elevah.club/" target="_blank" rel="noopener" onclick="trackEvent('elevah_banner_click',{source:'perfil_albuns'})">
+      <img src="banner.jpg" alt="Elevah — Loja de Presentes" loading="lazy" />
+    </a>
+
     <button class="back-btn" onclick="goBackToPerfil()" style="margin-top:24px">← Voltar ao Perfil</button>
   </div>
 
@@ -11111,7 +11145,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v39';
+const APP_VERSION = 'v41';
 const APP_DATE    = '09/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
