@@ -10556,6 +10556,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 <!-- ═══ ABA 1: VISÃO GERAL ══════════════════════════════════ -->
 <div id="tab-overview" class="tab-panel active">
 
+  <!-- Banner Elevah -->
+  <a class="elevah-banner-card" style="margin-bottom:16px" href="https://loja.elevah.club/" target="_blank" rel="noopener" onclick="trackEvent('elevah_banner_click',{source:'overview'})"><img src="banner.jpg" alt="Elevah — Loja de Presentes" loading="lazy" /></a>
+
   <!-- Cards view (default) -->
   <div id="overview-cards-view">
     <div id="overview-cards-content" class="album-cards"></div>
@@ -10760,11 +10763,6 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       + Criar Novo Álbum
     </button>
     <div id="perfil-friend-section" style="margin-top:20px"></div>
-    <!-- Banner Elevah -->
-    <a id="elevah-store-banner" class="elevah-banner-card" href="https://loja.elevah.club/" target="_blank" rel="noopener" onclick="trackEvent('elevah_banner_click',{source:'perfil_albuns'})">
-      <img src="banner.jpg" alt="Elevah — Loja de Presentes" loading="lazy" />
-    </a>
-
     <button class="back-btn" onclick="goBackToPerfil()" style="margin-top:24px">← Voltar ao Perfil</button>
   </div>
 
@@ -10879,14 +10877,22 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     <button class="back-btn" onclick="goBackToPerfil()" style="margin-top:24px">← Voltar ao Perfil</button>
   </div>
 
+
+  <!-- Banner Elevah no Perfil -->
+  <div id="perfil-main-banner" style="padding:0 0 4px">
+    <a class="elevah-banner-card" href="https://loja.elevah.club/" target="_blank" rel="noopener" onclick="trackEvent('elevah_banner_click',{source:'perfil'})"><img src="banner.jpg" alt="Elevah — Loja de Presentes" loading="lazy" /></a>
+  </div>
+
 </div><!-- /tab-perfil -->
 
 <!-- ═══ ABA 6: AJUDA ════════════════════════════════════════ -->
 <div id="tab-howto" class="tab-panel">
-  <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:20px">
+  <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:16px">
     <span style="font-size:.72rem;color:var(--text-light);font-weight:600;text-transform:uppercase;letter-spacing:.06em">Versão do app</span>
     <span id="app-version-badge" style="font-size:.85rem;font-weight:800;color:var(--primary-d)"></span>
   </div>
+  <!-- Banner Elevah -->
+  <a class="elevah-banner-card" style="margin-bottom:20px" href="https://loja.elevah.club/" target="_blank" rel="noopener" onclick="trackEvent('elevah_banner_click',{source:'ajuda'})"><img src="banner.jpg" alt="Elevah — Loja de Presentes" loading="lazy" /></a>
   <div class="howto-section">
     <h3>🎴 O que é este app?</h3>
     <p>Gestor do álbum de figurinhas da Copa do Mundo 2026, criado pela <strong>Elevah</strong>. Gerencie até 3 álbuns diferentes, controle o que tem, o que falta e o que está repetido — tudo no celular, sem instalar nada.</p>
@@ -11145,7 +11151,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v41';
+const APP_VERSION = 'v42';
 const APP_DATE    = '09/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
