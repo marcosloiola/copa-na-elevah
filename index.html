@@ -11110,7 +11110,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v34';
+const APP_VERSION = 'v37';
 const APP_DATE    = '09/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
@@ -11444,11 +11444,13 @@ function doSingle(id, tabType){
     const a = tabType === 'missing' ? getFaltamAlbum() : getActiveAlbum();
     if(a){ a.owned.add(id); if(tabType !== 'missing' || !isFriendAlbumActive()) checkGroupCompletion(id); }
   }
+  trackEvent('sticker_marked', { tab: tabType, sigla: id.split('-')[0] });
   saveState(); renderAll(); flashChip(id, tabType);
 }
 function doDouble(id, tabType){
   if(tabType==='repeated'){ removeRepeat(id); }
   else { const a = tabType === 'missing' ? getFaltamAlbum() : getActiveAlbum(); if(a) a.owned.delete(id); }
+  trackEvent('sticker_unmarked', { tab: tabType, sigla: id.split('-')[0] });
   saveState(); renderAll();
 }
 function flashChip(id, tabType){
@@ -11908,6 +11910,46 @@ function editUserName(){
 /* ── DADOS PESSOAIS ─────────────────────────────────────── */
 const LEADS_URL = 'https://script.google.com/macros/s/AKfycbzLXE_Y1L_c6lmz6xqedJksfdVHQ9n5S9P1XDbqA0-PsZ0LbKcxVVTxho8CTmUss2ua/exec';
 
+function trackEvent(name, params){
+  if(typeof gtag !== 'undefined') gtag('event', name, params || {});
+}
+
+/* ── GA4: IDENTIDADE ANÔNIMA DO USUÁRIO ─────────────────── */
+function getOrCreateUserId(){
+  let uid = localStorage.getItem('elevah_uid');
+  if(!uid){
+    // Gera UUID v4 anônimo — nunca contém dados pessoais
+    uid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+      const r = Math.random()*16|0;
+      return (c==='x' ? r : (r&0x3|0x8)).toString(16);
+    });
+    localStorage.setItem('elevah_uid', uid);
+  }
+  return uid;
+}
+
+function setupGA4Identity(){
+  if(typeof gtag === 'undefined') return;
+  const uid = getOrCreateUserId();
+  // Vincula todos os eventos futuros a este user_id anônimo
+  gtag('config', 'G-L288SGXWQH', { user_id: uid });
+}
+
+function updateGA4UserProperties(){
+  if(typeof gtag === 'undefined') return;
+  const dados = JSON.parse(localStorage.getItem('elevah_dados') || '{}');
+  const darkOn = document.documentElement.getAttribute('data-theme') === 'dark';
+  gtag('set', 'user_properties', {
+    tem_dados_pessoais : dados.nome ? 'sim' : 'nao',
+    tem_email          : dados.email ? 'sim' : 'nao',
+    tem_whatsapp       : dados.whatsapp ? 'sim' : 'nao',
+    qtd_albuns         : String(state?.albums?.length || 1),
+    usa_dark_mode      : darkOn ? 'sim' : 'nao',
+    usa_indice_lateral : _sideIndexEnabled ? 'sim' : 'nao',
+    versao_app         : APP_VERSION
+  });
+}
+
 function loadDadosPessoais(){
   const dados = JSON.parse(localStorage.getItem('elevah_dados') || '{}');
   const nomeEl = document.getElementById('dados-nome');
@@ -11936,17 +11978,24 @@ function saveDadosPessoais(){
 
   showDadosStatus('Salvando...', 'info');
 
-  // Send to Google Sheets
-  const formData = new FormData();
-  formData.append('nome', nome);
-  formData.append('email', email);
-  formData.append('whatsapp', whatsapp);
-  formData.append('app_version', APP_VERSION);
-  formData.append('timestamp', new Date().toISOString());
+  // Send to Google Sheets via URL-encoded POST with no-cors (required for GAS)
+  const params = new URLSearchParams();
+  params.append('nome', nome);
+  params.append('email', email);
+  params.append('whatsapp', whatsapp);
+  params.append('app_version', APP_VERSION);
+  params.append('timestamp', new Date().toISOString());
 
-  fetch(LEADS_URL, { method:'POST', body: formData })
-    .then(() => showDadosStatus('✅ Dados salvos com sucesso!', 'success'))
-    .catch(() => showDadosStatus('✅ Dados salvos localmente. Sincronização pendente.', 'success'));
+  fetch(LEADS_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: params.toString()
+  }).then(() => {
+    showDadosStatus('✅ Dados salvos com sucesso!', 'success');
+    trackEvent('dados_saved', { nome: nome ? 'sim' : 'nao', email: email ? 'sim' : 'nao', whatsapp: whatsapp ? 'sim' : 'nao' });
+    updateGA4UserProperties(); // atualiza user properties com novos dados
+  }).catch(() => showDadosStatus('✅ Dados salvos localmente.', 'success'));
 }
 
 function showDadosStatus(msg, type){
@@ -12020,8 +12069,11 @@ function switchTab(id){
   document.querySelectorAll('.group-block').forEach(b=>b.style.display='');
   document.querySelectorAll('.search-clear').forEach(b=>b.style.display='none');
   updateSideIndex();
-  // Track tab view in GA4
-  if(typeof gtag !== 'undefined') gtag('event', 'page_view', { page_title: id, page_location: window.location.href + '#' + id });
+  // Track tab navigation in GA4
+  const tabNames = { overview:'Visão Geral', list:'Lista', missing:'Faltantes', repeated:'Repetidas', perfil:'Perfil', howto:'Ajuda' };
+  trackEvent('tab_view', { tab_id: id, tab_name: tabNames[id] || id });
+  // Also send standard page_view so GA4 funnel reports work
+  if(typeof gtag !== 'undefined') gtag('event', 'page_view', { page_title: tabNames[id] || id, page_location: window.location.href + '#' + id });
 }
 document.querySelectorAll('.nav-btn').forEach(btn=>{
   btn.addEventListener('click', ()=> switchTab(btn.dataset.tab));
@@ -12213,7 +12265,7 @@ function checkGroupCompletion(id){
   if(!group||!group.grupo) return;
   const a=getActiveAlbum(); if(!a) return;
   const owned=group.nums.filter(n=>a.owned.has(chipId(group.sigla,n))).length;
-  if(owned===group.nums.length){ showToast(`🎉 ${group.titulo} completo!`); launchConfetti(); }
+  if(owned===group.nums.length){ showToast(`🎉 ${group.titulo} completo!`); launchConfetti(); trackEvent('team_completed', { team: group.sigla, titulo: group.titulo }); }
 }
 
 /* ── QR CODE ────────────────────────────────────────────── */
@@ -12278,6 +12330,7 @@ function decodeQRMissing(str){
 }
 
 function generateExchangeQR(){
+  trackEvent('qr_generated');
   let hasAny = false;
   for(const g of ALBUM_DATA)
     for(const n of g.nums)
@@ -12421,6 +12474,7 @@ function stopQRScanner(){
 }
 
 function processQRResult(data){
+  trackEvent('qr_scanned');
   // Reuses exchange-result div — same UI as text flow
   try{
     // Se o QR contém URL com #qr= (gerado pelo botão "Mostrar meu QR"),
@@ -12465,6 +12519,8 @@ function processQRResult(data){
 
 /* ── DARK MODE ──────────────────────────────────────────── */
 function toggleDarkMode(on){
+  trackEvent('dark_mode_toggled', { enabled: on });
+  setTimeout(updateGA4UserProperties, 100);
   document.documentElement.setAttribute('data-theme', on ? 'dark' : 'light');
   localStorage.setItem('elevah_dark', on ? '1' : '0');
 }
@@ -12509,6 +12565,7 @@ function updateSideIndex(){
   // Touch/click handlers
   const inputMap = { 'list-content':'search-list', 'missing-content':'search-missing', 'repeated-content':'search-repeated' };
   function selectSigla(sigla){
+    trackEvent('side_index_used', { sigla: sigla, tab: contentId });
     const inputId = inputMap[contentId];
     const inputEl = document.getElementById(inputId);
     if(!inputEl) return;
@@ -12547,6 +12604,7 @@ function scrollToSigla(contentId, sigla){
 /* ── FILTRO POR SIGLA ───────────────────────────────────── */
 function filterGroups(contentId, query, inputEl){
   const q = query.trim().toUpperCase();
+  if(q.length === 1) trackEvent('search_used', { tab: contentId }); // fire on first char only
   const contentEl = document.getElementById(contentId);
   if(!contentEl) return;
   // Mostra/esconde o botão clear
@@ -12567,6 +12625,7 @@ function clearSearch(contentId, inputId, clearBtn){
 
 /* ── BACKUP / RESTORE ───────────────────────────────────── */
 function exportBackup(){
+  trackEvent('backup_exported');
   const data = {
     version: 2,
     date: new Date().toISOString(),
@@ -12594,6 +12653,7 @@ function exportBackup(){
 }
 
 function importBackup(inputEl){
+  trackEvent('backup_imported');
   const file = inputEl.files[0];
   if(!file) return;
   const reader = new FileReader();
@@ -12637,6 +12697,9 @@ loadState();
 setupDelegation();
 renderAll();
 updateSideIndex();
+// Inicializa identidade GA4 após carregar estado
+setupGA4Identity();
+updateGA4UserProperties();
 // Reposition side index on window resize (desktop layout changes)
 window.addEventListener('resize', updateSideIndex);
 
