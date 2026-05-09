@@ -10937,7 +10937,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v25';
+const APP_VERSION = 'v26';
 const APP_DATE    = '08/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
@@ -12162,7 +12162,13 @@ function stopQRScanner(){
 function processQRResult(data){
   // Reuses exchange-result div — same UI as text flow
   try{
-    const friendMissing = decodeQRMissing(data.trim());
+    // Se o QR contém URL com #qr= (gerado pelo botão "Mostrar meu QR"),
+    // extrai apenas o payload ELQ3:... antes de decodificar
+    let payload = data.trim();
+    if(payload.includes('#qr=')){
+      payload = decodeURIComponent(payload.split('#qr=').pop());
+    }
+    const friendMissing = decodeQRMissing(payload);
     const matches = Object.keys(state.repeated).filter(id => friendMissing.has(id));
     const resEl = document.getElementById('exchange-result');
     resEl.style.display = 'block';
