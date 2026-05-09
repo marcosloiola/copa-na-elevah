@@ -12407,8 +12407,19 @@ function updateSideIndex(){
     sideEl.style.right = '0';
   }
   // Touch/click handlers
+  const inputMap = { 'list-content':'search-list', 'missing-content':'search-missing', 'repeated-content':'search-repeated' };
+  function selectSigla(sigla){
+    const inputId = inputMap[contentId];
+    const inputEl = document.getElementById(inputId);
+    if(!inputEl) return;
+    inputEl.value = sigla;
+    filterGroups(contentId, sigla, inputEl);
+    // Scroll content to top so user sees filtered results
+    const appMain = document.querySelector('.app-main');
+    if(appMain) appMain.scrollTop = 0;
+  }
   sideEl.querySelectorAll('.side-index-item:not(.dim)').forEach(item => {
-    item.addEventListener('click', () => scrollToSigla(contentId, item.dataset.sigla));
+    item.addEventListener('click', () => selectSigla(item.dataset.sigla));
   });
   // Touch drag handler
   sideEl.addEventListener('touchmove', e => {
@@ -12416,7 +12427,7 @@ function updateSideIndex(){
     const touch = e.touches[0];
     const el = document.elementFromPoint(touch.clientX, touch.clientY);
     if(el && el.classList.contains('side-index-item') && !el.classList.contains('dim')){
-      scrollToSigla(contentId, el.dataset.sigla);
+      selectSigla(el.dataset.sigla);
     }
   }, { passive: false });
 }
