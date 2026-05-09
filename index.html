@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -10411,7 +10411,74 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       .album-cards { flex-direction:row; flex-wrap:wrap; }
       .album-card { flex:1; min-width:220px; }
     }
-  </style>
+  
+    /* ── DARK MODE ───────────────────────────────── */
+    [data-theme="dark"] {
+      --bg:#1E1612; --bg-card:#2A1F1A; --text:#F0E0D0;
+      --text-mid:#C4A090; --text-light:#907060;
+      --border:#3D2E25; --shadow:rgba(0,0,0,.45);
+      --primary:#D4897B; --primary-d:#E09A8A;
+      --secondary:#C47A6A; --mauve:#8A6058;
+      --mint:#2D6B4F; --mint-d:#3D8B65;
+      --gold:#9A7A30; --gold-d:#C4A040;
+      --friend-bg:#1A2535; --friend-border:#2D4060; --friend-d:#7AAAD0;
+    }
+    [data-theme="dark"] .chip:not(.owned):not(.repeated) { background:var(--bg-card); color:var(--text-mid); }
+    [data-theme="dark"] .chip.shiny:not(.owned):not(.repeated) { background:linear-gradient(145deg,#2A2510 0%,#3A3018 100%); }
+    [data-theme="dark"] .chip.team-photo:not(.owned):not(.repeated) { background:#251A18; }
+    [data-theme="dark"] .modal-box { background:var(--bg-card); }
+    [data-theme="dark"] .nav-btn.active { background:rgba(212,137,123,.2); }
+
+    /* ── BUSCA POR SIGLA ─────────────────────────── */
+    .search-wrap { position:relative; margin-bottom:10px; }
+    .search-input {
+      width:100%; padding:9px 36px 9px 36px; border-radius:var(--radius-sm);
+      border:1.5px solid var(--border); background:var(--bg-card); color:var(--text);
+      font-size:.88rem; outline:none; box-sizing:border-box;
+      transition:border-color .2s;
+    }
+    .search-input:focus { border-color:var(--primary); }
+    .search-input::placeholder { color:var(--text-light); }
+    .search-icon { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-light); pointer-events:none; }
+    .search-clear { position:absolute; right:8px; top:50%; transform:translateY(-50%);
+      background:none; border:none; cursor:pointer; color:var(--text-light); font-size:1rem;
+      padding:2px 4px; display:none; }
+
+    /* ── ÍNDICE LATERAL ──────────────────────────── */
+    #side-index {
+      position:fixed; right:0; top:50%; transform:translateY(-50%);
+      z-index:90; display:flex; flex-direction:column; align-items:center;
+      padding:6px 2px; gap:1px; max-height:80vh; overflow:hidden;
+      background:rgba(255,255,255,.85); border-radius:12px 0 0 12px;
+      border:1px solid var(--border); border-right:none;
+      box-shadow:-2px 0 8px var(--shadow); touch-action:none;
+      transition:opacity .2s;
+    }
+    [data-theme="dark"] #side-index { background:rgba(42,31,26,.92); }
+    #side-index.hidden { display:none; }
+    .side-index-item {
+      font-size:.55rem; font-weight:700; line-height:1;
+      padding:2px 5px; border-radius:4px; cursor:pointer;
+      color:var(--primary-d); letter-spacing:.03em;
+      user-select:none; -webkit-user-select:none;
+      transition:background .1s, color .1s;
+    }
+    .side-index-item:active, .side-index-item.active { background:var(--primary); color:#fff; }
+    .side-index-item.dim { color:var(--border); pointer-events:none; }
+
+    /* ── PERFIL TOGGLE ────────────────────────────── */
+    .toggle-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border); }
+    .toggle-row:last-child { border-bottom:none; }
+    .toggle-label { font-size:.88rem; color:var(--text); }
+    .toggle-sub { font-size:.75rem; color:var(--text-light); margin-top:2px; }
+    .toggle-switch { position:relative; width:44px; height:24px; flex-shrink:0; }
+    .toggle-switch input { opacity:0; width:0; height:0; }
+    .toggle-slider { position:absolute; inset:0; background:var(--border); border-radius:12px; cursor:pointer; transition:.2s; }
+    .toggle-slider:before { content:''; position:absolute; width:18px; height:18px; left:3px; top:3px; background:#fff; border-radius:50%; transition:.2s; }
+    input:checked + .toggle-slider { background:var(--primary); }
+    input:checked + .toggle-slider:before { transform:translateX(20px); }
+
+    </style>
 </head>
 <body>
 
@@ -10493,6 +10560,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   </p>
   <div id="list-album-selector" class="album-selector"></div>
   <div id="sort-bar-list" class="sort-bar"></div>
+  <div class="search-wrap">
+    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input class="search-input" id="search-list" type="text" placeholder="Filtrar por sigla... ex: BRA" oninput="filterGroups('list-content',this.value,this)" />
+    <button class="search-clear" id="search-list-clear" onclick="clearSearch('list-content','search-list',this)">✕</button>
+  </div>
   <div id="list-content"></div>
 </div>
 
@@ -10503,6 +10575,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   </p>
   <div id="missing-album-selector" class="album-selector"></div>
   <div id="sort-bar-missing" class="sort-bar"></div>
+  <div class="search-wrap">
+    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input class="search-input" id="search-missing" type="text" placeholder="Filtrar por sigla... ex: BRA" oninput="filterGroups('missing-content',this.value,this)" />
+    <button class="search-clear" id="search-missing-clear" onclick="clearSearch('missing-content','search-missing',this)">✕</button>
+  </div>
   <div id="missing-all-banner" style="display:none;background:#FFF8EE;border:1.5px solid var(--gold-d);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:12px;color:var(--gold-d);font-size:.82rem;font-weight:600;line-height:1.5">
     👁️ Visualização geral de todos os álbuns — os <strong>toques nas figurinhas estão desativados</strong> neste modo. Selecione um álbum acima para editar.
   </div>
@@ -10517,6 +10594,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     <strong>1 toque</strong> = +1 repetida &nbsp;·&nbsp; <strong>2 toques rápidos</strong> = −1 repetida
   </p>
   <div id="sort-bar-repeated" class="sort-bar"></div>
+  <div class="search-wrap">
+    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input class="search-input" id="search-repeated" type="text" placeholder="Filtrar por sigla... ex: BRA" oninput="filterGroups('repeated-content',this.value,this)" />
+    <button class="search-clear" id="search-repeated-clear" onclick="clearSearch('repeated-content','search-repeated',this)">✕</button>
+  </div>
   <div id="repeated-content"></div>
 </div>
 
@@ -10546,6 +10628,14 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 
     <div class="perfil-group-label">Configurações</div>
     <div class="perfil-menu">
+      <div class="perfil-row" onclick="openPerfilSection('perfil-appearance')">
+        <div class="perfil-row-left">🎨 Aparência</div>
+        <div class="perfil-row-chevron">›</div>
+      </div>
+      <div class="perfil-row" onclick="openPerfilSection('perfil-backup')">
+        <div class="perfil-row-left">💾 Backup</div>
+        <div class="perfil-row-chevron">›</div>
+      </div>
       <div class="perfil-row" onclick="openPerfilSection('perfil-sync')">
         <div class="perfil-row-left">🔄 Sincronização</div>
         <div class="perfil-row-chevron">›</div>
@@ -10563,6 +10653,31 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         <div class="perfil-row-chevron" style="color:#e74c3c">›</div>
       </div>
     </div>
+  </div>
+
+  <!-- Sub: Aparência -->
+  <div id="perfil-appearance" style="display:none">
+    <button class="back-btn" onclick="goBackToPerfil()">← Voltar ao Perfil</button>
+    <div class="perfil-section-title">Aparência</div>
+    <div class="toggle-row">
+      <div><div class="toggle-label">🌙 Modo escuro</div><div class="toggle-sub">Tema escuro para uso noturno</div></div>
+      <label class="toggle-switch"><input type="checkbox" id="toggle-dark" onchange="toggleDarkMode(this.checked)"><span class="toggle-slider"></span></label>
+    </div>
+    <div class="toggle-row">
+      <div><div class="toggle-label">📑 Índice lateral</div><div class="toggle-sub">Atalho de siglas no lado direito das listas</div></div>
+      <label class="toggle-switch"><input type="checkbox" id="toggle-sideindex" onchange="toggleSideIndex(this.checked)" checked><span class="toggle-slider"></span></label>
+    </div>
+  </div>
+
+  <!-- Sub: Backup -->
+  <div id="perfil-backup" style="display:none">
+    <button class="back-btn" onclick="goBackToPerfil()">← Voltar ao Perfil</button>
+    <div class="perfil-section-title">Backup do Álbum</div>
+    <p class="hint">Salve um arquivo com todos os seus dados. Guarde onde quiser — Google Drive, iCloud, WhatsApp. Para restaurar, use o botão abaixo.</p>
+    <button class="btn btn-primary" style="width:100%;margin-bottom:10px" onclick="exportBackup()">📥 Exportar Backup</button>
+    <button class="btn btn-outline" style="width:100%" onclick="document.getElementById('import-backup-input').click()">📤 Importar Backup</button>
+    <input type="file" id="import-backup-input" accept=".json" style="display:none" onchange="importBackup(this)">
+    <p class="hint" style="margin-top:10px;color:var(--text-light);font-size:.75rem">⚠️ Importar substitui todos os dados atuais.</p>
   </div>
 
   <!-- Sub: Álbuns -->
@@ -10743,12 +10858,20 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     <p>Gera listas de texto das figurinhas faltantes ou repetidas para compartilhar via WhatsApp ou copiar. A lista de faltantes combina todos os álbuns e indica com <em>(×N)</em> quantos precisam de cada figurinha.</p>
   </div>
   <div class="howto-sub">
+    <h4>🎨 Aparência</h4>
+    <p><strong>Modo escuro:</strong> alterna entre o tema claro (padrão) e escuro. <strong>Índice lateral:</strong> mostra ou esconde o atalho de siglas no lado direito das abas de lista.</p>
+  </div>
+  <div class="howto-sub">
+    <h4>💾 Backup</h4>
+    <p>Exporta um arquivo <code>.json</code> com tudo — álbuns, repetidas, configurações. Guarde onde quiser (Google Drive, iCloud...). Para restaurar em outro dispositivo, use <strong>Importar Backup</strong> e selecione o arquivo.</p>
+  </div>
+  <div class="howto-sub">
     <h4>⚠️ Zona de Perigo</h4>
-    <p>Permite apagar as figurinhas de um álbum específico, de todos os álbuns de uma vez, ou limpar a lista de repetidas. Os álbuns em si não são excluídos ao apagar as figurinhas — apenas as marcações são removidas.</p>
+    <p>Permite apagar as figurinhas de um álbum específico, de todos os álbuns de uma vez, ou limpar a lista de repetidas. Os álbuns em si não são excluídos — apenas as marcações são removidas.</p>
   </div>
   <div class="howto-sub">
     <h4>📤 📥 Exportar e Importar álbum individual</h4>
-    <p>Cada álbum tem botões próprios de exportar (📤) e importar (📥) na lista de álbuns. Exportar gera um código só daquele álbum. Importar aplica um código e <strong>substitui</strong> as figurinhas marcadas. Use para sincronizar um álbum específico, incluindo o fluxo de troca com amigo.</p>
+    <p>Cada álbum tem botões próprios de exportar (📤) e importar (📥) na lista de álbuns. Exportar gera um código só daquele álbum. Importar aplica um código e <strong>substitui</strong> as figurinhas marcadas.</p>
   </div>
 
   <div class="howto-category" style="background:var(--friend)">👥 Álbum de Amigo</div>
@@ -10769,6 +10892,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   <div class="howto-section" style="margin-top:8px">
     <h3>📊 Visão Geral</h3>
     <p>Mostra o progresso do álbum. Se você tiver mais de um álbum, exibe um card por álbum (toque para ver detalhes por seleção) e um card "Total" com a soma de todos. Com apenas um álbum, abre diretamente no detalhamento.</p>
+  </div>
+  <div class="howto-section">
+    <h3>🔍 Busca e Índice lateral</h3>
+    <p>Nas abas <strong>Lista</strong>, <strong>Faltam</strong> e <strong>Repetidas</strong>, há um campo de busca no topo. Digite o início da sigla (ex: <strong>BR</strong> para BRA, <strong>S</strong> para SUI, SWE, SCO...) e a lista filtra instantaneamente. O ✕ limpa o filtro.</p>
+    <p>O <strong>índice lateral</strong> aparece no lado direito dessas abas com todas as siglas. Toque para pular direto à seção. Siglas acinzentadas indicam que não há figurinhas daquele time na aba atual.</p>
   </div>
   <div class="howto-section">
     <h3>📱 Instalar como app</h3>
@@ -10941,8 +11069,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v30';
-const APP_DATE    = '08/05/2026';
+const APP_VERSION = 'v33';
+const APP_DATE    = '09/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
 function range(a,b){ const r=[]; for(let i=a;i<=b;i++) r.push(String(i)); return r; }
@@ -11299,7 +11427,7 @@ function buildGroupHTML(group, tabType, ownedSet){
   const displayTitle = (group.sigla===group.titulo||group.sigla===group.titulo.toUpperCase())
     ? group.sigla : `${group.sigla} - ${group.titulo}`;
 
-  let html = `<div class="section-header"><div class="section-title">${displayTitle}</div>`;
+  let html = `<div class="group-block" data-sigla="${group.sigla}"><div class="section-header"><div class="section-title">${displayTitle}</div>`;
   if(tabType==='missing'){
     html += `<span class="section-badge">${total}</span>`;
   } else if(tabType!=='repeated'){
@@ -11327,7 +11455,7 @@ function buildGroupHTML(group, tabType, ownedSet){
     if(isTeamPhoto) cls+=' team-photo';
     html += `<div class="${cls}" data-cid="${id}${sfx}" data-id="${id}" data-tab="${tabType}">${innerLabel}</div>`;
   }
-  html += `</div>`;
+  html += `</div></div>`;
   return html;
 }
 
@@ -11472,6 +11600,7 @@ function renderList(){
   let html = '';
   for(const g of getDisplayOrder()) html += buildGroupHTML(g, 'list', album.owned);
   document.getElementById('list-content').innerHTML = html;
+  updateSideIndex();
 }
 
 /* ── RENDER: FALTAM ─────────────────────────────────────── */
@@ -11502,6 +11631,7 @@ function renderMissing(){
     html += buildGroupHTML({...g, nums:misNums}, 'missing', album.owned);
   }
   document.getElementById('missing-content').innerHTML = html;
+  updateSideIndex();
 }
 
 function renderMissingAll(){
@@ -11518,7 +11648,7 @@ function renderMissingAll(){
     });
     if(!neededNums.length) continue;
     const displayTitle = (g.sigla===g.titulo||g.sigla===g.titulo.toUpperCase()) ? g.sigla : `${g.sigla} - ${g.titulo}`;
-    html += `<div class="section-header"><div class="section-title">${displayTitle}</div><span class="section-badge">${neededNums.length}</span>`;
+    html += `<div class="group-block" data-sigla="${g.sigla}"><div class="section-header"><div class="section-title">${displayTitle}</div><span class="section-badge">${neededNums.length}</span>`;
     if(g.grupo) html += `<span class="group-label">Grupo ${g.grupo}</span>`;
     html += `</div><div class="chips-grid">`;
     for(const num of neededNums){
@@ -11534,9 +11664,10 @@ function renderMissingAll(){
       if(count > 1) innerLabel += `<span class="chip-rep-cnt">${count}</span>`;
       html += `<div class="${cls}" style="cursor:default">${innerLabel}</div>`;
     }
-    html += `</div>`;
+    html += `</div></div>`;
   }
   document.getElementById('missing-content').innerHTML = html;
+  updateSideIndex();
 }
 
 /* ── RENDER: REPETIDAS ──────────────────────────────────── */
@@ -11546,6 +11677,7 @@ function renderRepeated(){
   let html = rc ? `<div class="card" style="background:#FFF8EE;border-color:var(--gold-d);margin-bottom:16px"><div style="font-size:.85rem;color:var(--gold-d);font-weight:700">🔄 ${total} figurinha${total!==1?'s':''} repetida${total!==1?'s':''} · ${rc} número${rc!==1?'s':''} diferentes</div></div>` : '';
   for(const g of getDisplayOrder()) html += buildGroupHTML(g, 'repeated');
   document.getElementById('repeated-content').innerHTML = html;
+  updateSideIndex();
 }
 
 /* ── SORT BAR ───────────────────────────────────────────── */
@@ -11705,14 +11837,20 @@ function confirmDeleteFriend(){
 
 function openPerfilSection(sectionId){
   document.getElementById('perfil-main').style.display = 'none';
-  ['perfil-albuns','perfil-sync','perfil-exchange','perfil-export','perfil-danger'].forEach(id=>{
+  ['perfil-albuns','perfil-sync','perfil-exchange','perfil-export','perfil-danger','perfil-appearance','perfil-backup'].forEach(id=>{
     document.getElementById(id).style.display = 'none';
   });
   document.getElementById(sectionId).style.display = 'block';
   if(sectionId==='perfil-albuns') renderPerfilAlbuns();
+  if(sectionId==='perfil-appearance'){
+    const darkCb = document.getElementById('toggle-dark');
+    const sideCb = document.getElementById('toggle-sideindex');
+    if(darkCb) darkCb.checked = document.documentElement.getAttribute('data-theme')==='dark';
+    if(sideCb) sideCb.checked = _sideIndexEnabled;
+  }
 }
 function goBackToPerfil(){
-  ['perfil-albuns','perfil-sync','perfil-exchange','perfil-export','perfil-danger'].forEach(id=>{
+  ['perfil-albuns','perfil-sync','perfil-exchange','perfil-export','perfil-danger','perfil-appearance','perfil-backup'].forEach(id=>{
     document.getElementById(id).style.display = 'none';
   });
   document.getElementById('perfil-main').style.display = 'block';
@@ -11777,6 +11915,13 @@ function switchTab(id){
   document.getElementById('tab-'+id).classList.add('active');
   document.querySelector(`.nav-btn[data-tab="${id}"]`).classList.add('active');
   document.querySelector('.app-main').scrollTop = 0;
+  // clear search fields when switching tab
+  ['search-list','search-missing','search-repeated'].forEach(id=>{
+    const el=document.getElementById(id); if(el && el.value){ el.value=''; }
+  });
+  document.querySelectorAll('.group-block').forEach(b=>b.style.display='');
+  document.querySelectorAll('.search-clear').forEach(b=>b.style.display='none');
+  updateSideIndex();
 }
 document.querySelectorAll('.nav-btn').forEach(btn=>{
   btn.addEventListener('click', ()=> switchTab(btn.dataset.tab));
@@ -12218,10 +12363,171 @@ function processQRResult(data){
   }
 }
 
+/* ── DARK MODE ──────────────────────────────────────────── */
+function toggleDarkMode(on){
+  document.documentElement.setAttribute('data-theme', on ? 'dark' : 'light');
+  localStorage.setItem('elevah_dark', on ? '1' : '0');
+}
+
+/* ── ÍNDICE LATERAL ─────────────────────────────────────── */
+let _sideIndexEnabled = true;
+function toggleSideIndex(on){
+  _sideIndexEnabled = on;
+  localStorage.setItem('elevah_sideindex', on ? '1' : '0');
+  updateSideIndex();
+}
+
+function updateSideIndex(){
+  const sideEl = document.getElementById('side-index');
+  if(!sideEl) return;
+  // Mostra só nas abas de lista
+  const activeTab = document.querySelector('.tab-panel.active');
+  const tabId = activeTab?.id || '';
+  const contentMap = { 'tab-list':'list-content', 'tab-missing':'missing-content', 'tab-repeated':'repeated-content' };
+  const contentId = contentMap[tabId];
+  if(!contentId || !_sideIndexEnabled){ sideEl.classList.add('hidden'); return; }
+  const contentEl = document.getElementById(contentId);
+  if(!contentEl){ sideEl.classList.add('hidden'); return; }
+  // Coleta siglas presentes no conteúdo atual
+  const presentSiglas = new Set([...contentEl.querySelectorAll('.group-block')].map(el => el.dataset.sigla));
+  // Todas as siglas do álbum (na ordem de exibição) exceto PANINI
+  const allSiglas = getDisplayOrder().filter(g => g.sigla !== 'PANINI').map(g => g.sigla);
+  if(allSiglas.length === 0){ sideEl.classList.add('hidden'); return; }
+  sideEl.innerHTML = allSiglas.map(s =>
+    `<div class="side-index-item${presentSiglas.has(s)?'':' dim'}" data-sigla="${s}">${s}</div>`
+  ).join('');
+  sideEl.classList.remove('hidden');
+  // Position side index adjacent to app content (fixes desktop centered layout)
+  const panel = document.querySelector('.tab-panel.active');
+  if(panel){
+    const rect = panel.getBoundingClientRect();
+    const gap = Math.max(0, window.innerWidth - rect.right);
+    sideEl.style.right = gap + 'px';
+  } else {
+    sideEl.style.right = '0';
+  }
+  // Touch/click handlers
+  sideEl.querySelectorAll('.side-index-item:not(.dim)').forEach(item => {
+    item.addEventListener('click', () => scrollToSigla(contentId, item.dataset.sigla));
+  });
+  // Touch drag handler
+  sideEl.addEventListener('touchmove', e => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const el = document.elementFromPoint(touch.clientX, touch.clientY);
+    if(el && el.classList.contains('side-index-item') && !el.classList.contains('dim')){
+      scrollToSigla(contentId, el.dataset.sigla);
+    }
+  }, { passive: false });
+}
+
+function scrollToSigla(contentId, sigla){
+  const contentEl = document.getElementById(contentId);
+  if(!contentEl) return;
+  const block = contentEl.querySelector(`.group-block[data-sigla="${sigla}"]`);
+  if(!block) return;
+  const appMain = document.querySelector('.app-main');
+  if(appMain){
+    const offset = block.offsetTop + contentEl.offsetTop - 80;
+    appMain.scrollTo({ top: offset, behavior: 'smooth' });
+  }
+}
+
+/* ── FILTRO POR SIGLA ───────────────────────────────────── */
+function filterGroups(contentId, query, inputEl){
+  const q = query.trim().toUpperCase();
+  const contentEl = document.getElementById(contentId);
+  if(!contentEl) return;
+  // Mostra/esconde o botão clear
+  const clearBtn = inputEl?.nextElementSibling;
+  if(clearBtn) clearBtn.style.display = q ? 'block' : 'none';
+  contentEl.querySelectorAll('.group-block').forEach(block => {
+    const sigla = block.dataset.sigla || '';
+    block.style.display = (!q || sigla.startsWith(q)) ? '' : 'none';
+  });
+  updateSideIndex();
+}
+
+function clearSearch(contentId, inputId, clearBtn){
+  const input = document.getElementById(inputId);
+  if(input){ input.value = ''; filterGroups(contentId, '', input); }
+  clearBtn.style.display = 'none';
+}
+
+/* ── BACKUP / RESTORE ───────────────────────────────────── */
+function exportBackup(){
+  const data = {
+    version: 2,
+    date: new Date().toISOString(),
+    albums: state.albums.map(a => ({id:a.id, name:a.name, owned:[...a.owned]})),
+    repeated: state.repeated,
+    activeAlbumId: state.activeAlbumId,
+    friendAlbum: state.friendAlbum ? {
+      id:state.friendAlbum.id, name:state.friendAlbum.name,
+      friendName:state.friendAlbum.friendName, owned:[...state.friendAlbum.owned]
+    } : null,
+    userName: userName,
+    sortOrder: sortOrder,
+    darkMode: document.documentElement.getAttribute('data-theme') === 'dark',
+    sideIndexEnabled: _sideIndexEnabled,
+    missingShowAll: state.missingShowAll,
+    faltamAlbumId: state.faltamAlbumId,
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const date = new Date().toLocaleDateString('pt-BR').replace(/\//g,'-');
+  a.href = url; a.download = `elevah-backup-${date}.json`; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  showToast('📥 Backup exportado com sucesso!');
+}
+
+function importBackup(inputEl){
+  const file = inputEl.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try{
+      const data = JSON.parse(e.target.result);
+      if(!data.version || !data.albums) throw new Error('Arquivo inválido');
+      if(!confirm('⚠️ Isso vai substituir todos os seus dados atuais. Continuar?')){ inputEl.value=''; return; }
+      state.albums = data.albums.map(a => ({id:a.id, name:a.name, owned:new Set(a.owned||[])}));
+      state.repeated = data.repeated || {};
+      state.activeAlbumId = data.activeAlbumId || state.albums[0]?.id || null;
+      state.friendAlbum = data.friendAlbum ? {
+        ...data.friendAlbum, owned: new Set(data.friendAlbum.owned||[])
+      } : null;
+      if(data.userName) userName = data.userName;
+      if(data.sortOrder) sortOrder = data.sortOrder;
+      if(typeof data.darkMode !== 'undefined') toggleDarkMode(data.darkMode);
+      if(typeof data.sideIndexEnabled !== 'undefined'){ _sideIndexEnabled = data.sideIndexEnabled; localStorage.setItem('elevah_sideindex', data.sideIndexEnabled ? '1' : '0'); }
+      if(typeof data.missingShowAll !== 'undefined') state.missingShowAll = data.missingShowAll;
+      if(data.faltamAlbumId) state.faltamAlbumId = data.faltamAlbumId;
+      saveState(); renderAll();
+      showToast('✅ Backup importado com sucesso!');
+      goBackToPerfil();
+    } catch(err){
+      alert('❌ Arquivo de backup inválido ou corrompido.');
+    }
+    inputEl.value = '';
+  };
+  reader.readAsText(file);
+}
+
 /* ── INIT ───────────────────────────────────────────────── */
+// Load appearance prefs BEFORE first render
+(function initAppearance(){
+  const dark = localStorage.getItem('elevah_dark') === '1';
+  if(dark) document.documentElement.setAttribute('data-theme','dark');
+  const sideOff = localStorage.getItem('elevah_sideindex') === '0';
+  _sideIndexEnabled = !sideOff;
+})();
 loadState();
 setupDelegation();
 renderAll();
+updateSideIndex();
+// Reposition side index on window resize (desktop layout changes)
+window.addEventListener('resize', updateSideIndex);
 
 // Exibe versão na aba Ajuda
 const vBadge = document.getElementById('app-version-badge');
@@ -12250,5 +12556,6 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
+  <div id="side-index" class="hidden"></div>
 </body>
 </html>
