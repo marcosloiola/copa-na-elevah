@@ -834,7 +834,7 @@
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v23';
+const APP_VERSION = 'v24';
 const APP_DATE    = '08/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
@@ -2006,8 +2006,12 @@ async function startQRScanner(){
         if(statusEl) statusEl.textContent = '🔍 Scanner ativo — aponte para o QR Code...';
       } catch(e){ detector = null; }
     }
-    if(!detector && statusEl) statusEl.textContent = '🔍 Aponte para o QR Code...';
+    const jsqrOk = typeof jsQR === 'function';
+    const bdOk   = !!detector;
+    if(statusEl) statusEl.textContent =
+      `📐 Vídeo: ${canvas.width}×${canvas.height} | BD: ${bdOk?'✅':'❌'} | jsQR: ${jsqrOk?'✅':'❌'}`;
 
+    let frameCount = 0;
     // Loop único: desenha frame no canvas → tenta BarcodeDetector → fallback jsQR
     qrScanInterval = setInterval(async () => {
       if(video.readyState < 2 || !video.videoWidth) return;
@@ -2016,19 +2020,26 @@ async function startQRScanner(){
       if(canvas.height !== video.videoHeight) canvas.height = video.videoHeight;
       // Captura frame atual
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      frameCount++;
+      // Atualiza status com info de debug a cada 10 frames
+      if(frameCount % 10 === 0 && statusEl){
+        statusEl.textContent = `🔍 Frame ${frameCount} | ${canvas.width}×${canvas.height} | BD:${bdOk?'✅':'❌'} jsQR:${jsqrOk?'✅':'❌'}`;
+      }
       try{
         if(detector){
-          // BarcodeDetector recebe o canvas (mais compatível que o elemento video)
           const codes = await detector.detect(canvas);
           if(codes.length > 0 && codes[0].rawValue){
             stopQRScanner(); processQRResult(codes[0].rawValue); return;
           }
         }
-        // jsQR como fallback (ou se BarcodeDetector não disponível)
-        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const code = jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts: 'attemptBoth' });
-        if(code && code.data){ stopQRScanner(); processQRResult(code.data); }
-      } catch(e){ /* frame ainda processando */ }
+        if(jsqrOk){
+          const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const code = jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts: 'attemptBoth' });
+          if(code && code.data){ stopQRScanner(); processQRResult(code.data); }
+        }
+      } catch(e){
+        if(statusEl) statusEl.textContent = '⚠️ Erro: ' + e.message;
+      }
     }, 300);
 
   } catch(err){
