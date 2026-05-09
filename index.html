@@ -10735,7 +10735,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   </div>
   <div class="howto-sub">
     <h4>🤝 Troca de Figurinhas</h4>
-    <p><strong>Via QR Code (mais rápido):</strong> Toque em "Gerar meu QR Code". Mostre para o amigo ler com a <strong>câmera nativa</strong> do celular dele — o app vai abrir automaticamente e mostrar quais repetidas você tem que ele precisa. Não é necessário nenhum leitor dentro do app.</p>
+    <p><strong>Via QR Code (mais rápido):</strong> Toque em "Mostrar meu QR" e mostre a tela para o amigo. O amigo usa o botão "📸 Ler QR do amigo" para escanear pelo app, ou pode usar a câmera nativa do celular — neste caso o resultado abre automaticamente no browser.</p>
     <p><strong>Via código de texto:</strong> Gere o código de texto e envie por WhatsApp. O amigo cola o código e vê as coincidências. Funciona offline após o primeiro acesso.</p>
   </div>
   <div class="howto-sub">
@@ -10909,7 +10909,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     <h3>📷 QR Code das Minhas Faltantes</h3>
     <p id="qr-generate-count" style="font-size:.8rem;color:var(--text-light);margin-bottom:14px;text-align:center"></p>
     <div id="qr-generate-img" class="qr-img-wrap"></div>
-    <p style="font-size:.75rem;color:var(--text-light);text-align:center;margin-bottom:16px">📱 Peça ao amigo para escanear com a <strong>câmera nativa</strong> do celular — o app abre automaticamente com as figurinhas em comum.</p>
+    <p style="font-size:.75rem;color:var(--text-light);text-align:center;margin-bottom:16px">📱 Peça ao amigo escanear pelo app (botão "📸 Ler QR do amigo") ou pela câmera nativa do celular.</p>
     <div class="modal-actions">
       <button class="btn btn-primary" onclick="closeModal('modal-qr-generate')">Fechar</button>
     </div>
@@ -10937,7 +10937,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v26';
+const APP_VERSION = 'v27';
 const APP_DATE    = '08/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
@@ -12101,33 +12101,20 @@ async function startQRScanner(){
     canvas.height = video.videoHeight || 480;
     const ctx = canvas.getContext('2d');
 
-    // Tenta inicializar BarcodeDetector (usa canvas, não o video diretamente)
+    // BarcodeDetector (nativo, mais rápido) com fallback para jsQR via canvas
     let detector = null;
     if('BarcodeDetector' in window){
-      try{
-        detector = new BarcodeDetector({ formats: ['qr_code'] });
-        if(statusEl) statusEl.textContent = '🔍 Scanner ativo — aponte para o QR Code...';
-      } catch(e){ detector = null; }
+      try{ detector = new BarcodeDetector({ formats: ['qr_code'] }); }
+      catch(e){ detector = null; }
     }
-    const jsqrOk = typeof jsQR === 'function';
-    const bdOk   = !!detector;
-    if(statusEl) statusEl.textContent =
-      `📐 Vídeo: ${canvas.width}×${canvas.height} | BD: ${bdOk?'✅':'❌'} | jsQR: ${jsqrOk?'✅':'❌'}`;
+    if(statusEl) statusEl.textContent = '🔍 Aponte para o QR Code do amigo...';
 
-    let frameCount = 0;
-    // Loop único: desenha frame no canvas → tenta BarcodeDetector → fallback jsQR
+    // Loop: captura frame → BarcodeDetector (nativo) → jsQR (fallback)
     qrScanInterval = setInterval(async () => {
       if(video.readyState < 2 || !video.videoWidth) return;
-      // Sincroniza dimensões se mudar
       if(canvas.width !== video.videoWidth)  canvas.width  = video.videoWidth;
       if(canvas.height !== video.videoHeight) canvas.height = video.videoHeight;
-      // Captura frame atual
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      frameCount++;
-      // Atualiza status com info de debug a cada 10 frames
-      if(frameCount % 10 === 0 && statusEl){
-        statusEl.textContent = `🔍 Frame ${frameCount} | ${canvas.width}×${canvas.height} | BD:${bdOk?'✅':'❌'} jsQR:${jsqrOk?'✅':'❌'}`;
-      }
       try{
         if(detector){
           const codes = await detector.detect(canvas);
@@ -12135,14 +12122,10 @@ async function startQRScanner(){
             stopQRScanner(); processQRResult(codes[0].rawValue); return;
           }
         }
-        if(jsqrOk){
-          const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          const code = jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts: 'attemptBoth' });
-          if(code && code.data){ stopQRScanner(); processQRResult(code.data); }
-        }
-      } catch(e){
-        if(statusEl) statusEl.textContent = '⚠️ Erro: ' + e.message;
-      }
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts: 'attemptBoth' });
+        if(code && code.data){ stopQRScanner(); processQRResult(code.data); }
+      } catch(e){ /* frame ainda processando */ }
     }, 300);
 
   } catch(err){
@@ -12211,7 +12194,7 @@ renderAll();
 const vBadge = document.getElementById('app-version-badge');
 if(vBadge) vBadge.textContent = APP_VERSION + ' · ' + APP_DATE;
 
-// Detecta QR Code via URL hash (#qr=ELQ2*...)
+// Detecta QR Code via URL hash (#qr=ELQ3:...)
 // Ativado quando o amigo escaneia o QR com a câmera nativa e o app abre via link
 (function checkUrlQR(){
   const hash = window.location.hash;
