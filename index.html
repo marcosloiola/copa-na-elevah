@@ -10735,7 +10735,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   </div>
   <div class="howto-sub">
     <h4>🤝 Troca de Figurinhas</h4>
-    <p><strong>Via QR Code (mais rápido):</strong> Toque em "Mostrar meu QR" e mostre a tela para o amigo. O amigo usa o botão "📸 Ler QR do amigo" para escanear pelo app, ou pode usar a câmera nativa do celular — neste caso o resultado abre automaticamente no browser.</p>
+    <p><strong>Via QR Code (mais rápido):</strong> Toque em "Mostrar meu QR" e mostre a tela para o amigo. O amigo usa o botão "📸 Ler QR do amigo" no app dele para escanear e ver quais das suas repetidas ele precisa.</p>
     <p><strong>Via código de texto:</strong> Gere o código de texto e envie por WhatsApp. O amigo cola o código e vê as coincidências. Funciona offline após o primeiro acesso.</p>
   </div>
   <div class="howto-sub">
@@ -10909,7 +10909,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     <h3>📷 QR Code das Minhas Faltantes</h3>
     <p id="qr-generate-count" style="font-size:.8rem;color:var(--text-light);margin-bottom:14px;text-align:center"></p>
     <div id="qr-generate-img" class="qr-img-wrap"></div>
-    <p style="font-size:.75rem;color:var(--text-light);text-align:center;margin-bottom:16px">📱 Peça ao amigo escanear pelo app (botão "📸 Ler QR do amigo") ou pela câmera nativa do celular.</p>
+    <p style="font-size:.75rem;color:var(--text-light);text-align:center;margin-bottom:16px">📱 Peça ao amigo escanear usando o botão "📸 Ler QR do amigo" no app dele.</p>
     <div class="modal-actions">
       <button class="btn btn-primary" onclick="closeModal('modal-qr-generate')">Fechar</button>
     </div>
@@ -10937,7 +10937,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v27';
+const APP_VERSION = 'v28';
 const APP_DATE    = '08/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
@@ -12195,7 +12195,7 @@ const vBadge = document.getElementById('app-version-badge');
 if(vBadge) vBadge.textContent = APP_VERSION + ' · ' + APP_DATE;
 
 // Detecta QR Code via URL hash (#qr=ELQ3:...)
-// Ativado quando o amigo escaneia o QR com a câmera nativa e o app abre via link
+// Ativado quando o app abre via link com hash #qr= (fluxo URL-based)
 (function checkUrlQR(){
   const hash = window.location.hash;
   if(!hash || !hash.startsWith('#qr=')) return;
