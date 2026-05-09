@@ -806,7 +806,7 @@
     <h3>📷 QR Code das Minhas Faltantes</h3>
     <p id="qr-generate-count" style="font-size:.8rem;color:var(--text-light);margin-bottom:14px;text-align:center"></p>
     <div id="qr-generate-img" class="qr-img-wrap"></div>
-    <p style="font-size:.75rem;color:var(--text-light);text-align:center;margin-bottom:16px">Mostre para o amigo ler com o app dele — botão "📸 Ler QR do amigo"</p>
+    <p style="font-size:.75rem;color:var(--text-light);text-align:center;margin-bottom:16px">📱 Peça ao amigo para escanear com a <strong>câmera nativa</strong> do celular — o app abre automaticamente com as figurinhas em comum.</p>
     <div class="modal-actions">
       <button class="btn btn-primary" onclick="closeModal('modal-qr-generate')">Fechar</button>
     </div>
@@ -834,7 +834,7 @@
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v21';
+const APP_VERSION = 'v23';
 const APP_DATE    = '08/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
@@ -1936,12 +1936,14 @@ function generateExchangeQR(){
   const missingCount = QR_STICKER_IDS.filter(id => state.albums.some(a => !a.owned.has(id))).length;
 
   try{
-    // Alphanumeric mode (ELQ3 uses only 0-9 A-F : → QR alphanumeric set)
-    // ~254 chars → QR version 10, error L → 57×57 modules
+    // URL-based QR: native camera reads it as a link and opens the app automatically
+    // appUrl#qr=ELQ3:XXXX — QR version ~15 in Byte mode, easily readable by any camera
+    const appUrl = window.location.origin + window.location.pathname;
+    const qrUrl  = appUrl + '#qr=' + payload;
     const qr = qrcode(0, 'L');
-    qr.addData(payload, 'Alphanumeric');
+    qr.addData(qrUrl); // Byte mode — native camera recognizes as clickable URL
     qr.make();
-    const imgTag = qr.createImgTag(6, 4); // cell 6px, margin 4 cells
+    const imgTag = qr.createImgTag(5, 4); // cell 5px, margin 4 cells
     document.getElementById('qr-generate-img').innerHTML = imgTag;
     const img = document.querySelector('#qr-generate-img img');
     if(img){ img.style.cssText = 'max-width:min(300px,100%);width:auto;height:auto;border-radius:8px;border:2px solid var(--border);display:block;margin:0 auto'; }
@@ -1976,51 +1978,58 @@ async function startQRScanner(){
   }
 
   try{
+    // Sem forçar resolução — deixa o browser escolher o melhor modo
     const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
+      video: { facingMode: { ideal: 'environment' } }
     });
     qrScanStream = stream;
     video.srcObject = stream;
-    video.setAttribute('playsinline', 'true'); // iOS Safari
+    video.setAttribute('playsinline', 'true');
+    video.muted = true;
     await video.play();
-    if(statusEl) statusEl.textContent = '🔍 Aponte para o QR Code do amigo...';
 
-    // ── Estratégia 1: BarcodeDetector nativo (Android Chrome, iOS 17+)
-    // Usa o scanner de hardware do dispositivo — muito mais confiável que jsQR
-    if('BarcodeDetector' in window){
-      let detector;
-      try{ detector = new BarcodeDetector({ formats: ['qr_code'] }); }
-      catch(e){ detector = new BarcodeDetector(); } // fallback sem especificar formato
-      qrScanInterval = setInterval(async () => {
-        try{
-          const codes = await detector.detect(video);
-          if(codes.length > 0 && codes[0].rawValue){
-            stopQRScanner();
-            processQRResult(codes[0].rawValue);
-          }
-        } catch(e){ /* frame ainda não pronto */ }
-      }, 200);
-      return;
-    }
+    // Aguarda o vídeo ter frames reais antes de começar a ler
+    await new Promise(resolve => {
+      if(video.videoWidth > 0){ resolve(); return; }
+      video.addEventListener('loadeddata', resolve, { once: true });
+    });
 
-    // ── Estratégia 2: jsQR via canvas (fallback para browsers sem BarcodeDetector)
-    video.addEventListener('loadedmetadata', () => {
-      canvas.width  = video.videoWidth  || 640;
-      canvas.height = video.videoHeight || 480;
-    }, { once: true });
+    canvas.width  = video.videoWidth  || 640;
+    canvas.height = video.videoHeight || 480;
     const ctx = canvas.getContext('2d');
-    qrScanInterval = setInterval(() => {
+
+    // Tenta inicializar BarcodeDetector (usa canvas, não o video diretamente)
+    let detector = null;
+    if('BarcodeDetector' in window){
+      try{
+        detector = new BarcodeDetector({ formats: ['qr_code'] });
+        if(statusEl) statusEl.textContent = '🔍 Scanner ativo — aponte para o QR Code...';
+      } catch(e){ detector = null; }
+    }
+    if(!detector && statusEl) statusEl.textContent = '🔍 Aponte para o QR Code...';
+
+    // Loop único: desenha frame no canvas → tenta BarcodeDetector → fallback jsQR
+    qrScanInterval = setInterval(async () => {
       if(video.readyState < 2 || !video.videoWidth) return;
+      // Sincroniza dimensões se mudar
       if(canvas.width !== video.videoWidth)  canvas.width  = video.videoWidth;
       if(canvas.height !== video.videoHeight) canvas.height = video.videoHeight;
+      // Captura frame atual
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const code = jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts: 'attemptBoth' });
-      if(code && code.data){
-        stopQRScanner();
-        processQRResult(code.data);
-      }
-    }, 200);
+      try{
+        if(detector){
+          // BarcodeDetector recebe o canvas (mais compatível que o elemento video)
+          const codes = await detector.detect(canvas);
+          if(codes.length > 0 && codes[0].rawValue){
+            stopQRScanner(); processQRResult(codes[0].rawValue); return;
+          }
+        }
+        // jsQR como fallback (ou se BarcodeDetector não disponível)
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts: 'attemptBoth' });
+        if(code && code.data){ stopQRScanner(); processQRResult(code.data); }
+      } catch(e){ /* frame ainda processando */ }
+    }, 300);
 
   } catch(err){
     console.error('Camera error:', err);
