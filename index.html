@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-BR" data-theme="light">
 <head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-L288SGXWQH"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-L288SGXWQH');
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Elevah · Álbum Copa 2026</title>
@@ -10618,6 +10626,14 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       </button>
     </div>
 
+    <div class="perfil-group-label">Minha Conta</div>
+    <div class="perfil-menu">
+      <div class="perfil-row" onclick="openPerfilSection('perfil-dados')">
+        <div class="perfil-row-left">👤 Dados Pessoais</div>
+        <div class="perfil-row-chevron">›</div>
+      </div>
+    </div>
+
     <div class="perfil-group-label">Meus Álbuns</div>
     <div class="perfil-menu">
       <div class="perfil-row" onclick="openPerfilSection('perfil-albuns')">
@@ -10653,6 +10669,31 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         <div class="perfil-row-chevron" style="color:#e74c3c">›</div>
       </div>
     </div>
+  </div>
+
+  <!-- Sub: Dados Pessoais -->
+  <div id="perfil-dados" style="display:none">
+    <button class="back-btn" onclick="goBackToPerfil()">← Voltar ao Perfil</button>
+    <div class="perfil-section-title">Dados Pessoais</div>
+    <p class="hint" style="margin-bottom:16px">Esses dados ajudam a personalizar sua experiência e podem ser usados para te enviar novidades sobre o álbum. Não compartilhamos com terceiros.</p>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
+      <div>
+        <label style="font-size:.75rem;font-weight:700;color:var(--text-light);display:block;margin-bottom:4px">NOME</label>
+        <input id="dados-nome" type="text" placeholder="Seu nome completo" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text);font-size:.9rem;box-sizing:border-box" />
+      </div>
+      <div>
+        <label style="font-size:.75rem;font-weight:700;color:var(--text-light);display:block;margin-bottom:4px">E-MAIL</label>
+        <input id="dados-email" type="email" placeholder="seu@email.com" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text);font-size:.9rem;box-sizing:border-box" />
+      </div>
+      <div>
+        <label style="font-size:.75rem;font-weight:700;color:var(--text-light);display:block;margin-bottom:4px">WHATSAPP</label>
+        <input id="dados-whatsapp" type="tel" placeholder="+55 11 99999-9999" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text);font-size:.9rem;box-sizing:border-box" />
+      </div>
+    </div>
+    <button class="btn btn-primary" style="width:100%;margin-bottom:8px" onclick="saveDadosPessoais()">💾 Salvar Dados</button>
+    <div id="dados-status" style="display:none;text-align:center;font-size:.8rem;padding:8px;border-radius:var(--radius-sm);margin-top:4px"></div>
+    <p class="hint" style="margin-top:12px;font-size:.72rem;color:var(--text-light)">Seus dados são salvos no dispositivo e enviados de forma segura para a equipe Elevah.</p>
+    <button class="back-btn" onclick="goBackToPerfil()" style="margin-top:24px">← Voltar ao Perfil</button>
   </div>
 
   <!-- Sub: Aparência -->
@@ -11069,7 +11110,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v33';
+const APP_VERSION = 'v34';
 const APP_DATE    = '09/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
@@ -11837,27 +11878,84 @@ function confirmDeleteFriend(){
 
 function openPerfilSection(sectionId){
   document.getElementById('perfil-main').style.display = 'none';
-  ['perfil-albuns','perfil-sync','perfil-exchange','perfil-export','perfil-danger','perfil-appearance','perfil-backup'].forEach(id=>{
-    document.getElementById(id).style.display = 'none';
+  ['perfil-dados','perfil-albuns','perfil-sync','perfil-exchange','perfil-export','perfil-danger','perfil-appearance','perfil-backup'].forEach(id=>{
+    const el = document.getElementById(id); if(el) el.style.display = 'none';
   });
-  document.getElementById(sectionId).style.display = 'block';
+  const target = document.getElementById(sectionId);
+  if(target) target.style.display = 'block';
   if(sectionId==='perfil-albuns') renderPerfilAlbuns();
+  if(sectionId==='perfil-dados') loadDadosPessoais();
   if(sectionId==='perfil-appearance'){
     const darkCb = document.getElementById('toggle-dark');
     const sideCb = document.getElementById('toggle-sideindex');
     if(darkCb) darkCb.checked = document.documentElement.getAttribute('data-theme')==='dark';
     if(sideCb) sideCb.checked = _sideIndexEnabled;
   }
+  // Track section view in GA4
+  if(typeof gtag !== 'undefined') gtag('event', 'perfil_section', { section: sectionId });
 }
 function goBackToPerfil(){
-  ['perfil-albuns','perfil-sync','perfil-exchange','perfil-export','perfil-danger','perfil-appearance','perfil-backup'].forEach(id=>{
-    document.getElementById(id).style.display = 'none';
+  ['perfil-dados','perfil-albuns','perfil-sync','perfil-exchange','perfil-export','perfil-danger','perfil-appearance','perfil-backup'].forEach(id=>{
+    const el = document.getElementById(id); if(el) el.style.display = 'none';
   });
   document.getElementById('perfil-main').style.display = 'block';
 }
 function editUserName(){
   const n = prompt('Seu nome:', userName);
   if(n !== null){ userName = n.trim(); saveState(); renderPerfil(); }
+}
+
+/* ── DADOS PESSOAIS ─────────────────────────────────────── */
+const LEADS_URL = 'https://script.google.com/macros/s/AKfycbzLXE_Y1L_c6lmz6xqedJksfdVHQ9n5S9P1XDbqA0-PsZ0LbKcxVVTxho8CTmUss2ua/exec';
+
+function loadDadosPessoais(){
+  const dados = JSON.parse(localStorage.getItem('elevah_dados') || '{}');
+  const nomeEl = document.getElementById('dados-nome');
+  const emailEl = document.getElementById('dados-email');
+  const wpEl = document.getElementById('dados-whatsapp');
+  if(nomeEl) nomeEl.value = dados.nome || userName || '';
+  if(emailEl) emailEl.value = dados.email || '';
+  if(wpEl) wpEl.value = dados.whatsapp || '';
+  const statusEl = document.getElementById('dados-status');
+  if(statusEl) statusEl.style.display = 'none';
+}
+
+function saveDadosPessoais(){
+  const nome = (document.getElementById('dados-nome')?.value || '').trim();
+  const email = (document.getElementById('dados-email')?.value || '').trim();
+  const whatsapp = (document.getElementById('dados-whatsapp')?.value || '').trim();
+
+  if(!nome){ showDadosStatus('Por favor, preencha seu nome.', 'error'); return; }
+
+  // Save locally
+  const dados = { nome, email, whatsapp, savedAt: new Date().toISOString() };
+  localStorage.setItem('elevah_dados', JSON.stringify(dados));
+
+  // Update username display if empty
+  if(!userName){ userName = nome; saveState(); renderPerfil(); }
+
+  showDadosStatus('Salvando...', 'info');
+
+  // Send to Google Sheets
+  const formData = new FormData();
+  formData.append('nome', nome);
+  formData.append('email', email);
+  formData.append('whatsapp', whatsapp);
+  formData.append('app_version', APP_VERSION);
+  formData.append('timestamp', new Date().toISOString());
+
+  fetch(LEADS_URL, { method:'POST', body: formData })
+    .then(() => showDadosStatus('✅ Dados salvos com sucesso!', 'success'))
+    .catch(() => showDadosStatus('✅ Dados salvos localmente. Sincronização pendente.', 'success'));
+}
+
+function showDadosStatus(msg, type){
+  const el = document.getElementById('dados-status');
+  if(!el) return;
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.style.background = type === 'error' ? '#fdecea' : type === 'success' ? '#e8f5e9' : '#e3f2fd';
+  el.style.color = type === 'error' ? '#c62828' : type === 'success' ? '#2e7d32' : '#1565c0';
 }
 
 /* ── NORMALIZE STATE ────────────────────────────────────── */
@@ -11922,6 +12020,8 @@ function switchTab(id){
   document.querySelectorAll('.group-block').forEach(b=>b.style.display='');
   document.querySelectorAll('.search-clear').forEach(b=>b.style.display='none');
   updateSideIndex();
+  // Track tab view in GA4
+  if(typeof gtag !== 'undefined') gtag('event', 'page_view', { page_title: id, page_location: window.location.href + '#' + id });
 }
 document.querySelectorAll('.nav-btn').forEach(btn=>{
   btn.addEventListener('click', ()=> switchTab(btn.dataset.tab));
