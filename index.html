@@ -10910,8 +10910,12 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     <p id="qr-generate-count" style="font-size:.8rem;color:var(--text-light);margin-bottom:14px;text-align:center"></p>
     <div id="qr-generate-img" class="qr-img-wrap"></div>
     <p style="font-size:.75rem;color:var(--text-light);text-align:center;margin-bottom:16px">📱 Peça ao amigo escanear usando o botão "📸 Ler QR do amigo" no app dele.</p>
-    <div class="modal-actions">
-      <button class="btn btn-primary" onclick="closeModal('modal-qr-generate')">Fechar</button>
+    <div class="modal-actions" style="gap:8px">
+      <button class="btn btn-whatsapp" style="flex:1" onclick="shareQRWhatsApp()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle;margin-right:4px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.558 4.114 1.534 5.836L.054 23.5l5.82-1.527A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.808 9.808 0 01-5.002-1.368l-.36-.214-3.716.975.993-3.63-.234-.373A9.808 9.808 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
+        WhatsApp
+      </button>
+      <button class="btn btn-primary" style="flex:1" onclick="closeModal('modal-qr-generate')">Fechar</button>
     </div>
   </div>
 </div>
@@ -10937,7 +10941,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v28';
+const APP_VERSION = 'v30';
 const APP_DATE    = '08/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
@@ -12035,12 +12039,10 @@ function generateExchangeQR(){
       if(state.albums.some(a => !a.owned.has(chipId(g.sigla, n)))){ hasAny = true; break; }
   if(!hasAny){ alert('🏆 Todos os álbuns completos!'); return; }
 
-  const payload = encodeQRMissing(); // ELQ3:XXXX... (~254 chars hex alphanumeric)
+  const payload = encodeQRMissing();
   const missingCount = QR_STICKER_IDS.filter(id => state.albums.some(a => !a.owned.has(id))).length;
 
   try{
-    // URL-based QR: native camera reads it as a link and opens the app automatically
-    // appUrl#qr=ELQ3:XXXX — QR version ~15 in Byte mode, easily readable by any camera
     const appUrl = window.location.origin + window.location.pathname;
     const qrUrl  = appUrl + '#qr=' + payload;
     const qr = qrcode(0, 'L');
@@ -12131,6 +12133,37 @@ async function startQRScanner(){
   } catch(err){
     console.error('Camera error:', err);
     if(statusEl) statusEl.textContent = '❌ Sem acesso à câmera. Verifique as permissões do navegador.';
+  }
+}
+
+async function shareQRWhatsApp(){
+  const img = document.querySelector('#qr-generate-img img');
+  if(!img){ alert('Gere o QR Code primeiro.'); return; }
+  try{
+    const canvas = document.createElement('canvas');
+    canvas.width  = img.naturalWidth  || img.width  || 300;
+    canvas.height = img.naturalHeight || img.height || 300;
+    canvas.getContext('2d').drawImage(img, 0, 0);
+    canvas.toBlob(async blob => {
+      const file = new File([blob], 'figurinhas-qrcode.png', { type: 'image/png' });
+      if(navigator.share && navigator.canShare && navigator.canShare({ files: [file] })){
+        try{
+          await navigator.share({
+            files: [file],
+            title: 'Minhas figurinhas faltantes — Copa 2026',
+            text: '👋 Abre no app Elevah e usa o botão "📸 Ler QR do amigo" para ver quais das suas repetidas eu preciso!'
+          });
+          return;
+        } catch(e){ if(e.name === 'AbortError') return; }
+      }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'figurinhas-qrcode.png'; a.click();
+      setTimeout(() => { URL.revokeObjectURL(url); showToast('📥 Imagem baixada! Compartilhe no WhatsApp.'); }, 400);
+    }, 'image/png');
+  } catch(e){
+    console.error(e);
+    alert('❌ Não foi possível compartilhar. Faça um print e envie para o amigo.');
   }
 }
 
