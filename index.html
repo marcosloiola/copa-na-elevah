@@ -11111,7 +11111,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v38';
+const APP_VERSION = 'v39';
 const APP_DATE    = '09/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
@@ -12059,6 +12059,15 @@ function renderAll(){
   renderSortBars();
   renderAlbumSelectors();
   renderPerfil();
+  // Re-aplica filtros de busca ativos para não perder o estado ao marcar figurinha
+  [
+    { inputId:'search-list',     contentId:'list-content' },
+    { inputId:'search-missing',  contentId:'missing-content' },
+    { inputId:'search-repeated', contentId:'repeated-content' }
+  ].forEach(({ inputId, contentId }) => {
+    const el = document.getElementById(inputId);
+    if(el && el.value.trim()) filterGroups(contentId, el.value, el);
+  });
 }
 
 /* ── EVENT DELEGATION ───────────────────────────────────── */
