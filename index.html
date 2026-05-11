@@ -10126,6 +10126,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    /* Prevent double-tap zoom on iOS Safari without disabling pinch-zoom */
+    button, a, .chip, .nav-btn, .perfil-row, .album-item, .btn,
+    .side-index-item, .elevah-banner-card, .back-btn, .btn-icon,
+    input, select, textarea, label { touch-action: manipulation; }
     html { font-size: 16px; -webkit-tap-highlight-color: transparent; }
     body {
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -10469,7 +10473,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     /* ── BUSCA POR SIGLA ─────────────────────────── */
     .search-wrap { position:relative; margin-bottom:10px; }
     .search-input {
-      width:100%; padding:9px 36px 9px 36px; border-radius:var(--radius-sm);
+      width:100%; padding:9px 12px 9px 36px; border-radius:var(--radius-sm);
       border:1.5px solid var(--border); background:var(--bg-card); color:var(--text);
       font-size:.88rem; outline:none; box-sizing:border-box;
       transition:border-color .2s;
@@ -10477,9 +10481,6 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     .search-input:focus { border-color:var(--primary); }
     .search-input::placeholder { color:var(--text-light); }
     .search-icon { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-light); pointer-events:none; }
-    .search-clear { position:absolute; right:8px; top:50%; transform:translateY(-50%);
-      background:none; border:none; cursor:pointer; color:var(--text-light); font-size:1rem;
-      padding:2px 4px; display:none; }
 
     /* ── ÍNDICE LATERAL ──────────────────────────── */
     #side-index {
@@ -10602,8 +10603,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   <div id="sort-bar-list" class="sort-bar"></div>
   <div class="search-wrap">
     <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-    <input class="search-input" id="search-list" type="text" placeholder="Filtrar por sigla... ex: BRA" oninput="filterGroups('list-content',this.value,this)" />
-    <button class="search-clear" id="search-list-clear" onclick="clearSearch('list-content','search-list',this)">✕</button>
+    <input class="search-input" id="search-list" type="text" placeholder="Filtrar por sigla... ex: BRA" oninput="filterGroups('list-content',this.value,this)" onfocus="this.select()" />
+
   </div>
   <div id="list-content"></div>
 </div>
@@ -10617,8 +10618,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   <div id="sort-bar-missing" class="sort-bar"></div>
   <div class="search-wrap">
     <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-    <input class="search-input" id="search-missing" type="text" placeholder="Filtrar por sigla... ex: BRA" oninput="filterGroups('missing-content',this.value,this)" />
-    <button class="search-clear" id="search-missing-clear" onclick="clearSearch('missing-content','search-missing',this)">✕</button>
+    <input class="search-input" id="search-missing" type="text" placeholder="Filtrar por sigla... ex: BRA" oninput="filterGroups('missing-content',this.value,this)" onfocus="this.select()" />
+
   </div>
   <div id="missing-all-banner" style="display:none;background:#FFF8EE;border:1.5px solid var(--gold-d);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:12px;color:var(--gold-d);font-size:.82rem;font-weight:600;line-height:1.5">
     👁️ Visualização geral de todos os álbuns — os <strong>toques nas figurinhas estão desativados</strong> neste modo. Selecione um álbum acima para editar.
@@ -10636,8 +10637,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   <div id="sort-bar-repeated" class="sort-bar"></div>
   <div class="search-wrap">
     <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-    <input class="search-input" id="search-repeated" type="text" placeholder="Filtrar por sigla... ex: BRA" oninput="filterGroups('repeated-content',this.value,this)" />
-    <button class="search-clear" id="search-repeated-clear" onclick="clearSearch('repeated-content','search-repeated',this)">✕</button>
+    <input class="search-input" id="search-repeated" type="text" placeholder="Filtrar por sigla... ex: BRA" oninput="filterGroups('repeated-content',this.value,this)" onfocus="this.select()" />
+
   </div>
   <div id="repeated-content"></div>
 </div>
@@ -10680,10 +10681,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         <div class="perfil-row-left">🎨 Aparência</div>
         <div class="perfil-row-chevron">›</div>
       </div>
-      <div class="perfil-row" onclick="openPerfilSection('perfil-backup')">
-        <div class="perfil-row-left">💾 Backup</div>
-        <div class="perfil-row-chevron">›</div>
-      </div>
+
       <div class="perfil-row" onclick="openPerfilSection('perfil-sync')">
         <div class="perfil-row-left">🔄 Sincronização</div>
         <div class="perfil-row-chevron">›</div>
@@ -10743,17 +10741,6 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     </div>
   </div>
 
-  <!-- Sub: Backup -->
-  <div id="perfil-backup" style="display:none">
-    <button class="back-btn" onclick="goBackToPerfil()">← Voltar ao Perfil</button>
-    <div class="perfil-section-title">Backup do Álbum</div>
-    <p class="hint">Salve um arquivo com todos os seus dados. Guarde onde quiser — Google Drive, iCloud, WhatsApp. Para restaurar, use o botão abaixo.</p>
-    <button class="btn btn-primary" style="width:100%;margin-bottom:10px" onclick="exportBackup()">📥 Exportar Backup</button>
-    <button class="btn btn-outline" style="width:100%" onclick="document.getElementById('import-backup-input').click()">📤 Importar Backup</button>
-    <input type="file" id="import-backup-input" accept=".json" style="display:none" onchange="importBackup(this)">
-    <p class="hint" style="margin-top:10px;color:var(--text-light);font-size:.75rem">⚠️ Importar substitui todos os dados atuais.</p>
-  </div>
-
   <!-- Sub: Álbuns -->
   <div id="perfil-albuns" style="display:none">
     <button class="back-btn" onclick="goBackToPerfil()">← Voltar ao Perfil</button>
@@ -10777,6 +10764,12 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         <button class="btn-copy" onclick="copyCode('export-code-box')" title="Copiar código">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
           Copiar
+        </button>
+      </div>
+      <div style="display:flex;gap:8px;margin:4px 0 12px">
+        <button class="btn btn-whatsapp" style="flex:1;margin-bottom:0" onclick="shareSyncCodeWhatsApp()">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.554 4.121 1.522 5.857L.057 23.882a.5.5 0 0 0 .613.613l6.101-1.457A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.953 9.953 0 0 1-5.33-1.538l-.38-.23-3.938.94.957-3.854-.247-.393A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+          Enviar por WhatsApp
         </button>
       </div>
       <p class="hint" style="margin-bottom:16px">Cole via WhatsApp no outro dispositivo.</p>
@@ -10814,7 +10807,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
           Copiar
         </button>
       </div>
-      <p class="hint" style="margin-bottom:16px">Combina faltantes de todos os álbuns. Envie por WhatsApp.</p>
+      <p class="hint" style="margin-bottom:8px">Combina faltantes de todos os álbuns.</p>
+      <button class="btn btn-whatsapp" style="width:100%;margin-bottom:16px" onclick="shareExchangeCodeWhatsApp()">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.554 4.121 1.522 5.857L.057 23.882a.5.5 0 0 0 .613.613l6.101-1.457A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.953 9.953 0 0 1-5.33-1.538l-.38-.23-3.938.94.957-3.854-.247-.393A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg> Enviar por WhatsApp
+      </button>
       <div class="card-title" style="font-size:.75rem;margin-bottom:6px">Colar Código de Texto do Amigo</div>
       <textarea id="exchange-in-box" class="code-box" placeholder="Cole aqui o código de texto do amigo..."></textarea>
       <button class="btn btn-mint" style="margin-top:8px" onclick="applyExchangeCode()">🔍 Ver minhas repetidas que ele precisa</button>
@@ -10923,29 +10919,29 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   <div class="howto-category">⚙️ Aba Perfil</div>
 
   <div class="howto-sub">
+    <h4>👤 Dados Pessoais</h4>
+    <p>Preencha seu nome, e-mail e WhatsApp para personalizar a experiência e receber novidades sobre o app. Toque 5 vezes no texto da nota de rodapé para exibir seu User ID único.</p>
+  </div>
+  <div class="howto-sub">
     <h4>🏆 Gerenciar Álbuns</h4>
     <p>Crie até 3 álbuns (um por pessoa, por exemplo). O álbum <strong>ativo</strong> é o que está sendo editado nas abas Lista e Faltam. Você pode renomear ou excluir álbuns, mas não é possível excluir o único álbum.</p>
   </div>
   <div class="howto-sub">
     <h4>🔄 Sincronização</h4>
-    <p>Transfere todos os seus álbuns entre dispositivos. O código é gerado automaticamente — copie e cole via WhatsApp no outro celular, depois clique em <strong>Aplicar Código</strong>.</p>
+    <p>Transfere todos os seus álbuns entre dispositivos. O código é gerado automaticamente — copie ou envie por WhatsApp no outro celular, depois clique em <strong>Aplicar Código</strong>. O mesmo User ID é mantido entre dispositivos.</p>
   </div>
   <div class="howto-sub">
     <h4>🤝 Troca de Figurinhas</h4>
-    <p><strong>Via QR Code (mais rápido):</strong> Toque em "Mostrar meu QR" e mostre a tela para o amigo. O amigo usa o botão "📸 Ler QR do amigo" no app dele para escanear e ver quais das suas repetidas ele precisa.</p>
-    <p><strong>Via código de texto:</strong> Gere o código de texto e envie por WhatsApp. O amigo cola o código e vê as coincidências. Funciona offline após o primeiro acesso.</p>
+    <p><strong>Via QR Code (mais rápido):</strong> Toque em "Mostrar meu QR" e mostre a tela para o amigo. O amigo usa "📸 Ler QR do amigo" e vê quais das suas repetidas ele precisa — com as figurinhas brilhantes identificadas visualmente.</p>
+    <p><strong>Via código de texto:</strong> Gere o código, envie por WhatsApp. O amigo cola e vê as coincidências. Na lista de resultado, toque em uma figurinha para marcá-la como trocada, ou use <strong>Marcar todas como trocadas</strong> para remover todas de uma vez. Também é possível gerar e enviar a lista de coincidências por WhatsApp.</p>
   </div>
   <div class="howto-sub">
     <h4>📋 Exportar Listas</h4>
-    <p>Gera listas de texto das figurinhas faltantes ou repetidas para compartilhar via WhatsApp ou copiar. A lista de faltantes combina todos os álbuns e indica com <em>(×N)</em> quantos precisam de cada figurinha.</p>
+    <p>Gera listas de texto das figurinhas faltantes ou repetidas para compartilhar via WhatsApp. A lista de faltantes combina todos os álbuns e indica com <em>(×N)</em> quantos precisam de cada figurinha.</p>
   </div>
   <div class="howto-sub">
     <h4>🎨 Aparência</h4>
-    <p><strong>Modo escuro:</strong> alterna entre o tema claro (padrão) e escuro. <strong>Índice lateral:</strong> mostra ou esconde o atalho de siglas no lado direito das abas de lista.</p>
-  </div>
-  <div class="howto-sub">
-    <h4>💾 Backup</h4>
-    <p>Exporta um arquivo <code>.json</code> com tudo — álbuns, repetidas, configurações. Guarde onde quiser (Google Drive, iCloud...). Para restaurar em outro dispositivo, use <strong>Importar Backup</strong> e selecione o arquivo.</p>
+    <p><strong>Modo escuro:</strong> alterna entre tema claro e escuro. <strong>Índice lateral:</strong> mostra ou esconde o atalho de siglas no lado direito — toque em uma sigla para filtrar diretamente.</p>
   </div>
   <div class="howto-sub">
     <h4>⚠️ Zona de Perigo</h4>
@@ -10953,7 +10949,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   </div>
   <div class="howto-sub">
     <h4>📤 📥 Exportar e Importar álbum individual</h4>
-    <p>Cada álbum tem botões próprios de exportar (📤) e importar (📥) na lista de álbuns. Exportar gera um código só daquele álbum. Importar aplica um código e <strong>substitui</strong> as figurinhas marcadas.</p>
+    <p>Cada álbum tem botões próprios de exportar (📤) e importar (📥). Exportar gera um código só daquele álbum. Importar aplica um código e <strong>substitui</strong> as figurinhas marcadas.</p>
   </div>
 
   <div class="howto-category" style="background:var(--friend)">👥 Álbum de Amigo</div>
@@ -10977,7 +10973,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   </div>
   <div class="howto-section">
     <h3>🔍 Busca e Índice lateral</h3>
-    <p>Nas abas <strong>Lista</strong>, <strong>Faltam</strong> e <strong>Repetidas</strong>, há um campo de busca no topo. Digite o início da sigla (ex: <strong>BR</strong> para BRA, <strong>S</strong> para SUI, SWE, SCO...) e a lista filtra instantaneamente. O ✕ limpa o filtro.</p>
+    <p>Nas abas <strong>Lista</strong>, <strong>Faltam</strong> e <strong>Repetidas</strong>, há um campo de busca no topo. Digite o início da sigla (ex: <strong>BR</strong> para BRA) e a lista filtra. O ✕ limpa o filtro. Quando a sigla digitada corresponder exatamente a uma sigla do álbum, ela ficará destacada no índice lateral. Toque em qualquer sigla do índice para filtrar diretamente.</p>
     <p>O <strong>índice lateral</strong> aparece no lado direito dessas abas com todas as siglas. Toque para pular direto à seção. Siglas acinzentadas indicam que não há figurinhas daquele time na aba atual.</p>
   </div>
   <div class="howto-section">
@@ -11151,7 +11147,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v42';
+const APP_VERSION = 'v48';
 const APP_DATE    = '09/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
@@ -11921,7 +11917,7 @@ function confirmDeleteFriend(){
 
 function openPerfilSection(sectionId){
   document.getElementById('perfil-main').style.display = 'none';
-  ['perfil-dados','perfil-albuns','perfil-sync','perfil-exchange','perfil-export','perfil-danger','perfil-appearance','perfil-backup'].forEach(id=>{
+  ['perfil-dados','perfil-albuns','perfil-sync','perfil-exchange','perfil-export','perfil-danger','perfil-appearance'].forEach(id=>{
     const el = document.getElementById(id); if(el) el.style.display = 'none';
   });
   const target = document.getElementById(sectionId);
@@ -11938,7 +11934,7 @@ function openPerfilSection(sectionId){
   if(typeof gtag !== 'undefined') gtag('event', 'perfil_section', { section: sectionId });
 }
 function goBackToPerfil(){
-  ['perfil-dados','perfil-albuns','perfil-sync','perfil-exchange','perfil-export','perfil-danger','perfil-appearance','perfil-backup'].forEach(id=>{
+  ['perfil-dados','perfil-albuns','perfil-sync','perfil-exchange','perfil-export','perfil-danger','perfil-appearance'].forEach(id=>{
     const el = document.getElementById(id); if(el) el.style.display = 'none';
   });
   document.getElementById('perfil-main').style.display = 'block';
@@ -12134,7 +12130,6 @@ function switchTab(id){
     const el=document.getElementById(id); if(el && el.value){ el.value=''; }
   });
   document.querySelectorAll('.group-block').forEach(b=>b.style.display='');
-  document.querySelectorAll('.search-clear').forEach(b=>b.style.display='none');
   updateSideIndex();
   // Track tab navigation in GA4
   const tabNames = { overview:'Visão Geral', list:'Lista', missing:'Faltantes', repeated:'Repetidas', perfil:'Perfil', howto:'Ajuda' };
@@ -12203,6 +12198,115 @@ function generateExchangeCode(){
   if(!missingSet.size){ alert('🏆 Todos os álbuns completos!'); return; }
   document.getElementById('exchange-out-box').value = btoa(unescape(encodeURIComponent('ELV2:'+[...missingSet].join(','))));
 }
+/* ── EXCHANGE RESULT (shared by text code + QR) ─────────── */
+function buildExchangeResultHTML(matches){
+  // Sort matches using getDisplayOrder() so PANINI/FWC come first
+  const orderMap = {};
+  getDisplayOrder().forEach((g,i) => orderMap[g.sigla] = i);
+  const byGroup = {};
+  for(const id of matches){
+    const [sigla, num] = id.split('-');
+    if(!byGroup[sigla]) byGroup[sigla] = [];
+    byGroup[sigla].push(num);
+  }
+  const sortedEntries = Object.entries(byGroup).sort((a,b) =>
+    (orderMap[a[0]] ?? 999) - (orderMap[b[0]] ?? 999)
+  );
+  let chipsHtml = '';
+  for(const [sigla, nums] of sortedEntries){
+    const group = ALBUM_DATA.find(g => g.sigla === sigla);
+    const chips = nums.map(n => {
+      const isShiny = (sigla === 'FWC') || (group?.grupo !== null && n === '1');
+      const isTeamPhoto = group?.grupo !== null && n !== '1' && parseInt(n) >= 17;
+      return `<div class="chip repeated${isShiny?' shiny':''}${isTeamPhoto?' team-photo':''}" data-id="${sigla}-${n}" onclick="removeFromRepeatedViaResult('${sigla}-${n}',this)">${n}</div>`;
+    }).join('');
+    chipsHtml += `<div style="margin-bottom:10px"><div class="group-label" style="margin-bottom:4px">${sigla} · ${group?.titulo||sigla}</div><div class="chips-grid">${chips}</div></div>`;
+  }
+  return chipsHtml;
+}
+
+function renderExchangeResult(matches, resEl){
+  if(!matches.length){
+    resEl.className = 'exchange-result no-match';
+    resEl.innerHTML = `<h4>😕 Nenhuma coincidência</h4><p style="font-size:.8rem;color:var(--text-light)">Nenhuma das suas repetidas está na lista do amigo.</p>`;
+    return;
+  }
+  const chipsHtml = buildExchangeResultHTML(matches);
+  resEl.className = 'exchange-result';
+  resEl._matchIds = [...matches]; // store for "mark all" action
+  resEl.innerHTML = `
+    <h4>✅ <span id="exchange-match-count">${matches.length}</span> repetida${matches.length!==1?'s':''} que o amigo precisa:</h4>
+    <p style="font-size:.72rem;color:var(--text-light);margin-bottom:8px">Toque em uma figurinha para marcá-la como trocada (remove das repetidas).</p>
+    ${chipsHtml}
+    <div style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap">
+      <button class="btn btn-outline" style="flex:1;min-width:120px;font-size:.78rem" onclick="generateExchangeMatchText()">📋 Gerar lista</button>
+      <button class="btn btn-outline" style="flex:1;min-width:120px;font-size:.78rem" onclick="copyCode('exchange-match-box')">📋 Copiar</button>
+      <button class="btn btn-whatsapp" style="flex:1;min-width:120px;font-size:.78rem" onclick="shareExchangeMatchWhatsApp()">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.554 4.121 1.522 5.857L.057 23.882a.5.5 0 0 0 .613.613l6.101-1.457A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.953 9.953 0 0 1-5.33-1.538l-.38-.23-3.938.94.957-3.854-.247-.393A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+        WhatsApp
+      </button>
+    </div>
+    <button class="btn btn-danger" style="width:100%;margin-top:6px;font-size:.78rem" onclick="markAllExchangedAsTraded()">✅ Marcar todas como trocadas</button>
+    <textarea id="exchange-match-box" class="code-box" style="margin-top:10px;display:none" readonly onclick="this.select()"></textarea>`;
+}
+
+function removeFromRepeatedViaResult(id, chipEl){
+  if(!state.repeated[id]) return;
+  removeRepeat(id);
+  saveState();
+  chipEl.style.opacity = '0.3';
+  chipEl.style.textDecoration = 'line-through';
+  chipEl.onclick = null;
+  // Update count
+  const resEl = document.getElementById('exchange-result');
+  if(resEl._matchIds){
+    resEl._matchIds = resEl._matchIds.filter(x => x !== id);
+    const countEl = document.getElementById('exchange-match-count');
+    if(countEl) countEl.textContent = resEl._matchIds.length;
+  }
+  renderRepeated();
+}
+
+function markAllExchangedAsTraded(){
+  const resEl = document.getElementById('exchange-result');
+  if(!resEl._matchIds || !resEl._matchIds.length) return;
+  if(!confirm(`Remover ${resEl._matchIds.length} figurinha(s) das suas repetidas?`)) return;
+  for(const id of resEl._matchIds){
+    if(state.repeated[id]) delete state.repeated[id];
+  }
+  resEl._matchIds = [];
+  resEl.style.display = 'none';
+  saveState(); renderAll();
+  showToast('✅ Figurinhas marcadas como trocadas!');
+}
+
+function generateExchangeMatchText(){
+  const resEl = document.getElementById('exchange-result');
+  if(!resEl._matchIds || !resEl._matchIds.length) return;
+  const orderMap = {};
+  getDisplayOrder().forEach((g,i) => orderMap[g.sigla] = i);
+  const byGroup = {};
+  for(const id of resEl._matchIds){
+    const [sigla, num] = id.split('-');
+    if(!byGroup[sigla]) byGroup[sigla] = [];
+    byGroup[sigla].push(num);
+  }
+  const lines = Object.entries(byGroup)
+    .sort((a,b) => (orderMap[a[0]]??999)-(orderMap[b[0]]??999))
+    .map(([sigla, nums]) => `${sigla}: ${nums.join(', ')}`);
+  const box = document.getElementById('exchange-match-box');
+  if(box){
+    box.value = `🤝 Minhas repetidas que você precisa (${resEl._matchIds.length} figurinha${resEl._matchIds.length!==1?'s':''}):\n\n` + lines.join('\n');
+    box.style.display = 'block';
+  }
+}
+
+function shareExchangeMatchWhatsApp(){
+  generateExchangeMatchText();
+  const box = document.getElementById('exchange-match-box');
+  if(box && box.value) window.open('https://wa.me/?text='+encodeURIComponent(box.value), '_blank');
+}
+
 function applyExchangeCode(){
   const encoded = document.getElementById('exchange-in-box').value.trim();
   if(!encoded){ alert('Cole o código do amigo acima.'); return; }
@@ -12213,20 +12317,7 @@ function applyExchangeCode(){
     const matches = Object.keys(state.repeated).filter(id => friendMissing.has(id));
     const resEl = document.getElementById('exchange-result');
     resEl.style.display = 'block';
-    if(!matches.length){
-      resEl.className='exchange-result no-match';
-      resEl.innerHTML=`<h4>😕 Nenhuma coincidência</h4><p style="font-size:.8rem;color:var(--text-light)">Nenhuma das suas repetidas está na lista do amigo.</p>`;
-      return;
-    }
-    const byGroup = {};
-    for(const id of matches){ const [sigla,num]=id.split('-'); if(!byGroup[sigla]) byGroup[sigla]=[]; byGroup[sigla].push(num); }
-    let chipsHtml='';
-    for(const [sigla,nums] of Object.entries(byGroup).sort((a,b)=>a[0].localeCompare(b[0]))){
-      const group=ALBUM_DATA.find(g=>g.sigla===sigla);
-      chipsHtml+=`<div style="margin-bottom:10px"><div class="group-label" style="margin-bottom:4px">${sigla} · ${group?.titulo||sigla}</div><div class="chips-grid">${nums.map(n=>`<div class="chip repeated">${n}</div>`).join('')}</div></div>`;
-    }
-    resEl.className='exchange-result';
-    resEl.innerHTML=`<h4>✅ ${matches.length} repetida${matches.length!==1?'s':''} que o amigo precisa:</h4>${chipsHtml}`;
+    renderExchangeResult(matches, resEl);
   } catch{ alert('❌ Código inválido.'); }
 }
 
@@ -12261,6 +12352,18 @@ function exportRepeatedList(){
 }
 
 /* ── WHATSAPP ───────────────────────────────────────────── */
+function shareExchangeCodeWhatsApp(){
+  // Auto-generate if not done yet
+  const box = document.getElementById('exchange-out-box');
+  if(!box || !box.value || box.value.startsWith('Clique')) generateExchangeCode();
+  if(!box.value || box.value.startsWith('Clique')) return; // nothing to share (album complete)
+  window.open('https://wa.me/?text='+encodeURIComponent('🔄 Meu código de troca de figurinhas Copa 2026:\n\n'+box.value), '_blank');
+}
+function shareSyncCodeWhatsApp(){
+  const box = document.getElementById('export-code-box');
+  if(!box || !box.value){ alert('Código não disponível.'); return; }
+  window.open('https://wa.me/?text='+encodeURIComponent('📲 Meu código de sincronização do álbum Elevah:\n\n'+box.value), '_blank');
+}
 function shareMissingOnWhatsApp(){ exportMissingList(); const t=document.getElementById('missing-list-box').value; if(!t||t.startsWith('🏆')){alert('Nenhuma figurinha faltando!');return;} window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank'); }
 function shareRepeatedOnWhatsApp(){ exportRepeatedList(); const t=document.getElementById('repeated-list-box').value; if(!t||t.startsWith('😅')){alert('Nenhuma figurinha repetida.');return;} window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank'); }
 
@@ -12562,24 +12665,11 @@ function processQRResult(data){
     setTimeout(() => resEl.scrollIntoView({ behavior:'smooth', block:'nearest' }), 100);
 
     if(!matches.length){
-      resEl.className = 'exchange-result no-match';
-      resEl.innerHTML = `<h4>😕 Nenhuma coincidência</h4><p style="font-size:.8rem;color:var(--text-light)">Nenhuma das suas repetidas está na lista do amigo.</p>`;
+      renderExchangeResult([], resEl);
       showToast('QR lido! Nenhuma coincidência.');
       return;
     }
-    const byGroup = {};
-    for(const id of matches){
-      const [sigla, num] = id.split('-');
-      if(!byGroup[sigla]) byGroup[sigla] = [];
-      byGroup[sigla].push(num);
-    }
-    let chipsHtml = '';
-    for(const [sigla, nums] of Object.entries(byGroup).sort((a,b) => a[0].localeCompare(b[0]))){
-      const group = ALBUM_DATA.find(g => g.sigla === sigla);
-      chipsHtml += `<div style="margin-bottom:10px"><div class="group-label" style="margin-bottom:4px">${sigla} · ${group?.titulo||sigla}</div><div class="chips-grid">${nums.map(n=>`<div class="chip repeated">${n}</div>`).join('')}</div></div>`;
-    }
-    resEl.className = 'exchange-result';
-    resEl.innerHTML = `<h4>✅ ${matches.length} repetida${matches.length!==1?'s':''} que o amigo precisa:</h4>${chipsHtml}`;
+    renderExchangeResult(matches, resEl);
     showToast(`✅ QR lido! ${matches.length} figurinha${matches.length!==1?'s':''} em comum`);
   } catch(e){
     console.error('QR decode error:', e);
@@ -12619,19 +12709,19 @@ function updateSideIndex(){
   // Todas as siglas do álbum (na ordem de exibição) exceto PANINI
   const allSiglas = getDisplayOrder().filter(g => g.sigla !== 'PANINI').map(g => g.sigla);
   if(allSiglas.length === 0){ sideEl.classList.add('hidden'); return; }
-  sideEl.innerHTML = allSiglas.map(s =>
-    `<div class="side-index-item${presentSiglas.has(s)?'':' dim'}" data-sigla="${s}">${s}</div>`
-  ).join('');
+  // Check if current search field has an exact sigla match
+  const inputMap2 = { 'list-content':'search-list', 'missing-content':'search-missing', 'repeated-content':'search-repeated' };
+  const activeSearchEl = document.getElementById(inputMap2[contentId]);
+  const activeQuery = (activeSearchEl?.value || '').trim().toUpperCase();
+  const exactMatch = allSiglas.includes(activeQuery) ? activeQuery : null;
+
+  sideEl.innerHTML = allSiglas.map(s => {
+    const isDim = !presentSiglas.has(s);
+    const isActive = (s === exactMatch);
+    return `<div class="side-index-item${isDim?' dim':''}${isActive?' active':''}" data-sigla="${s}">${s}</div>`;
+  }).join('');
   sideEl.classList.remove('hidden');
-  // Position side index adjacent to app content (fixes desktop centered layout)
-  const panel = document.querySelector('.tab-panel.active');
-  if(panel){
-    const rect = panel.getBoundingClientRect();
-    const gap = Math.max(0, window.innerWidth - rect.right);
-    sideEl.style.right = gap + 'px';
-  } else {
-    sideEl.style.right = '0';
-  }
+  // Side index stays at right:0 always; content has padding-right via CSS
   // Touch/click handlers
   const inputMap = { 'list-content':'search-list', 'missing-content':'search-missing', 'repeated-content':'search-repeated' };
   function selectSigla(sigla){
@@ -12677,9 +12767,7 @@ function filterGroups(contentId, query, inputEl){
   if(q.length === 1) trackEvent('search_used', { tab: contentId }); // fire on first char only
   const contentEl = document.getElementById(contentId);
   if(!contentEl) return;
-  // Mostra/esconde o botão clear
-  const clearBtn = inputEl?.nextElementSibling;
-  if(clearBtn) clearBtn.style.display = q ? 'block' : 'none';
+  // (clear button removed — user selects all via onfocus to clear)
   contentEl.querySelectorAll('.group-block').forEach(block => {
     const sigla = block.dataset.sigla || '';
     block.style.display = (!q || sigla.startsWith(q)) ? '' : 'none';
@@ -12773,8 +12861,7 @@ updateSideIndex();
 // Inicializa identidade GA4 após carregar estado
 setupGA4Identity();
 updateGA4UserProperties();
-// Reposition side index on window resize (desktop layout changes)
-window.addEventListener('resize', updateSideIndex);
+// Side index is fixed at right:0 — no resize listener needed
 
 // Exibe versão na aba Ajuda
 const vBadge = document.getElementById('app-version-badge');
