@@ -11434,7 +11434,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v75';
+const APP_VERSION = 'v77';
 const APP_DATE    = '12/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
@@ -12269,6 +12269,7 @@ function openPerfilSection(sectionId){
   const target = document.getElementById(sectionId);
   if(target) target.style.display = 'block';
   if(sectionId==='perfil-albuns') renderPerfilAlbuns();
+  if(sectionId==='perfil-sync') autoUpdateSyncCode(); // always fresh when opened
   if(sectionId==='perfil-dados') loadDadosPessoais();
   if(sectionId==='perfil-jornada') renderJornada();
   if(sectionId==='perfil-trofeus') renderTrofeus();
@@ -12899,6 +12900,7 @@ function checkTrophies(){
   if(newOnes.length>0){
     localStorage.setItem('elevah_trophies', JSON.stringify(unlocked));
     updateScoreDisplay();
+    autoUpdateSyncCode(); // sync code must reflect newly unlocked trophies
     trophyQueue = newOnes;
     trophyQueueIdx = 0;
     showNextTrophyModal();
@@ -12919,6 +12921,7 @@ function checkTrophiesSilent(){
   }
   if(changed){
     localStorage.setItem('elevah_trophies', JSON.stringify(unlocked));
+    autoUpdateSyncCode(); // keep sync code in sync after silent unlock
   }
   updateTrophyBadge();
   updateScoreDisplay();
@@ -13711,6 +13714,19 @@ function getPayload(){
     helpVisited:localStorage.getItem('elevah_help_visited')||'',
     cardGen:    localStorage.getItem('elevah_card_gen')||'',
     firstBattle:localStorage.getItem('elevah_first_battle')||'',
+    // Preferências de UI
+    sortOrder:  localStorage.getItem('elevah_sort')||'alpha',
+    sideIndex:  localStorage.getItem('elevah_sideindex')||'',
+    // Álbum do Amigo
+    friend:     localStorage.getItem('elevah_friend')||'',
+    // Por álbum: snapshots + datas de primeira/última figurinha (Minha Jornada)
+    albumMeta:  Object.fromEntries(
+      state.albums.map(a=>([a.id,{
+        snap:        localStorage.getItem('elevah_snap_'+a.id)||'',
+        firstSticker:localStorage.getItem('elevah_first_sticker_'+a.id)||'',
+        lastSticker: localStorage.getItem('elevah_last_sticker_'+a.id)||'',
+      }]))
+    ),
     at: new Date().toISOString()
   };
 }
@@ -13749,10 +13765,37 @@ function applyPayload(p){
       if(p.helpVisited) localStorage.setItem('elevah_help_visited',  p.helpVisited);
       if(p.cardGen)     localStorage.setItem('elevah_card_gen',       p.cardGen);
       if(p.firstBattle) localStorage.setItem('elevah_first_battle',   p.firstBattle);
+      // Preferências de UI
+      if(p.sortOrder){  sortOrder = p.sortOrder; localStorage.setItem('elevah_sort', p.sortOrder); }
+      if(p.sideIndex !== undefined && p.sideIndex !== '')
+        localStorage.setItem('elevah_sideindex', p.sideIndex);
+      // Álbum do Amigo
+      if(p.friend){
+        try{
+          const fr=JSON.parse(p.friend);
+          if(fr&&fr.id){ state.friendAlbum={...fr,owned:new Set(fr.owned||[])}; }
+        }catch(e){}
+      }
+      // Por álbum: snapshots + datas (Minha Jornada)
+      if(p.albumMeta){
+        for(const [albumId,meta] of Object.entries(p.albumMeta)){
+          if(meta.snap)         localStorage.setItem('elevah_snap_'+albumId,          meta.snap);
+          if(meta.firstSticker) localStorage.setItem('elevah_first_sticker_'+albumId, meta.firstSticker);
+          if(meta.lastSticker)  localStorage.setItem('elevah_last_sticker_'+albumId,  meta.lastSticker);
+        }
+      }
     }
   } else { throw new Error('invalid version'); }
   saveState(); renderAll();
   updateTrophyBadge(); updateScoreDisplay();
+  // Aplica dark mode visualmente
+  if(p.darkMode==='1') document.documentElement.setAttribute('data-theme','dark');
+  else if(p.darkMode==='0') document.documentElement.setAttribute('data-theme','light');
+  // Aplica preferência de índice lateral
+  if(p.sideIndex!==undefined && p.sideIndex!==''){
+    _sideIndexEnabled = p.sideIndex!=='0';
+    updateSideIndex();
+  }
   // Aplica e exibe troféus vindos do sync sem disparar o modal
   checkTrophiesSilent();
 }
