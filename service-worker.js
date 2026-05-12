@@ -3,21 +3,22 @@
 
    ⚠️  COMO ATUALIZAR O APP:
    Toda vez que o index.html for atualizado, incremente
-   o número abaixo (v1 → v2 → v3...). O browser detecta
+   o número abaixo (v9 → v10 → v11...). O browser detecta
    a mudança neste arquivo e baixa os assets novos
    automaticamente. O app recarrega sozinho para o usuário.
 ───────────────────────────────────────────────── */
-const CACHE = 'elevah-copa-v8'; // ← incrementar a cada deploy
+const CACHE = 'elevah-copa-v9'; // ← incrementar a cada deploy
 
 const STATIC_ASSETS = [
   './logo.png',
   './manifest.json',
   'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.js',
-  // jsQR agora está inline no index.html — não precisa cachear do CDN
+  // jsQR está inline no index.html — não precisa cachear do CDN
 ];
 
-// ── Install: pré-carrega assets estáticos (não o index.html — ele usa network-first) ──
+// ── Install: pré-carrega assets estáticos ──
+// (index.html usa network-first, não entra aqui)
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE)
@@ -26,7 +27,7 @@ self.addEventListener('install', e => {
   );
 });
 
-// ── Activate: limpa caches antigos e avisa clientes para recarregar ──
+// ── Activate: limpa caches antigos e notifica clientes ──
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
@@ -46,6 +47,7 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const url = e.request.url;
 
+  // index.html e raiz → network-first (sempre tenta pegar versão nova)
   if(url.includes('index.html') || url.endsWith('/') || url.split('?')[0].endsWith('/')){
     e.respondWith(
       fetch(e.request)
@@ -59,6 +61,7 @@ self.addEventListener('fetch', e => {
     return;
   }
 
+  // Assets estáticos → cache-first
   if(STATIC_ASSETS.some(a => url.includes(a.replace('./', '')))){
     e.respondWith(
       caches.match(e.request).then(cached => cached || fetch(e.request))
@@ -66,5 +69,6 @@ self.addEventListener('fetch', e => {
     return;
   }
 
+  // Demais requests → network com fallback para cache
   e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
 });

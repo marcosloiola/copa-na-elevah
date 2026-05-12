@@ -10217,9 +10217,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     .chip.shiny::after { content:'★'; position:absolute; bottom:1px; right:2px; font-size:6px; color:var(--gold); line-height:1; pointer-events:none; opacity:.85; }
     .chip.shiny.owned::after { color:var(--gold-d); opacity:.4; }
     .chip.shiny.repeated::after { opacity:.2; }
-    .chip.team-photo:not(.owned):not(.repeated) { border-color:var(--primary); border-style:dashed; background:#FFF7F4; color:var(--primary-d); }
-    .chip.team-photo.owned { border-style:dashed; border-color:var(--mint-d); }
-    .chip.team-photo.repeated { border-style:dashed; }
+    .chip.team-photo:not(.owned):not(.repeated) { border-color:#8BADC8; border-style:solid; background:#FFF7F4; color:var(--primary-d); }
+    .chip.team-photo.owned { border-style:solid; border-color:#6B9AB8; }
+    .chip.team-photo.repeated { border-style:solid; border-color:#8BADC8; }
+    [data-theme="dark"] .chip.team-photo:not(.owned):not(.repeated) { background:#1E2830; border-color:#5A7A94; }
 
     /* ─── Cards ── */
     .card { background:var(--bg-card); border-radius:var(--radius); border:1.5px solid var(--border); padding:16px; margin-bottom:12px; box-shadow:0 1px 4px var(--shadow); }
@@ -10423,6 +10424,12 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     .hint { font-size:.72rem; color:var(--text-light); margin-top:4px; line-height:1.4; }
     @keyframes pop { 0%{transform:scale(1)} 40%{transform:scale(1.3)} 100%{transform:scale(1)} }
     .chip.just-toggled { animation:pop .22s ease; }
+    .chip.long-press-active { animation:shake .25s ease; }
+    @keyframes shake {
+      0%,100%{ transform:scale(1); }
+      25%{ transform:scale(.88) rotate(-4deg); }
+      75%{ transform:scale(.88) rotate(4deg); }
+    }
 
     /* ─── QR Code ── */
     .qr-section-label { font-size:.82rem; font-weight:700; color:var(--primary-d); margin-bottom:10px; display:flex; align-items:center; gap:6px; }
@@ -10516,7 +10523,125 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     input:checked + .toggle-slider { background:var(--primary); }
     input:checked + .toggle-slider:before { transform:translateX(20px); }
 
-    </style>
+  
+    /* ── INTEL MODAL ──────────────────────────────────────── */
+    .intel-modal-overlay { position:fixed; inset:0; background:rgba(30,20,10,.5); z-index:600; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s; padding:16px; }
+    .intel-modal-overlay.open { opacity:1; pointer-events:all; }
+    .intel-modal-box { background:var(--bg-card); border-radius:var(--radius); width:100%; max-width:480px; max-height:88vh; display:flex; flex-direction:column; box-shadow:0 8px 40px rgba(0,0,0,.18); transform:scale(.96); transition:transform .22s ease; overflow:hidden; }
+    .intel-modal-overlay.open .intel-modal-box { transform:scale(1); }
+    .intel-modal-header { display:flex; align-items:center; justify-content:space-between; padding:16px 18px 12px; border-bottom:1.5px solid var(--border); flex-shrink:0; }
+    .intel-modal-title { font-size:1rem; font-weight:800; color:var(--text); }
+    .intel-modal-body { overflow-y:auto; padding:16px 18px 20px; flex:1; }
+    .intel-section { margin-bottom:20px; }
+    .intel-section-title { font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--text-light); margin-bottom:8px; }
+    .intel-stat-row { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+    .intel-stat { background:var(--bg); border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:12px 8px; text-align:center; }
+    .intel-stat .v { font-size:1.4rem; font-weight:800; color:var(--primary); line-height:1; }
+    .intel-stat .v.green { color:var(--mint-d); }
+    .intel-stat .v.orange { color:var(--gold-d); }
+    .intel-stat .l { font-size:.58rem; color:var(--text-light); text-transform:uppercase; letter-spacing:.06em; margin-top:3px; }
+    .intel-projection { background:var(--bg); border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:12px 14px; display:flex; align-items:center; gap:10px; }
+    .intel-projection .proj-icon { font-size:1.4rem; flex-shrink:0; }
+    .intel-projection .proj-text { font-size:.85rem; color:var(--text); line-height:1.4; }
+    .intel-projection .proj-text strong { color:var(--primary-d); }
+    .intel-ranking-item { display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid var(--border); }
+    .intel-ranking-item:last-child { border-bottom:none; }
+    .intel-rank-pos { font-size:.7rem; font-weight:700; color:var(--text-light); width:18px; flex-shrink:0; }
+    .intel-rank-name { font-size:.82rem; color:var(--text); flex:1; font-weight:600; }
+    .intel-rank-bar-wrap { width:80px; height:6px; background:var(--border); border-radius:99px; overflow:hidden; flex-shrink:0; }
+    .intel-rank-bar { height:100%; background:var(--mint); border-radius:99px; }
+    .intel-rank-pct { font-size:.75rem; font-weight:700; color:var(--primary-d); width:32px; text-align:right; flex-shrink:0; }
+    .intel-fact { font-size:.82rem; color:var(--text-mid); padding:7px 0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+    .intel-fact:last-child { border-bottom:none; }
+    .intel-fact .fact-val { font-weight:700; color:var(--text); }
+    /* Stats teaser card */
+    .stats-teaser { display:flex; align-items:center; justify-content:space-between; background:var(--bg-card); border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:12px 14px; cursor:pointer; transition:border-color .15s, box-shadow .15s; margin-bottom:16px; }
+    .stats-teaser:hover { border-color:var(--primary); box-shadow:0 2px 12px var(--shadow); }
+    .stats-teaser .st-left { font-size:.85rem; font-weight:600; color:var(--text); }
+    .stats-teaser .st-sub { font-size:.72rem; color:var(--text-light); margin-top:2px; }
+    .stats-teaser .st-arrow { font-size:1.1rem; color:var(--primary); }
+    /* Jornada */
+    .jornada-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+    .jornada-stat { background:var(--bg); border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:14px 12px; }
+    .jornada-stat .jv { font-size:1.5rem; font-weight:800; color:var(--primary); line-height:1; }
+    .jornada-stat .jl { font-size:.62rem; color:var(--text-light); text-transform:uppercase; letter-spacing:.06em; margin-top:4px; }
+
+    /* ── TROPHY UNLOCK MODAL ────────────────────────────────── */
+    .trophy-unlock-overlay { position:fixed; inset:0; background:rgba(20,10,5,.6); z-index:700; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .25s; padding:20px; }
+    .trophy-unlock-overlay.open { opacity:1; pointer-events:all; }
+    .trophy-unlock-box {
+      background:var(--bg-card); border-radius:18px; width:100%; max-width:340px;
+      text-align:center; padding:32px 24px 28px;
+      transform:scale(.85) translateY(20px); transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+      box-shadow:0 12px 48px rgba(0,0,0,.25); position:relative; overflow:hidden;
+    }
+    .trophy-unlock-overlay.open .trophy-unlock-box { transform:scale(1) translateY(0); }
+    .trophy-unlock-ribbon {
+      font-size:.62rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase;
+      padding:3px 12px; border-radius:99px; display:inline-block; margin-bottom:16px;
+    }
+    .trophy-unlock-icon { font-size:4rem; line-height:1; margin-bottom:12px; filter:drop-shadow(0 4px 12px rgba(0,0,0,.15)); }
+    .trophy-unlock-label { font-size:.62rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--text-light); margin-bottom:4px; }
+    .trophy-unlock-name { font-size:1.4rem; font-weight:800; color:var(--text); margin-bottom:8px; line-height:1.2; }
+    .trophy-unlock-desc { font-size:.85rem; color:var(--text-mid); line-height:1.5; margin-bottom:24px; }
+    .trophy-unlock-btn { background:var(--primary); color:#fff; border:none; border-radius:var(--radius-sm); padding:12px 32px; font-size:.9rem; font-weight:700; cursor:pointer; width:100%; transition:opacity .15s; }
+    .trophy-unlock-btn:hover { opacity:.88; }
+    /* Tier colors */
+    .tier-bronze .trophy-unlock-ribbon { background:#FFF0E0; color:#A0522D; }
+    .tier-bronze .trophy-unlock-icon::after { content:''; }
+    .tier-silver .trophy-unlock-ribbon { background:#F0F0F0; color:#555; }
+    .tier-gold   .trophy-unlock-ribbon { background:#FFF8D6; color:#8B6914; }
+    .tier-platinum .trophy-unlock-ribbon { background:#F5EEFF; color:#6A0DAD; }
+    .tier-platinum .trophy-unlock-btn { background:linear-gradient(135deg,#8B5CF6,#6A0DAD); }
+    /* Sparkle backdrop for platinum */
+    .tier-platinum .trophy-unlock-box { background:linear-gradient(160deg,#fdf6ff 0%,var(--bg-card) 60%); }
+
+    /* ── TROPHY CARDS IN PERFIL ─────────────────────────────── */
+    .trophy-section-label { font-size:.62rem; font-weight:800; text-transform:uppercase; letter-spacing:.1em; padding:4px 10px; border-radius:99px; display:inline-block; margin-bottom:10px; }
+    .trophy-section-label.bronze   { background:#FFF0E0; color:#A0522D; }
+    .trophy-section-label.silver   { background:#F0F0F0; color:#555; }
+    .trophy-section-label.gold     { background:#FFF8D6; color:#8B6914; }
+    .trophy-section-label.platinum { background:#F5EEFF; color:#6A0DAD; }
+    .trophy-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px; }
+    .trophy-card {
+      background:var(--bg-card); border:1.5px solid var(--border); border-radius:var(--radius-sm);
+      padding:14px 12px 12px; text-align:center; transition:box-shadow .15s;
+    }
+    .trophy-card.unlocked { box-shadow:0 2px 10px var(--shadow); }
+    .trophy-card.locked   { opacity:.55; }
+    .trophy-card .tc-icon { font-size:2rem; line-height:1; margin-bottom:6px; }
+    .trophy-card.locked .tc-icon { filter:grayscale(1); }
+    .trophy-card .tc-name { font-size:.78rem; font-weight:700; color:var(--text); line-height:1.3; }
+    .trophy-card.locked .tc-name { color:var(--text-light); }
+    .trophy-card .tc-desc { font-size:.65rem; color:var(--text-light); margin-top:3px; line-height:1.4; }
+    .trophy-card .tc-date { font-size:.58rem; color:var(--primary); font-weight:700; margin-top:5px; }
+    .trophy-card.bronze.unlocked   { border-color:#CD9B6A; }
+    .trophy-card.silver.unlocked   { border-color:#ADADAD; }
+    .trophy-card.gold.unlocked     { border-color:#D4A017; }
+    .trophy-card.platinum.unlocked { border-color:#8B5CF6; background:linear-gradient(160deg,#fdf6ff,var(--bg-card)); }
+    /* Trophy count badge in perfil */
+    .trophy-badge { background:var(--primary); color:#fff; border-radius:99px; font-size:.62rem; font-weight:800; padding:2px 7px; margin-left:6px; }
+
+    /* ── SCORE ───────────────────────────────────────────────── */
+    .user-score { font-size:.78rem; font-weight:700; color:var(--gold-d); margin-top:3px; display:flex; align-items:center; gap:4px; }
+    .user-score .score-num { font-size:.92rem; font-weight:800; }
+    .score-breakdown { background:var(--bg); border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:14px 16px; margin-bottom:16px; }
+    .score-breakdown .score-total { font-size:1.8rem; font-weight:800; color:var(--gold-d); line-height:1; }
+    .score-breakdown .score-total-label { font-size:.6rem; text-transform:uppercase; letter-spacing:.08em; color:var(--text-light); margin-top:2px; margin-bottom:12px; }
+    .score-breakdown-row { display:flex; justify-content:space-between; align-items:center; font-size:.8rem; color:var(--text-mid); padding:4px 0; border-bottom:1px solid var(--border); }
+    .score-breakdown-row:last-child { border-bottom:none; }
+    .score-breakdown-row .sbr-val { font-weight:700; color:var(--text); }
+
+    /* Device-aware hint text */
+    @media (hover: hover) and (pointer: fine) { .hint-touch-only { display:none; } }
+    @media (hover: none), (pointer: coarse)   { .hint-mouse-only { display:none; } }
+
+    .chip.cc:not(.owned):not(.repeated) { border-color:#E63946; background:#FFF0EE; color:#C1121F; font-weight:800; }
+    .chip.cc.owned  { border-color:#E63946; }
+    .chip.cc.repeated { border-color:#E63946; opacity:.7; }
+    .chip.cc::after { content:'©'; position:absolute; bottom:1px; right:2px; font-size:6px; color:#E63946; line-height:1; pointer-events:none; opacity:.75; }
+    [data-theme="dark"] .chip.cc:not(.owned):not(.repeated) { background:#2A1010; border-color:#C1121F; color:#FF6B72; }
+  </style>
 </head>
 <body>
 
@@ -10586,6 +10711,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         </div>
       </div>
     </div>
+    <div id="stats-teaser-container"></div>
     <div class="card">
       <div class="card-title">Por Seção</div>
       <div id="sort-bar-overview" class="sort-bar"></div>
@@ -10597,7 +10723,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 <!-- ═══ ABA 2: LISTA ════════════════════════════════════════ -->
 <div id="tab-list" class="tab-panel">
   <p class="hint" style="margin-bottom:10px">
-    <strong>1 toque</strong> = tenho &nbsp;·&nbsp; <strong>2 toques rápidos</strong> = desfaz
+    <strong>1 toque</strong> = tenho &nbsp;·&nbsp; <span class="hint-touch-only"><strong>segurar (500ms)</strong> = desfaz</span><span class="hint-mouse-only"><strong>duplo clique</strong> = desfaz</span>
   </p>
   <div id="list-album-selector" class="album-selector"></div>
   <div id="sort-bar-list" class="sort-bar"></div>
@@ -10632,7 +10758,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 <div id="tab-repeated" class="tab-panel">
   <p class="hint" style="margin-bottom:10px">
     Lista única de repetidas compartilhada entre todos os álbuns.<br>
-    <strong>1 toque</strong> = +1 repetida &nbsp;·&nbsp; <strong>2 toques rápidos</strong> = −1 repetida
+    <strong>1 toque</strong> = +1 repetida &nbsp;·&nbsp; <span class="hint-touch-only"><strong>segurar (500ms)</strong> = −1 repetida</span><span class="hint-mouse-only"><strong>duplo clique</strong> = −1 repetida</span>
   </p>
   <div id="sort-bar-repeated" class="sort-bar"></div>
   <div class="search-wrap">
@@ -10653,6 +10779,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       <div class="user-info">
         <div class="user-name" id="perfil-user-name">Meu Perfil</div>
         <div class="user-hint">Toque no lápis para editar o nome</div>
+        <div class="user-score" id="perfil-score" style="display:none">⭐ <span class="score-num" id="perfil-score-num">0</span> pts</div>
       </div>
       <button class="btn-icon" onclick="editUserName()" style="margin-left:auto" title="Editar nome">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -10663,6 +10790,14 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     <div class="perfil-menu">
       <div class="perfil-row" onclick="openPerfilSection('perfil-dados')">
         <div class="perfil-row-left">👤 Dados Pessoais</div>
+        <div class="perfil-row-chevron">›</div>
+      </div>
+      <div class="perfil-row" onclick="openPerfilSection('perfil-jornada')">
+        <div class="perfil-row-left">📅 Minha Jornada</div>
+        <div class="perfil-row-chevron">›</div>
+      </div>
+      <div class="perfil-row" onclick="openPerfilSection('perfil-trofeus')">
+        <div class="perfil-row-left">🏆 Troféus <span class="trophy-badge" id="trophy-count-badge">0</span></div>
         <div class="perfil-row-chevron">›</div>
       </div>
     </div>
@@ -10717,7 +10852,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       </div>
       <div>
         <label style="font-size:.75rem;font-weight:700;color:var(--text-light);display:block;margin-bottom:4px">WHATSAPP</label>
-        <input id="dados-whatsapp" type="tel" placeholder="+55 11 99999-9999" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text);font-size:.9rem;box-sizing:border-box" />
+        <input id="dados-whatsapp" type="tel" placeholder="(11) 99999-9999" maxlength="16" oninput="maskPhone(this)" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text);font-size:.9rem;box-sizing:border-box" />
       </div>
     </div>
     <button class="btn btn-primary" style="width:100%;margin-bottom:8px" onclick="saveDadosPessoais()">💾 Salvar Dados</button>
@@ -10875,6 +11010,22 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 
 
   <!-- Banner Elevah no Perfil -->
+
+  <!-- Sub: Minha Jornada -->
+  <div id="perfil-jornada" style="display:none">
+    <button class="back-btn" onclick="goBackToPerfil()">← Voltar ao Perfil</button>
+    <div class="perfil-section-title">Minha Jornada</div>
+    <p class="hint" style="margin-bottom:16px">Um resumo da sua história com o álbum da Copa 2026.</p>
+    <div id="jornada-content"></div>
+  </div>
+
+  <!-- Sub: Troféus -->
+  <div id="perfil-trofeus" style="display:none">
+    <button class="back-btn" onclick="goBackToPerfil()">← Voltar ao Perfil</button>
+    <div class="perfil-section-title">Troféus</div>
+    <p class="hint" style="margin-bottom:16px">Conquistas que você desbloqueia ao usar o álbum. Os troféus cinzas ainda não foram conquistados.</p>
+    <div id="trofeus-content"></div>
+  </div>
   <div id="perfil-main-banner" style="padding:0 0 4px">
     <a class="elevah-banner-card" href="https://loja.elevah.club/" target="_blank" rel="noopener" onclick="trackEvent('elevah_banner_click',{source:'perfil'})"><img src="banner.jpg" alt="Elevah — Loja de Presentes" loading="lazy" /></a>
   </div>
@@ -10900,10 +11051,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       <div class="demo-chip d-owned">7</div><span class="demo-label">Tenho ✓</span>
       <div class="demo-chip d-repeat">7</div><span class="demo-label">Repetida</span>
     </div>
-    <ul>
-      <li><strong>1 toque</strong> → marca que você tem (ou +1 repetida na aba Repetidas)</li>
-      <li><strong>2 toques rápidos</strong> → desfaz (ou −1 repetida)</li>
-    </ul>
+    <p style="font-size:.85rem;color:var(--text-mid);line-height:1.6;margin-top:8px">
+      <strong>Marcar:</strong> 1 toque (celular) ou 1 clique (computador).<br>
+      <strong>Desfazer:</strong> <span style="color:var(--primary-d)">segurar a figurinha por ~½ segundo</span> no celular, ou <span style="color:var(--primary-d)">duplo clique</span> no computador.<br>
+      Na aba Repetidas, o mesmo gesto adiciona ou remove uma repetida.
+    </p>
   </div>
   <div class="howto-section">
     <h3>✨ Figurinhas especiais</h3>
@@ -10912,15 +11064,19 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       <span class="demo-label">Brilhante (FWC + nº 1 dos países)</span>
     </div>
     <div class="howto-chip-demo">
-      <div class="demo-chip" style="border:1.5px dashed var(--primary);background:#FFF7F4;color:var(--primary-d)">13</div>
+      <div class="demo-chip" style="border:1.5px solid #8BADC8;background:#FFF7F4;color:var(--primary-d)">13</div>
       <span class="demo-label">Foto do time (nº 13 dos países)</span>
+    </div>
+    <div class="howto-chip-demo">
+      <div class="demo-chip" style="border:1.5px solid #E63946;background:#FFF0EE;color:#C1121F;font-weight:800">CC</div>
+      <span class="demo-label">Coca-Cola (seção especial, mais raras)</span>
     </div>
   </div>
   <div class="howto-category">⚙️ Aba Perfil</div>
 
   <div class="howto-sub">
     <h4>👤 Dados Pessoais</h4>
-    <p>Preencha seu nome, e-mail e WhatsApp para personalizar a experiência e receber novidades sobre o app. Toque 5 vezes no texto da nota de rodapé para exibir seu User ID único.</p>
+    <p>Preencha seu nome, e-mail e WhatsApp para personalizar a experiência e receber novidades sobre o app.</p>
   </div>
   <div class="howto-sub">
     <h4>🏆 Gerenciar Álbuns</h4>
@@ -10928,7 +11084,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   </div>
   <div class="howto-sub">
     <h4>🔄 Sincronização</h4>
-    <p>Transfere todos os seus álbuns entre dispositivos. O código é gerado automaticamente — copie ou envie por WhatsApp no outro celular, depois clique em <strong>Aplicar Código</strong>. O mesmo User ID é mantido entre dispositivos.</p>
+    <p>Transfere todos os seus dados entre dispositivos. O código inclui: álbuns, repetidas, troféus conquistados, histórico de atividade, streak, trocas realizadas, dados pessoais e todas as flags de comportamento. Copie ou envie por WhatsApp, depois clique em <strong>Aplicar Código</strong> no outro aparelho.</p>
   </div>
   <div class="howto-sub">
     <h4>🤝 Troca de Figurinhas</h4>
@@ -10950,6 +11106,18 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   <div class="howto-sub">
     <h4>📤 📥 Exportar e Importar álbum individual</h4>
     <p>Cada álbum tem botões próprios de exportar (📤) e importar (📥). Exportar gera um código só daquele álbum. Importar aplica um código e <strong>substitui</strong> as figurinhas marcadas.</p>
+  </div>
+  <div class="howto-sub">
+    <h4>📅 Minha Jornada</h4>
+    <p>Mostra sua pontuação total detalhada, dias ativos no app, sequência atual e melhor sequência de dias consecutivos, e outros dados da sua história com o álbum.</p>
+  </div>
+  <div class="howto-sub">
+    <h4>🏆 Troféus</h4>
+    <p>São 51 troféus em 4 níveis: 🥉 Bronze (21), 🥈 Prata (21), 🥇 Ouro (8) e 🏆 Platina (1). Os bloqueados mostram <em>"???"</em> — parte do desafio é descobrir como ganhar cada um. Ao conquistar um troféu, um modal aparece celebrando na hora.</p>
+  </div>
+  <div class="howto-sub">
+    <h4>⭐ Pontuação</h4>
+    <p>Cada figurinha e troféu geram pontos, visíveis abaixo do seu nome no Perfil e detalhados em Minha Jornada. Figurinhas especiais valem mais: brilhantes e Coca-Cola têm multiplicadores maiores.</p>
   </div>
 
   <div class="howto-category" style="background:var(--friend)">👥 Álbum de Amigo</div>
@@ -10976,6 +11144,13 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     <p>Nas abas <strong>Lista</strong>, <strong>Faltam</strong> e <strong>Repetidas</strong>, há um campo de busca no topo. Digite o início da sigla (ex: <strong>BR</strong> para BRA) e a lista filtra. O ✕ limpa o filtro. Quando a sigla digitada corresponder exatamente a uma sigla do álbum, ela ficará destacada no índice lateral. Toque em qualquer sigla do índice para filtrar diretamente.</p>
     <p>O <strong>índice lateral</strong> aparece no lado direito dessas abas com todas as siglas. Toque para pular direto à seção. Siglas acinzentadas indicam que não há figurinhas daquele time na aba atual.</p>
   </div>
+  <div class="howto-section">
+    <h3>📈 Estatísticas do Álbum</h3>
+    <p>Na <strong>Visão Geral</strong>, dentro do detalhe de cada álbum, há um card <em>"Estatísticas detalhadas"</em>. Toque para ver um painel com evolução de figurinhas (hoje, 7 e 30 dias), projeção de quando você vai completar o álbum, ranking dos times mais próximos de completar e fatos curiosos como primeira e última figurinha marcada.</p>
+  </div>
+
+
+
   <div class="howto-section">
     <h3>📱 Instalar como app</h3>
     <p><strong>iPhone (Safari):</strong> botão compartilhar ↑ → Adicionar à Tela de Início.</p>
@@ -11147,8 +11322,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v48';
-const APP_DATE    = '09/05/2026';
+const APP_VERSION = 'v66';
+const APP_DATE    = '12/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
 function range(a,b){ const r=[]; for(let i=a;i<=b;i++) r.push(String(i)); return r; }
@@ -11243,6 +11418,10 @@ function pctForAlbum(a){ return TOTAL ? Math.round(a.owned.size / TOTAL * 100) :
 
 /* ── SAVE / LOAD ────────────────────────────────────────── */
 function saveState(){
+  // Track activity and per-album owned snapshots for intelligence
+  ensureStartDate();
+  recordActivity();
+  for(const a of state.albums){ updateAlbumSnap(a.id, a.owned.size); }
   localStorage.setItem('elevah_albums',    JSON.stringify(state.albums.map(a => ({id:a.id, name:a.name, owned:[...a.owned]}))));
   localStorage.setItem('elevah_repeated',  JSON.stringify(state.repeated));
   localStorage.setItem('elevah_active',    state.activeAlbumId || '');
@@ -11305,6 +11484,9 @@ function loadState(){
     // Critical for migration: if the old elevah_owned was just deleted, we must
     // immediately write elevah_albums before any page reload wipes the data.
     saveState();
+    updateTrophyBadge();
+    // Retroactive trophy check: unlock trophies already earned by existing users
+    setTimeout(checkTrophies, 800);
   } catch(e){ console.warn('loadState error', e); }
 }
 
@@ -11454,16 +11636,26 @@ function removeRepeat(id){
 function totalRepeatCount(){ return Object.values(state.repeated).reduce((s,c)=>s+c,0); }
 
 /* ── TAP HANDLER ────────────────────────────────────────── */
-const tapMap = {};
+// Long-press threshold (ms) — replaces double-tap to avoid iOS Safari zoom
+const LONG_PRESS_MS = 500;
+const pressMap = {};
+
 function handleChipTap(id, tabType){
-  if(!tapMap[id]) tapMap[id] = {c:0, t:null};
-  const s = tapMap[id]; s.c++;
-  clearTimeout(s.t);
-  s.t = setTimeout(()=>{
-    if(s.c===1) doSingle(id, tabType);
-    else        doDouble(id, tabType);
-    s.c=0; s.t=null;
-  }, 270);
+  // Simple tap → mark (doSingle). Long press handled via touch events.
+  doSingle(id, tabType);
+}
+
+function startLongPress(id, tabType, chipEl){
+  pressMap[id] = setTimeout(()=>{
+    pressMap[id] = null;
+    chipEl.classList.add('long-press-active');
+    setTimeout(() => chipEl.classList.remove('long-press-active'), 300);
+    doDouble(id, tabType);
+  }, LONG_PRESS_MS);
+}
+
+function cancelLongPress(id){
+  if(pressMap[id]){ clearTimeout(pressMap[id]); pressMap[id] = null; }
 }
 function doSingle(id, tabType){
   if(tabType==='repeated'){
@@ -11479,16 +11671,35 @@ function doSingle(id, tabType){
   }
   else {
     const a = tabType === 'missing' ? getFaltamAlbum() : getActiveAlbum();
-    if(a){ a.owned.add(id); if(tabType !== 'missing' || !isFriendAlbumActive()) checkGroupCompletion(id); }
+    if(a){ a.owned.add(id); if(tabType !== 'missing' || !isFriendAlbumActive()) checkGroupCompletion(id); if(tabType==='missing'&&isFriendAlbumActive()) localStorage.setItem('elevah_marked_friend','1'); }
   }
   trackEvent('sticker_marked', { tab: tabType, sigla: id.split('-')[0] });
+  // Track first/last sticker per album
+  if(tabType !== 'repeated'){
+    const activeA = tabType==='missing' ? getFaltamAlbum() : getActiveAlbum();
+    if(activeA){
+      const fsKey = 'elevah_first_sticker_'+activeA.id;
+      const lsKey = 'elevah_last_sticker_'+activeA.id;
+      if(!localStorage.getItem(fsKey)) localStorage.setItem(fsKey, id);
+      localStorage.setItem(lsKey, id);
+      // Track first shiny / first CC
+      const _sig = id.split('-')[0]; const _num = id.split('-')[1];
+      const _grp = ALBUM_DATA.find(g=>g.sigla===_sig);
+      if(!localStorage.getItem('elevah_first_shiny') && (_sig==='FWC'||(_grp&&_grp.grupo!==null&&_num==='1')))
+        localStorage.setItem('elevah_first_shiny','1');
+      if(!localStorage.getItem('elevah_first_cc') && _sig==='CC')
+        localStorage.setItem('elevah_first_cc','1');
+    }
+  }
   saveState(); renderAll(); flashChip(id, tabType);
+  checkTrophies();
 }
 function doDouble(id, tabType){
   if(tabType==='repeated'){ removeRepeat(id); }
   else { const a = tabType === 'missing' ? getFaltamAlbum() : getActiveAlbum(); if(a) a.owned.delete(id); }
   trackEvent('sticker_unmarked', { tab: tabType, sigla: id.split('-')[0] });
   saveState(); renderAll();
+  checkTrophies();
 }
 function flashChip(id, tabType){
   const sfx = tabType==='repeated'?'-r': tabType==='missing'?'-m':'-l';
@@ -11531,8 +11742,10 @@ function buildGroupHTML(group, tabType, ownedSet){
     }
     const isShiny = (group.sigla==='FWC') || (group.grupo!==null && num==='1');
     const isTeamPhoto = group.grupo!==null && num==='13';
+    const isCC = group.sigla==='CC';
     if(isShiny)    cls+=' shiny';
     if(isTeamPhoto) cls+=' team-photo';
+    if(isCC)       cls+=' cc';
     html += `<div class="${cls}" data-cid="${id}${sfx}" data-id="${id}" data-tab="${tabType}">${innerLabel}</div>`;
   }
   html += `</div></div>`;
@@ -11671,6 +11884,24 @@ function renderAlbumDetail(albumId){
   }
   document.getElementById('progress-list').innerHTML = html;
   renderSortBars();
+
+  // Inject stats teaser card
+  const teaserContainer = document.getElementById('stats-teaser-container');
+  if(teaserContainer){
+    const s = computeAlbumStats(album);
+    const pct = pctForAlbum(album);
+    let teaserSub = '';
+    if(pct === 100){ teaserSub = 'Álbum completo! 🏆'; }
+    else if(s.addedWeek > 0){ teaserSub = `+${s.addedWeek} esta semana`; }
+    else { teaserSub = 'Veja detalhes de evolução e projeção'; }
+    teaserContainer.innerHTML = `<div class="stats-teaser" onclick="openIntelModal('${albumId}')">
+      <div>
+        <div class="st-left">📈 Estatísticas detalhadas</div>
+        <div class="st-sub">${teaserSub}</div>
+      </div>
+      <div class="st-arrow">›</div>
+    </div>`;
+  }
 }
 
 /* ── RENDER: LISTA ──────────────────────────────────────── */
@@ -11738,8 +11969,10 @@ function renderMissingAll(){
       if(g.sigla==='PANINI') cls+=' wide';
       const isShiny = (g.sigla==='FWC')||(g.grupo!==null&&num==='1');
       const isTeamPhoto = g.grupo!==null&&num==='13';
+      const isCC = g.sigla==='CC';
       if(isShiny)    cls+=' shiny';
       if(isTeamPhoto) cls+=' team-photo';
+      if(isCC)       cls+=' cc';
       let innerLabel = g.sigla==='PANINI' ? `PANINI ${num}` : num;
       if(count > 1) innerLabel += `<span class="chip-rep-cnt">${count}</span>`;
       html += `<div class="${cls}" style="cursor:default">${innerLabel}</div>`;
@@ -11809,6 +12042,7 @@ function renderPerfil(){
   if(nameEl) nameEl.textContent = userName || 'Meu Perfil';
   const avatarEl = document.getElementById('user-avatar');
   if(avatarEl) avatarEl.textContent = (userName||'M')[0].toUpperCase();
+  updateScoreDisplay();
   renderPerfilAlbuns();
   autoUpdateSyncCode();
 }
@@ -11917,13 +12151,15 @@ function confirmDeleteFriend(){
 
 function openPerfilSection(sectionId){
   document.getElementById('perfil-main').style.display = 'none';
-  ['perfil-dados','perfil-albuns','perfil-sync','perfil-exchange','perfil-export','perfil-danger','perfil-appearance'].forEach(id=>{
+  ['perfil-dados','perfil-albuns','perfil-sync','perfil-exchange','perfil-export','perfil-danger','perfil-appearance','perfil-jornada','perfil-trofeus'].forEach(id=>{
     const el = document.getElementById(id); if(el) el.style.display = 'none';
   });
   const target = document.getElementById(sectionId);
   if(target) target.style.display = 'block';
   if(sectionId==='perfil-albuns') renderPerfilAlbuns();
   if(sectionId==='perfil-dados') loadDadosPessoais();
+  if(sectionId==='perfil-jornada') renderJornada();
+  if(sectionId==='perfil-trofeus') renderTrofeus();
   if(sectionId==='perfil-appearance'){
     const darkCb = document.getElementById('toggle-dark');
     const sideCb = document.getElementById('toggle-sideindex');
@@ -11934,7 +12170,7 @@ function openPerfilSection(sectionId){
   if(typeof gtag !== 'undefined') gtag('event', 'perfil_section', { section: sectionId });
 }
 function goBackToPerfil(){
-  ['perfil-dados','perfil-albuns','perfil-sync','perfil-exchange','perfil-export','perfil-danger','perfil-appearance'].forEach(id=>{
+  ['perfil-dados','perfil-albuns','perfil-sync','perfil-exchange','perfil-export','perfil-danger','perfil-appearance','perfil-jornada','perfil-trofeus'].forEach(id=>{
     const el = document.getElementById(id); if(el) el.style.display = 'none';
   });
   document.getElementById('perfil-main').style.display = 'block';
@@ -11994,11 +12230,18 @@ function loadDadosPessoais(){
   const wpEl = document.getElementById('dados-whatsapp');
   if(nomeEl) nomeEl.value = dados.nome || userName || '';
   if(emailEl) emailEl.value = dados.email || '';
-  if(wpEl) wpEl.value = dados.whatsapp || '';
+  if(wpEl){ wpEl.value = dados.whatsapp || ''; if(wpEl.value) maskPhone(wpEl); }
   const statusEl = document.getElementById('dados-status');
   if(statusEl) statusEl.style.display = 'none';
 }
 
+function maskPhone(el){
+  let v = el.value.replace(/\D/g,'').slice(0,11);
+  if(v.length > 6)      v = '(' + v.slice(0,2) + ') ' + v.slice(2,7) + '-' + v.slice(7);
+  else if(v.length > 2) v = '(' + v.slice(0,2) + ') ' + v.slice(2);
+  else if(v.length > 0) v = '(' + v;
+  el.value = v;
+}
 function saveDadosPessoais(){
   const nome = (document.getElementById('dados-nome')?.value || '').trim();
   const email = (document.getElementById('dados-email')?.value || '').trim();
@@ -12032,6 +12275,7 @@ function saveDadosPessoais(){
   }).then(() => {
     showDadosStatus('✅ Dados salvos com sucesso!', 'success');
     trackEvent('dados_saved', { nome: nome ? 'sim' : 'nao', email: email ? 'sim' : 'nao', whatsapp: whatsapp ? 'sim' : 'nao' });
+    checkTrophies();
     updateGA4UserProperties(); // atualiza user properties com novos dados
   }).catch(() => showDadosStatus('✅ Dados salvos localmente.', 'success'));
 }
@@ -12107,13 +12351,596 @@ function renderAll(){
 }
 
 /* ── EVENT DELEGATION ───────────────────────────────────── */
+
+/* ── INTELLIGENCE & STATS ──────────────────────────────── */
+function todayStr(){
+  return new Date().toISOString().slice(0,10);
+}
+
+function getAlbumSnaps(albumId){
+  try { return JSON.parse(localStorage.getItem('elevah_snap_'+albumId)||'{}'); }
+  catch(e){ return {}; }
+}
+
+function updateAlbumSnap(albumId, count){
+  const snap = getAlbumSnaps(albumId);
+  snap[todayStr()] = count;
+  // Trim to last 120 days
+  const cutoff = new Date(Date.now()-120*86400000).toISOString().slice(0,10);
+  for(const d of Object.keys(snap)){ if(d < cutoff) delete snap[d]; }
+  localStorage.setItem('elevah_snap_'+albumId, JSON.stringify(snap));
+}
+
+function recordActivity(){
+  const act = JSON.parse(localStorage.getItem('elevah_activity')||'{}');
+  act[todayStr()] = 1;
+  localStorage.setItem('elevah_activity', JSON.stringify(act));
+}
+
+function ensureStartDate(){
+  if(!localStorage.getItem('elevah_start')){
+    localStorage.setItem('elevah_start', todayStr());
+  }
+}
+
+function incExchangeCount(){
+  const n = parseInt(localStorage.getItem('elevah_exchanges')||'0',10);
+  localStorage.setItem('elevah_exchanges', String(n+1));
+}
+
+function getCountDaysAgo(snap, daysAgo){
+  const target = new Date(Date.now()-daysAgo*86400000).toISOString().slice(0,10);
+  const dates = Object.keys(snap).sort();
+  let last = 0;
+  for(const d of dates){ if(d <= target) last = snap[d]; else break; }
+  return last;
+}
+
+function computeAlbumStats(album){
+  const snap = getAlbumSnaps(album.id);
+  const owned = album.owned.size;
+  const today = todayStr();
+
+  // Ensure today's snap exists for "added today" computation
+  const todayStart = getCountDaysAgo(snap, 0);  // last snap before/on today
+  // Actually we store the running count, so "added today" = today's count - yesterday's count
+  const yesterdayCount = (() => {
+    const dates = Object.keys(snap).sort();
+    let last = 0;
+    for(const d of dates){ if(d < today) last = snap[d]; }
+    return last;
+  })();
+  const addedToday = Math.max(0, owned - yesterdayCount);
+  const count7     = getCountDaysAgo(snap, 7);
+  const count30    = getCountDaysAgo(snap, 30);
+  const addedWeek  = Math.max(0, owned - count7);
+  const addedMonth = Math.max(0, owned - count30);
+
+  // Projection: avg daily over last 14 days
+  const count14 = getCountDaysAgo(snap, 14);
+  const avgDaily14 = (owned - count14) / 14;
+  let projection = null;
+  if(avgDaily14 > 0 && owned < TOTAL){
+    const daysLeft = Math.ceil((TOTAL - owned) / avgDaily14);
+    const projDate = new Date(Date.now() + daysLeft*86400000);
+    projection = { days: daysLeft, date: projDate.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'}) };
+  }
+
+  // Top teams by % (top 5 nearest completion, not yet complete)
+  const allGroups = getDisplayOrder();
+  const grouped = allGroups.map(g => {
+    const go = g.nums.filter(n=>album.owned.has(chipId(g.sigla,n))).length;
+    const gt = g.nums.length;
+    return { name: g.titulo, sigla: g.sigla, pct: gt?Math.round(go/gt*100):0, owned:go, total:gt };
+  }).filter(g=>g.pct<100 && g.total>0).sort((a,b)=>b.pct-a.pct).slice(0,5);
+
+  // Most repeated team
+  const repeatBySigla = {};
+  for(const [id,cnt] of Object.entries(state.repeated)){
+    const sigla = id.split('-')[0];
+    repeatBySigla[sigla] = (repeatBySigla[sigla]||0) + cnt;
+  }
+  const topRepeat = Object.entries(repeatBySigla).sort((a,b)=>b[1]-a[1])[0] || null;
+  const topRepeatGroup = topRepeat ? allGroups.find(g=>g.sigla===topRepeat[0]) : null;
+
+  return { addedToday, addedWeek, addedMonth, projection, grouped, topRepeat, topRepeatGroup };
+}
+
+function openIntelModal(albumId){
+  const album = getAlbumById(albumId) || (state.friendAlbum?.id===albumId ? state.friendAlbum : null);
+  if(!album) return;
+  trackEvent('stats_modal_open', { album_id: albumId });
+
+  const s = computeAlbumStats(album);
+  const pct = pctForAlbum(album);
+
+  let html = '';
+
+  // Evolução
+  html += `<div class="intel-section">
+    <div class="intel-section-title">📊 Evolução</div>
+    <div class="intel-stat-row">
+      <div class="intel-stat"><div class="v green">${s.addedToday}</div><div class="l">Hoje</div></div>
+      <div class="intel-stat"><div class="v">${s.addedWeek}</div><div class="l">7 dias</div></div>
+      <div class="intel-stat"><div class="v orange">${s.addedMonth}</div><div class="l">30 dias</div></div>
+    </div>
+  </div>`;
+
+  // Projeção
+  html += `<div class="intel-section">
+    <div class="intel-section-title">🔮 Projeção de Conclusão</div>
+    <div class="intel-projection">
+      <div class="proj-icon">${s.projection ? '📅' : '⏸️'}</div>
+      <div class="proj-text">`;
+  if(pct === 100){
+    html += `<strong>Álbum completo! 🏆</strong> Parabéns pela conquista!`;
+  } else if(s.projection){
+    html += `No ritmo atual, você completa em aproximadamente <strong>${s.projection.days} dias</strong> — por volta de <strong>${s.projection.date}</strong>.`;
+  } else {
+    html += `Ainda sem dados de ritmo suficientes. Continue marcando suas figurinhas!`;
+  }
+  html += `</div></div></div>`;
+
+  // Ranking times mais próximos
+  if(s.grouped.length > 0){
+    html += `<div class="intel-section">
+      <div class="intel-section-title">🏅 Times mais próximos de completar</div>`;
+    s.grouped.forEach((g,i) => {
+      html += `<div class="intel-ranking-item">
+        <div class="intel-rank-pos">${i+1}º</div>
+        <div class="intel-rank-name">${g.name}</div>
+        <div class="intel-rank-bar-wrap"><div class="intel-rank-bar" style="width:${g.pct}%"></div></div>
+        <div class="intel-rank-pct">${g.pct}%</div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // Fatos curiosos
+  html += `<div class="intel-section">
+    <div class="intel-section-title">💡 Fatos</div>`;
+
+  html += `<div class="intel-fact"><span>Figurinhas no álbum</span><span class="fact-val">${album.owned.size} de ${TOTAL}</span></div>`;
+  html += `<div class="intel-fact"><span>Faltam</span><span class="fact-val">${TOTAL - album.owned.size}</span></div>`;
+
+  if(s.topRepeatGroup){
+    const cnt = s.topRepeat[1];
+    html += `<div class="intel-fact"><span>Time com mais repetidas</span><span class="fact-val">${s.topRepeatGroup.titulo} (${cnt})</span></div>`;
+  } else if(Object.keys(state.repeated).length === 0){
+    html += `<div class="intel-fact"><span>Repetidas cadastradas</span><span class="fact-val">Nenhuma ainda</span></div>`;
+  }
+
+  // First/last sticker info
+  const firstSticker = localStorage.getItem('elevah_first_sticker_'+albumId);
+  const lastSticker  = localStorage.getItem('elevah_last_sticker_'+albumId);
+  if(firstSticker) html += `<div class="intel-fact"><span>Primeira figurinha</span><span class="fact-val">${firstSticker}</span></div>`;
+  if(lastSticker && lastSticker !== firstSticker) html += `<div class="intel-fact"><span>Última marcada</span><span class="fact-val">${lastSticker}</span></div>`;
+
+  html += `</div>`;
+
+  document.getElementById('intel-modal-title').textContent = '📈 ' + album.name;
+  document.getElementById('intel-modal-body').innerHTML = html;
+  document.getElementById('intel-modal').classList.add('open');
+}
+
+function closeIntelModal(){
+  document.getElementById('intel-modal').classList.remove('open');
+}
+
+/* ── MINHA JORNADA ──────────────────────────────────────── */
+function renderJornada(){
+  const startDate = localStorage.getItem('elevah_start') || todayStr();
+  const exchanges  = parseInt(localStorage.getItem('elevah_exchanges')||'0',10);
+  const { activeDays, maxStreak, currentStreak } = getActivityStats();
+
+  // Total stickers across all albums
+  const totalOwned = state.albums.reduce((s,a)=>s+a.owned.size,0);
+
+  // Start date formatted
+  const startFormatted = new Date(startDate+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+
+  const score = computeScore();
+  const unlockedCount = Object.keys(getUnlockedTrophies()).length;
+  let html = `<div class="score-breakdown" style="margin-bottom:20px">
+    <div class="score-total">${score.total.toLocaleString('pt-BR')}</div>
+    <div class="score-total-label">pontos totais</div>
+    <div class="score-breakdown-row"><span>⭐ Figurinhas (${state.albums.reduce((s,a)=>s+a.owned.size,0)})</span><span class="sbr-val">${score.stickers.toLocaleString('pt-BR')} pts</span></div>
+    <div class="score-breakdown-row"><span>🏆 Troféus (${unlockedCount})</span><span class="sbr-val">${score.trophiesScore.toLocaleString('pt-BR')} pts</span></div>
+  </div>`;
+  html += `<div class="jornada-grid">
+    <div class="jornada-stat"><div class="jv">${totalOwned}</div><div class="jl">Figurinhas colecionadas</div></div>
+    <div class="jornada-stat"><div class="jv">${activeDays}</div><div class="jl">Dias ativos</div></div>
+    <div class="jornada-stat"><div class="jv">${currentStreak}</div><div class="jl">Sequência atual 🔥</div></div>
+    <div class="jornada-stat"><div class="jv">${maxStreak}</div><div class="jl">Melhor sequência</div></div>
+  </div>
+  <div class="intel-section">
+    <div class="intel-section-title">📋 Detalhes</div>
+    <div class="intel-fact"><span>Membro desde</span><span class="fact-val">${startFormatted}</span></div>
+    <div class="intel-fact"><span>Trocas realizadas</span><span class="fact-val">${exchanges}</span></div>
+    <div class="intel-fact"><span>Álbuns criados</span><span class="fact-val">${state.albums.length}</span></div>
+  </div>`;
+
+  document.getElementById('jornada-content').innerHTML = html;
+  trackEvent('jornada_view', {});
+}
+
+
+/* ── TROPHY SYSTEM ──────────────────────────────────────── */
+const TROPHIES = [
+  // ── BRONZE ──
+  { id:'first_sticker',  tier:'bronze',   icon:'⚽', name:'Pontapé Inicial',    desc:'Marcou sua primeira figurinha no álbum.',
+    check:()=>{ const a=getActiveAlbum(); return a&&a.owned.size>=1; } },
+  { id:'pack_50',        tier:'bronze',   icon:'📦', name:'Abrindo Pacotes',     desc:'50 figurinhas no álbum ativo.',
+    check:()=>{ const a=getActiveAlbum(); return a&&a.owned.size>=50; } },
+  { id:'collector_100',  tier:'bronze',   icon:'🃏', name:'Colecionador',         desc:'100 figurinhas no álbum ativo.',
+    check:()=>{ const a=getActiveAlbum(); return a&&a.owned.size>=100; } },
+  { id:'repeats_10',     tier:'bronze',   icon:'🔄', name:'Bem Sortido',          desc:'10 figurinhas repetidas cadastradas.',
+    check:()=>Object.values(state.repeated).reduce((s,n)=>s+n,0)>=10 },
+  { id:'first_exchange', tier:'bronze',   icon:'🤝', name:'Primeira Troca',       desc:'Realizou sua primeira troca de figurinhas.',
+    check:()=>parseInt(localStorage.getItem('elevah_exchanges')||'0',10)>=1 },
+  { id:'one_per_team',   tier:'bronze',   icon:'🗺️', name:'Representação Global',  desc:'Tem pelo menos uma figurinha de cada seleção do álbum.',
+    check:()=>{ const a=getActiveAlbum(); if(!a) return false;
+      return ALBUM_DATA.filter(g=>g.grupo!==null).every(g=>g.nums.some(n=>a.owned.has(chipId(g.sigla,n)))); } },
+  { id:'streak_3',       tier:'bronze',   icon:'🔥', name:'Madrugador',             desc:'3 dias seguidos atualizando o álbum.',
+    check:()=>getActivityStats().maxStreak>=3 },
+  { id:'dark_mode_on',   tier:'bronze',   icon:'🌑', name:'Modo Noturno',           desc:'Ativou o modo escuro no app.',
+    check:()=>localStorage.getItem('elevah_dark')==='1' },
+  { id:'first_shiny',    tier:'bronze',   icon:'✨', name:'Primeira Brilhante',     desc:'Marcou sua primeira figurinha brilhante (FWC ou nº 1 de uma seleção).',
+    check:()=>localStorage.getItem('elevah_first_shiny')==='1' },
+  { id:'first_cc',       tier:'bronze',   icon:'🥤', name:'Primeiro Gole',          desc:'Marcou sua primeira figurinha Coca-Cola.',
+    check:()=>localStorage.getItem('elevah_first_cc')==='1' },
+  { id:'first_qr',       tier:'bronze',   icon:'📱', name:'QR na Mão',              desc:'Gerou seu primeiro QR Code de figurinhas faltantes.',
+    check:()=>localStorage.getItem('elevah_first_qr')==='1' },
+  { id:'streak_2',       tier:'bronze',   icon:'⚡', name:'Dois Dias',              desc:'2 dias seguidos atualizando o álbum.',
+    check:()=>getActivityStats().maxStreak>=2 },
+  { id:'repeats_5',      tier:'bronze',   icon:'♻️', name:'Cinco Repetidas',        desc:'5 figurinhas repetidas cadastradas.',
+    check:()=>Object.values(state.repeated).reduce((s,n)=>s+n,0)>=5 },
+  { id:'active_5',       tier:'bronze',   icon:'📆', name:'Fã da Copa',             desc:'5 dias ativos no app.',
+    check:()=>getActivityStats().activeDays>=5 },
+  { id:'collector_150',  tier:'bronze',   icon:'🥇', name:'Cento e Cinquenta',      desc:'150 figurinhas no álbum ativo.',
+    check:()=>{ const a=getActiveAlbum(); return a&&a.owned.size>=150; } },
+  { id:'panini_complete',tier:'bronze',   icon:'🅿️', name:'Panini Completo',        desc:'Completou todas as figurinhas da seção Panini.',
+    check:()=>{ const a=getActiveAlbum(); if(!a) return false;
+      return G_PANINI&&G_PANINI.nums.every(n=>a.owned.has(chipId('PANINI',n))); } },
+  { id:'multi_album',    tier:'bronze',   icon:'📚', name:'Dois Álbuns',            desc:'Criou um segundo álbum no app.',
+    check:()=>state.albums.length>=2 },
+  { id:'first_search',   tier:'bronze',   icon:'🔍', name:'Explorador',             desc:'Usou o filtro de busca pela primeira vez.',
+    check:()=>localStorage.getItem('elevah_first_search')==='1' },
+  { id:'first_share',    tier:'bronze',   icon:'📤', name:'Compartilhou',           desc:'Compartilhou sua lista de figurinhas via WhatsApp.',
+    check:()=>localStorage.getItem('elevah_first_share')==='1' },
+  { id:'help_visited',   tier:'bronze',   icon:'📖', name:'Curioso',                desc:'Visitou a aba "Como Funciona".',
+    check:()=>localStorage.getItem('elevah_help_visited')==='1' },
+
+  // ── PRATA ──
+  { id:'half_album',     tier:'silver',   icon:'📊', name:'Meio a Meio',          desc:'50% do álbum ativo completo.',
+    check:()=>{ const a=getActiveAlbum(); return a&&pctForAlbum(a)>=50; } },
+  { id:'first_team',     tier:'bronze',   icon:'🏅', name:'Time Completo',        desc:'Completou todas as figurinhas de um time.',
+    check:()=>{ const a=getActiveAlbum(); if(!a) return false;
+      return ALBUM_DATA.some(g=>g.grupo&&g.nums.every(n=>a.owned.has(chipId(g.sigla,n)))); } },
+  { id:'full_group',     tier:'silver',   icon:'🎯', name:'Grupo Fechado',        desc:'Completou todos os times de um grupo da Copa.',
+    check:()=>{ const a=getActiveAlbum(); if(!a) return false;
+      const letters=[...new Set(ALBUM_DATA.filter(g=>g.grupo).map(g=>g.grupo))];
+      return letters.some(letter=>{
+        const teams=ALBUM_DATA.filter(g=>g.grupo===letter);
+        return teams.length>0&&teams.every(g=>g.nums.every(n=>a.owned.has(chipId(g.sigla,n))));
+      }); } },
+  { id:'collector_200',  tier:'silver',   icon:'📚', name:'Figurinheiro',         desc:'200 figurinhas no álbum ativo.',
+    check:()=>{ const a=getActiveAlbum(); return a&&a.owned.size>=200; } },
+  { id:'streak_7',       tier:'silver',   icon:'📅', name:'Dedicado',             desc:'7 dias seguidos atualizando o álbum.',
+    check:()=>getActivityStats().maxStreak>=7 },
+  { id:'twelve_teams',   tier:'silver',   icon:'🏆', name:'Doze de Ouro',          desc:'Completou 12 times inteiros.',
+    check:()=>{ const a=getActiveAlbum(); if(!a) return false;
+      return ALBUM_DATA.filter(g=>g.grupo&&g.nums.every(n=>a.owned.has(chipId(g.sigla,n)))).length>=12; } },
+  { id:'all_fwc',        tier:'silver',   icon:'✨', name:'Ouro em Campo',          desc:'Coletou todas as figurinhas FWC do álbum.',
+    check:()=>{ const a=getActiveAlbum(); if(!a) return false;
+      return G_FWC&&G_FWC.nums.every(n=>a.owned.has(chipId('FWC',n))); } },
+
+  // ── OURO ──
+  { id:'album_90',       tier:'gold',     icon:'🔥', name:'Quase Lá',             desc:'90% do álbum ativo preenchido.',
+    check:()=>{ const a=getActiveAlbum(); return a&&pctForAlbum(a)>=90; } },
+  { id:'three_teams',    tier:'silver',   icon:'🎖️', name:'Trezentos',            desc:'Completou 3 times inteiros.',
+    check:()=>{ const a=getActiveAlbum(); if(!a) return false;
+      return ALBUM_DATA.filter(g=>g.grupo&&g.nums.every(n=>a.owned.has(chipId(g.sigla,n)))).length>=3; } },
+  { id:'active_30',      tier:'gold',     icon:'⭐', name:'Obcecado',             desc:'30 dias ativos no app.',
+    check:()=>getActivityStats().activeDays>=30 },
+  { id:'exchanges_5',    tier:'gold',     icon:'🔁', name:'Mestre das Trocas',    desc:'Realizou 5 trocas de figurinhas.',
+    check:()=>parseInt(localStorage.getItem('elevah_exchanges')||'0',10)>=5 },
+  { id:'collector_400',  tier:'silver',   icon:'🌟', name:'Lenda',                desc:'400 figurinhas no álbum ativo.',
+    check:()=>{ const a=getActiveAlbum(); return a&&a.owned.size>=400; } },
+  { id:'collector_700',  tier:'gold',     icon:'💎', name:'Elite',                 desc:'700 figurinhas no álbum ativo.',
+    check:()=>{ const a=getActiveAlbum(); return a&&a.owned.size>=700; } },
+  { id:'thirty_six_teams', tier:'gold',   icon:'🌐', name:'Copa das Copas',        desc:'Completou 36 times inteiros.',
+    check:()=>{ const a=getActiveAlbum(); if(!a) return false;
+      return ALBUM_DATA.filter(g=>g.grupo&&g.nums.every(n=>a.owned.has(chipId(g.sigla,n)))).length>=36; } },
+  { id:'all_shiny',      tier:'gold',     icon:'🌠', name:'Coleção Brilhante',      desc:'Coletou todas as figurinhas brilhantes (FWC + número 1 de cada seleção).',
+    check:()=>{ const a=getActiveAlbum(); if(!a) return false;
+      const fwcOk=G_FWC&&G_FWC.nums.every(n=>a.owned.has(chipId('FWC',n)));
+      const countryOk=ALBUM_DATA.filter(g=>g.grupo!==null).every(g=>a.owned.has(chipId(g.sigla,'1')));
+      return fwcOk&&countryOk; } },
+
+  // ── PLATINA ──
+  { id:'complete',       tier:'platinum', icon:'🏆', name:'Torcedor Elevah',              desc:'Álbum 100% completo! Você é um verdadeiro Torcedor Elevah!',
+    check:()=>{ const a=getActiveAlbum(); return a&&pctForAlbum(a)===100; } },
+
+  // ── PRATA — 12 GRUPOS ──
+  { id:'group_A', tier:'silver', icon:'A', name:'Grupo A Completo',
+    desc:'Completou todos os times do Grupo A da Copa.',
+    check:()=>{ const a=getActiveAlbum(); if(!a) return false;
+      const teams=ALBUM_DATA.filter(g=>g.grupo==='A');
+      return teams.length>0&&teams.every(g=>g.nums.every(n=>a.owned.has(chipId(g.sigla,n)))); } },
+  { id:'group_B', tier:'silver', icon:'B', name:'Grupo B Completo',
+    desc:'Completou todos os times do Grupo B da Copa.',
+    check:()=>{ const a=getActiveAlbum(); if(!a) return false;
+      const teams=ALBUM_DATA.filter(g=>g.grupo==='B');
+      return teams.length>0&&teams.every(g=>g.nums.every(n=>a.owned.has(chipId(g.sigla,n)))); } },
+  { id:'group_C', tier:'silver', icon:'C', name:'Grupo C Completo',
+    desc:'Completou todos os times do Grupo C da Copa.',
+    check:()=>{ const a=getActiveAlbum(); if(!a) return false;
+      const teams=ALBUM_DATA.filter(g=>g.grupo==='C');
+      return teams.length>0&&teams.every(g=>g.nums.every(n=>a.owned.has(chipId(g.sigla,n)))); } },
+  { id:'group_D', tier:'silver', icon:'D', name:'Grupo D Completo',
+    desc:'Completou todos os times do Grupo D da Copa.',
+    check:()=>{ const a=getActiveAlbum(); if(!a) return false;
+      const teams=ALBUM_DATA.filter(g=>g.grupo==='D');
+      return teams.length>0&&teams.every(g=>g.nums.every(n=>a.owned.has(chipId(g.sigla,n)))); } },
+  { id:'group_E', tier:'silver', icon:'E', name:'Grupo E Completo',
+    desc:'Completou todos os times do Grupo E da Copa.',
+    check:()=>{ const a=getActiveAlbum(); if(!a) return false;
+      const teams=ALBUM_DATA.filter(g=>g.grupo==='E');
+      return teams.length>0&&teams.every(g=>g.nums.every(n=>a.owned.has(chipId(g.sigla,n)))); } },
+  { id:'group_F', tier:'silver', icon:'F', name:'Grupo F Completo',
+    desc:'Completou todos os times do Grupo F da Copa.',
+    check:()=>{ const a=getActiveAlbum(); if(!a) return false;
+      const teams=ALBUM_DATA.filter(g=>g.grupo==='F');
+      return teams.length>0&&teams.every(g=>g.nums.every(n=>a.owned.has(chipId(g.sigla,n)))); } },
+  { id:'group_G', tier:'silver', icon:'G', name:'Grupo G Completo',
+    desc:'Completou todos os times do Grupo G da Copa.',
+    check:()=>{ const a=getActiveAlbum(); if(!a) return false;
+      const teams=ALBUM_DATA.filter(g=>g.grupo==='G');
+      return teams.length>0&&teams.every(g=>g.nums.every(n=>a.owned.has(chipId(g.sigla,n)))); } },
+  { id:'group_H', tier:'silver', icon:'H', name:'Grupo H Completo',
+    desc:'Completou todos os times do Grupo H da Copa.',
+    check:()=>{ const a=getActiveAlbum(); if(!a) return false;
+      const teams=ALBUM_DATA.filter(g=>g.grupo==='H');
+      return teams.length>0&&teams.every(g=>g.nums.every(n=>a.owned.has(chipId(g.sigla,n)))); } },
+  { id:'group_I', tier:'silver', icon:'I', name:'Grupo I Completo',
+    desc:'Completou todos os times do Grupo I da Copa.',
+    check:()=>{ const a=getActiveAlbum(); if(!a) return false;
+      const teams=ALBUM_DATA.filter(g=>g.grupo==='I');
+      return teams.length>0&&teams.every(g=>g.nums.every(n=>a.owned.has(chipId(g.sigla,n)))); } },
+  { id:'group_J', tier:'silver', icon:'J', name:'Grupo J Completo',
+    desc:'Completou todos os times do Grupo J da Copa.',
+    check:()=>{ const a=getActiveAlbum(); if(!a) return false;
+      const teams=ALBUM_DATA.filter(g=>g.grupo==='J');
+      return teams.length>0&&teams.every(g=>g.nums.every(n=>a.owned.has(chipId(g.sigla,n)))); } },
+  { id:'group_K', tier:'silver', icon:'K', name:'Grupo K Completo',
+    desc:'Completou todos os times do Grupo K da Copa.',
+    check:()=>{ const a=getActiveAlbum(); if(!a) return false;
+      const teams=ALBUM_DATA.filter(g=>g.grupo==='K');
+      return teams.length>0&&teams.every(g=>g.nums.every(n=>a.owned.has(chipId(g.sigla,n)))); } },
+  { id:'group_L', tier:'silver', icon:'L', name:'Grupo L Completo',
+    desc:'Completou todos os times do Grupo L da Copa.',
+    check:()=>{ const a=getActiveAlbum(); if(!a) return false;
+      const teams=ALBUM_DATA.filter(g=>g.grupo==='L');
+      return teams.length>0&&teams.every(g=>g.nums.every(n=>a.owned.has(chipId(g.sigla,n)))); } },
+
+  // ── PRATA — AMIGO ──
+  { id:'marked_for_friend', tier:'silver', icon:'👥', name:'Trocando para o Amigo',
+    desc:'Marcou uma figurinha no álbum de um amigo.',
+    check:()=>localStorage.getItem('elevah_marked_friend')==='1' },
+
+  // ── OURO — COCA-COLA & DADOS PESSOAIS ──
+  { id:'cc_complete',    tier:'gold',     icon:'🥤', name:'Coleção Coca-Cola',      desc:'Completou todas as figurinhas da Coca-Cola no álbum.',
+    check:()=>{ const a=getActiveAlbum(); if(!a) return false;
+      return G_EXTRA&&G_EXTRA.nums.every(n=>a.owned.has(chipId(G_EXTRA.sigla,n))); } },
+  { id:'dados_saved', tier:'gold', icon:'👤', name:'Bem Cadastrado',
+    desc:'Preencheu seus dados pessoais no app.',
+    check:()=>{ const d=JSON.parse(localStorage.getItem('elevah_dados')||'{}'); return !!(d.nome && (d.email||d.whatsapp)); } },
+];
+
+const TIER_LABELS = { bronze:'Bronze', silver:'Prata', gold:'Ouro', platinum:'Platina' };
+const TIER_ORDER  = ['bronze','silver','gold','platinum'];
+
+let trophyQueue = [];
+let trophyQueueIdx = 0;
+
+function getUnlockedTrophies(){
+  try{ return JSON.parse(localStorage.getItem('elevah_trophies')||'{}'); }
+  catch(e){ return {}; }
+}
+
+function checkTrophies(){
+  const unlocked = getUnlockedTrophies();
+  const newOnes = [];
+  for(const t of TROPHIES){
+    if(unlocked[t.id]) continue;
+    try{ if(t.check()){ unlocked[t.id]=todayStr(); newOnes.push(t); } }
+    catch(e){}
+  }
+  if(newOnes.length>0){
+    localStorage.setItem('elevah_trophies', JSON.stringify(unlocked));
+    updateScoreDisplay();
+    trophyQueue = newOnes;
+    trophyQueueIdx = 0;
+    showNextTrophyModal();
+    for(const t of newOnes){
+      trackEvent('trophy_unlocked', { trophy_id: t.id, trophy_name: t.name, trophy_tier: t.tier });
+    }
+  }
+}
+
+function showNextTrophyModal(){
+  if(trophyQueueIdx >= trophyQueue.length) return;
+  const t = trophyQueue[trophyQueueIdx];
+  const box   = document.getElementById('trophy-unlock-box');
+  const ovl   = document.getElementById('trophy-unlock-overlay');
+  const btn   = document.getElementById('trophy-unlock-btn');
+  const more  = trophyQueue.length - trophyQueueIdx - 1;
+  // Set tier class
+  box.className = 'trophy-unlock-box tier-' + t.tier;
+  document.getElementById('trophy-ribbon').textContent = TIER_LABELS[t.tier];
+  document.getElementById('trophy-icon').textContent   = t.icon;
+  document.getElementById('trophy-name').textContent   = t.name;
+  document.getElementById('trophy-desc').textContent   = t.desc;
+  btn.textContent = more > 0 ? `Ver próximo (${more} restante${more>1?'s':''})` : 'Continuar';
+  ovl.classList.add('open');
+  if(t.tier==='gold'||t.tier==='platinum') launchConfetti();
+}
+
+function closeTrophyModal(){
+  trophyQueueIdx++;
+  if(trophyQueueIdx < trophyQueue.length){
+    showNextTrophyModal();
+  } else {
+    document.getElementById('trophy-unlock-overlay').classList.remove('open');
+  }
+}
+
+function updateTrophyBadge(){
+  const count = Object.keys(getUnlockedTrophies()).length;
+  const badge = document.getElementById('trophy-count-badge');
+  if(badge) badge.textContent = count;
+}
+
+function renderTrofeus(){
+  const unlocked = getUnlockedTrophies();
+  let html = '';
+  for(const tier of TIER_ORDER){
+    const tierTrophies = TROPHIES.filter(t=>t.tier===tier);
+    html += `<div class="trophy-section-label ${tier}">${TIER_LABELS[tier]}</div>`;
+    html += `<div class="trophy-grid">`;
+    for(const t of tierTrophies){
+      const isUnlocked = !!unlocked[t.id];
+      const dateStr = isUnlocked
+        ? new Date(unlocked[t.id]+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'})
+        : '';
+      html += `<div class="trophy-card ${t.tier} ${isUnlocked?'unlocked':'locked'}">
+        <div class="tc-icon">${t.icon}</div>
+        <div class="tc-name">${isUnlocked?t.name:'???'}</div>
+        <div class="tc-desc">${isUnlocked?t.desc:'Continue jogando para descobrir!'}</div>
+        ${isUnlocked?`<div class="tc-date">🗓 ${dateStr}</div>`:''}
+      </div>`;
+    }
+    html += `</div>`;
+  }
+  // Summary
+  const total   = TROPHIES.length;
+  const earned  = Object.keys(unlocked).length;
+  html = `<div style="text-align:center;background:var(--bg);border-radius:var(--radius-sm);padding:12px;margin-bottom:20px;border:1.5px solid var(--border)">
+    <div style="font-size:1.6rem;font-weight:800;color:var(--primary)">${earned}<span style="font-size:.9rem;color:var(--text-light);font-weight:400"> / ${total}</span></div>
+    <div style="font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-light);margin-top:2px">Troféus desbloqueados</div>
+  </div>` + html;
+  document.getElementById('trofeus-content').innerHTML = html;
+}
+
+function getActivityStats(){
+  const activity = JSON.parse(localStorage.getItem('elevah_activity')||'{}');
+  const activeDays = Object.keys(activity).length;
+  const sortedDays = Object.keys(activity).sort();
+  let maxStreak=0, curStreak=0, prevDate=null;
+  for(const d of sortedDays){
+    if(prevDate){ const diff=(new Date(d)-new Date(prevDate))/86400000; curStreak=diff===1?curStreak+1:1; }
+    else curStreak=1;
+    maxStreak=Math.max(maxStreak,curStreak); prevDate=d;
+  }
+  const today=todayStr(), yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);
+  let currentStreak=0;
+  if(activity[today]||activity[yesterday]){
+    let check=activity[today]?today:yesterday;
+    while(activity[check]){ currentStreak++; check=new Date(new Date(check).getTime()-86400000).toISOString().slice(0,10); }
+  }
+  return { activeDays, maxStreak, currentStreak };
+}
+
+
+/* ── PONTUAÇÃO ──────────────────────────────────────────── */
+const TROPHY_PTS = { bronze:100, silver:250, gold:600, platinum:2000 };
+
+function computeScore(){
+  let stickers=0, trophiesScore=0;
+  // Sticker points (all own albums)
+  for(const album of state.albums){
+    for(const id of album.owned){
+      const parts=id.split('-'); const sigla=parts[0]; const num=parts[1];
+      const group=ALBUM_DATA.find(g=>g.sigla===sigla);
+      if(!group) continue;
+      const isCC       = sigla==='CC';
+      const isShiny    = sigla==='FWC'||(group.grupo!==null&&num==='1');
+      const isTeamPhoto= group.grupo!==null&&num==='13';
+      if(isCC)        stickers+=50;
+      else if(isShiny)stickers+=35;
+      else if(isTeamPhoto) stickers+=20;
+      else stickers+=10;
+    }
+  }
+  // Trophy points
+  const unlocked=getUnlockedTrophies();
+  for(const t of TROPHIES){ if(unlocked[t.id]) trophiesScore+=TROPHY_PTS[t.tier]||0; }
+  return { stickers, trophiesScore, total: stickers+trophiesScore };
+}
+
+function updateScoreDisplay(){
+  const { total } = computeScore();
+  const el   = document.getElementById('perfil-score');
+  const num  = document.getElementById('perfil-score-num');
+  if(el && num){
+    num.textContent = total.toLocaleString('pt-BR');
+    el.style.display = total>0 ? 'flex' : 'none';
+  }
+  // Update trophy badge too
+  updateTrophyBadge();
+}
+
 function setupDelegation(){
   const map = {'list-content':'list','missing-content':'missing','repeated-content':'repeated'};
+  const isTouchDevice = () => window.matchMedia('(hover: none)').matches;
+
   for(const [cid, tabType] of Object.entries(map)){
-    document.getElementById(cid).addEventListener('click', e=>{
-      if(tabType==='missing' && state.missingShowAll && state.albums.length > 1) return; // read-only in all mode
+    const el = document.getElementById(cid);
+
+    // ── TOUCH (mobile): tap = mark, long press = unmark ──────
+    el.addEventListener('touchstart', e=>{
       const chip = e.target.closest('.chip[data-id]');
-      if(chip) handleChipTap(chip.dataset.id, tabType);
+      if(chip) startLongPress(chip.dataset.id, tabType, chip);
+    }, { passive: true });
+    el.addEventListener('touchmove',  e=>{ const chip = e.target.closest('.chip[data-id]'); if(chip) cancelLongPress(chip.dataset.id); }, { passive: true });
+    el.addEventListener('touchend',   e=>{
+      const chip = e.target.closest('.chip[data-id]');
+      if(!chip) return;
+      const wasLong = !pressMap[chip.dataset.id]; // already fired = long press happened
+      cancelLongPress(chip.dataset.id);
+      if(!wasLong){
+        // long press already handled doDouble — don't also doSingle
+        return;
+      }
+      if(tabType==='missing' && state.missingShowAll && state.albums.length > 1) return;
+      doSingle(chip.dataset.id, tabType);
+    }, { passive: true });
+    el.addEventListener('touchcancel',e=>{ const chip = e.target.closest('.chip[data-id]'); if(chip) cancelLongPress(chip.dataset.id); }, { passive: true });
+
+    // ── MOUSE (desktop): single click = mark, double click = unmark ──
+    // Timer-based: wait 300ms after first click to detect double click.
+    // Necessary because renderAll() rebuilds the DOM between clicks,
+    // breaking the browser's native dblclick detection.
+    const clickTimers = {};
+    el.addEventListener('click', e=>{
+      if(isTouchDevice()) return; // touch handled above
+      if(tabType==='missing' && state.missingShowAll && state.albums.length > 1) return;
+      const chip = e.target.closest('.chip[data-id]');
+      if(!chip) return;
+      const id = chip.dataset.id;
+      if(clickTimers[id]){
+        // Second click within 300ms → double click → unmark
+        clearTimeout(clickTimers[id]);
+        delete clickTimers[id];
+        doDouble(id, tabType);
+      } else {
+        // First click → wait to see if double click follows
+        clickTimers[id] = setTimeout(()=>{
+          delete clickTimers[id];
+          doSingle(id, tabType);
+        }, 300);
+      }
     });
   }
 }
@@ -12134,6 +12961,9 @@ function switchTab(id){
   // Track tab navigation in GA4
   const tabNames = { overview:'Visão Geral', list:'Lista', missing:'Faltantes', repeated:'Repetidas', perfil:'Perfil', howto:'Ajuda' };
   trackEvent('tab_view', { tab_id: id, tab_name: tabNames[id] || id });
+  if(id==='howto' && !localStorage.getItem('elevah_help_visited')){
+    localStorage.setItem('elevah_help_visited','1'); setTimeout(checkTrophies,400);
+  }
   // Also send standard page_view so GA4 funnel reports work
   if(typeof gtag !== 'undefined') gtag('event', 'page_view', { page_title: tabNames[id] || id, page_location: window.location.href + '#' + id });
 }
@@ -12144,33 +12974,66 @@ document.querySelectorAll('.nav-btn').forEach(btn=>{
 /* ── SYNC ───────────────────────────────────────────────── */
 function getPayload(){
   return {
-    v: 2,
+    v: 3,
     user: userName,
     uid: getOrCreateUserId(),
     albums: state.albums.map(a => ({id:a.id, name:a.name, owned:[...a.owned]})),
     repeated: state.repeated,
+    // Jornada & troféus
+    trophies:   JSON.parse(localStorage.getItem('elevah_trophies')||'{}'),
+    activity:   JSON.parse(localStorage.getItem('elevah_activity')||'{}'),
+    start:      localStorage.getItem('elevah_start')||'',
+    exchanges:  localStorage.getItem('elevah_exchanges')||'0',
+    mrkFriend:  localStorage.getItem('elevah_marked_friend')||'',
+    dados:      JSON.parse(localStorage.getItem('elevah_dados')||'{}'),
+    // Flags de troféus e comportamento
+    darkMode:   localStorage.getItem('elevah_dark')||'',
+    fstShiny:   localStorage.getItem('elevah_first_shiny')||'',
+    fstCC:      localStorage.getItem('elevah_first_cc')||'',
+    fstQR:      localStorage.getItem('elevah_first_qr')||'',
+    fstSearch:  localStorage.getItem('elevah_first_search')||'',
+    fstShare:   localStorage.getItem('elevah_first_share')||'',
+    helpVisited:localStorage.getItem('elevah_help_visited')||'',
     at: new Date().toISOString()
   };
 }
 function applyPayload(p){
   if(!p) throw new Error('invalid');
+  // Albums + repeated (all versions)
   if(p.v === 1){
-    // Old single-album code → import into active album
     const a = getActiveAlbum();
     if(a) a.owned = new Set(p.owned||[]);
     const rp = p.repeated;
     state.repeated = Array.isArray(rp) ? Object.fromEntries(rp.map(id=>[id,1])) : (rp||{});
-  } else if(p.v === 2){
+  } else if(p.v === 2 || p.v === 3){
     state.albums = p.albums.map(a => ({id:a.id, name:a.name, owned:new Set(a.owned||[])}));
     const rp = p.repeated;
     state.repeated = Array.isArray(rp) ? Object.fromEntries(rp.map(id=>[id,1])) : (rp||{});
     if(!state.activeAlbumId || !getAlbumById(state.activeAlbumId))
       state.activeAlbumId = state.albums[0]?.id || null;
     if(p.user !== undefined && p.user !== null) userName = p.user;
-    // Restaura o mesmo uid do dispositivo de origem
     if(p.uid){ localStorage.setItem('elevah_uid', p.uid); setupGA4Identity(); }
+    // v3 extras: jornada, troféus, dados pessoais
+    if(p.v === 3){
+      if(p.trophies)  localStorage.setItem('elevah_trophies',  JSON.stringify(p.trophies));
+      if(p.activity)  localStorage.setItem('elevah_activity',  JSON.stringify(p.activity));
+      if(p.start)     localStorage.setItem('elevah_start',     p.start);
+      if(p.exchanges) localStorage.setItem('elevah_exchanges', p.exchanges);
+      if(p.mrkFriend) localStorage.setItem('elevah_marked_friend', p.mrkFriend);
+      if(p.dados && Object.keys(p.dados).length)
+        localStorage.setItem('elevah_dados', JSON.stringify(p.dados));
+      // Flags de troféus e comportamento
+      if(p.darkMode)    localStorage.setItem('elevah_dark',          p.darkMode);
+      if(p.fstShiny)    localStorage.setItem('elevah_first_shiny',   p.fstShiny);
+      if(p.fstCC)       localStorage.setItem('elevah_first_cc',      p.fstCC);
+      if(p.fstQR)       localStorage.setItem('elevah_first_qr',      p.fstQR);
+      if(p.fstSearch)   localStorage.setItem('elevah_first_search',  p.fstSearch);
+      if(p.fstShare)    localStorage.setItem('elevah_first_share',   p.fstShare);
+      if(p.helpVisited) localStorage.setItem('elevah_help_visited',  p.helpVisited);
+    }
   } else { throw new Error('invalid version'); }
   saveState(); renderAll();
+  updateTrophyBadge(); updateScoreDisplay();
 }
 function autoUpdateSyncCode(){
   const box = document.getElementById('export-code-box');
@@ -12218,7 +13081,8 @@ function buildExchangeResultHTML(matches){
     const chips = nums.map(n => {
       const isShiny = (sigla === 'FWC') || (group?.grupo !== null && n === '1');
       const isTeamPhoto = group?.grupo !== null && n !== '1' && parseInt(n) >= 17;
-      return `<div class="chip repeated${isShiny?' shiny':''}${isTeamPhoto?' team-photo':''}" data-id="${sigla}-${n}" onclick="removeFromRepeatedViaResult('${sigla}-${n}',this)">${n}</div>`;
+      const isCC = sigla === 'CC';
+      return `<div class="chip repeated${isShiny?' shiny':''}${isTeamPhoto?' team-photo':''}${isCC?' cc':''}" data-id="${sigla}-${n}" onclick="removeFromRepeatedViaResult('${sigla}-${n}',this)">${n}</div>`;
     }).join('');
     chipsHtml += `<div style="margin-bottom:10px"><div class="group-label" style="margin-bottom:4px">${sigla} · ${group?.titulo||sigla}</div><div class="chips-grid">${chips}</div></div>`;
   }
@@ -12252,6 +13116,8 @@ function renderExchangeResult(matches, resEl){
 
 function removeFromRepeatedViaResult(id, chipEl){
   if(!state.repeated[id]) return;
+  incExchangeCount();
+  setTimeout(checkTrophies, 400);
   removeRepeat(id);
   saveState();
   chipEl.style.opacity = '0.3';
@@ -12268,6 +13134,8 @@ function removeFromRepeatedViaResult(id, chipEl){
 }
 
 function markAllExchangedAsTraded(){
+  incExchangeCount();
+  setTimeout(checkTrophies, 400);
   const resEl = document.getElementById('exchange-result');
   if(!resEl._matchIds || !resEl._matchIds.length) return;
   if(!confirm(`Remover ${resEl._matchIds.length} figurinha(s) das suas repetidas?`)) return;
@@ -12364,8 +13232,8 @@ function shareSyncCodeWhatsApp(){
   if(!box || !box.value){ alert('Código não disponível.'); return; }
   window.open('https://wa.me/?text='+encodeURIComponent('📲 Meu código de sincronização do álbum Elevah:\n\n'+box.value), '_blank');
 }
-function shareMissingOnWhatsApp(){ exportMissingList(); const t=document.getElementById('missing-list-box').value; if(!t||t.startsWith('🏆')){alert('Nenhuma figurinha faltando!');return;} window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank'); }
-function shareRepeatedOnWhatsApp(){ exportRepeatedList(); const t=document.getElementById('repeated-list-box').value; if(!t||t.startsWith('😅')){alert('Nenhuma figurinha repetida.');return;} window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank'); }
+function shareMissingOnWhatsApp(){ exportMissingList(); const t=document.getElementById('missing-list-box').value; if(!t||t.startsWith('🏆')){alert('Nenhuma figurinha faltando!');return;} if(!localStorage.getItem('elevah_first_share')){localStorage.setItem('elevah_first_share','1');setTimeout(checkTrophies,400);} window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank'); }
+function shareRepeatedOnWhatsApp(){ exportRepeatedList(); const t=document.getElementById('repeated-list-box').value; if(!t||t.startsWith('😅')){alert('Nenhuma figurinha repetida.');return;} if(!localStorage.getItem('elevah_first_share')){localStorage.setItem('elevah_first_share','1');setTimeout(checkTrophies,400);} window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank'); }
 
 /* ── COPY ───────────────────────────────────────────────── */
 function copyCode(boxId){
@@ -12504,6 +13372,7 @@ function decodeQRMissing(str){
 
 function generateExchangeQR(){
   trackEvent('qr_generated');
+  if(!localStorage.getItem('elevah_first_qr')) localStorage.setItem('elevah_first_qr','1');
   let hasAny = false;
   for(const g of ALBUM_DATA)
     for(const n of g.nums)
@@ -12765,6 +13634,9 @@ function scrollToSigla(contentId, sigla){
 function filterGroups(contentId, query, inputEl){
   const q = query.trim().toUpperCase();
   if(q.length === 1) trackEvent('search_used', { tab: contentId }); // fire on first char only
+  if(q.length >= 1 && !localStorage.getItem('elevah_first_search')){
+    localStorage.setItem('elevah_first_search','1'); setTimeout(checkTrophies,400);
+  }
   const contentEl = document.getElementById(contentId);
   if(!contentEl) return;
   // (clear button removed — user selects all via onfocus to clear)
@@ -12891,5 +13763,30 @@ if('serviceWorker' in navigator){
 }
 </script>
   <div id="side-index" class="hidden"></div>
+
+<!-- ═══ INTEL MODAL ═══════════════════════════════════════ -->
+<div id="intel-modal" class="intel-modal-overlay" onclick="if(event.target===this)closeIntelModal()">
+  <div class="intel-modal-box">
+    <div class="intel-modal-header">
+      <div class="intel-modal-title" id="intel-modal-title">📈 Estatísticas do Álbum</div>
+      <button class="btn-icon" onclick="closeIntelModal()" style="font-size:.9rem;padding:4px 8px">✕</button>
+    </div>
+    <div class="intel-modal-body" id="intel-modal-body"></div>
+  </div>
+</div>
+
+
+<!-- ═══ TROPHY UNLOCK MODAL ══════════════════════════════════ -->
+<div id="trophy-unlock-overlay" class="trophy-unlock-overlay">
+  <div class="trophy-unlock-box" id="trophy-unlock-box">
+    <div class="trophy-unlock-ribbon" id="trophy-ribbon">Bronze</div>
+    <div class="trophy-unlock-icon" id="trophy-icon">🏆</div>
+    <div class="trophy-unlock-label">Troféu Desbloqueado!</div>
+    <div class="trophy-unlock-name" id="trophy-name">Nome</div>
+    <div class="trophy-unlock-desc" id="trophy-desc">Descrição</div>
+    <button class="trophy-unlock-btn" id="trophy-unlock-btn" onclick="closeTrophyModal()">Continuar</button>
+  </div>
+</div>
+
 </body>
 </html>
