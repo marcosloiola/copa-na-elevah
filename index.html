@@ -11322,7 +11322,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v66';
+const APP_VERSION = 'v67';
 const APP_DATE    = '12/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
@@ -13552,6 +13552,7 @@ function toggleDarkMode(on){
   setTimeout(updateGA4UserProperties, 100);
   document.documentElement.setAttribute('data-theme', on ? 'dark' : 'light');
   localStorage.setItem('elevah_dark', on ? '1' : '0');
+  if(on) setTimeout(checkTrophies, 400);
 }
 
 /* ── ÍNDICE LATERAL ─────────────────────────────────────── */
