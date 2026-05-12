@@ -10854,7 +10854,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         <div class="perfil-row-chevron">›</div>
       </div>
       <div class="perfil-row" onclick="openPerfilSection('perfil-batalha')">
-        <div class="perfil-row-left">⚔️ Modo Batalha</div>
+        <div class="perfil-row-left">⚔️ Mata-Mata</div>
         <div class="perfil-row-chevron">›</div>
       </div>
     </div>
@@ -11091,10 +11091,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     <button class="back-btn" onclick="goBackToPerfil()" style="margin-top:24px">← Voltar ao Perfil</button>
   </div>
 
-  <!-- Sub: Modo Batalha -->
+  <!-- Sub: Mata-Mata -->
   <div id="perfil-batalha" style="display:none">
     <button class="back-btn" onclick="goBackToPerfil()">← Voltar ao Perfil</button>
-    <div class="perfil-section-title">⚔️ Modo Batalha</div>
+    <div class="perfil-section-title">⚔️ Mata-Mata</div>
     <p class="hint" style="margin-bottom:14px">Compare seu álbum com o de um amigo — time a time, troféu a troféu.</p>
 
     <!-- Meu QR de Batalha -->
@@ -11157,7 +11157,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     <h3>✨ Figurinhas especiais</h3>
     <div class="howto-chip-demo">
       <div class="demo-chip" style="position:relative;border:1.5px solid var(--gold-d);background:linear-gradient(145deg,#FFFCEE,#FFF0C0);color:var(--gold-d)">1<span style="position:absolute;bottom:1px;right:2px;font-size:6px;color:var(--gold)">★</span></div>
-      <span class="demo-label">Brilhante (FWC + nº 1 dos países)</span>
+      <span class="demo-label">Brilhante (PANINI 00, FWC + nº 1 dos países)</span>
     </div>
     <div class="howto-chip-demo">
       <div class="demo-chip" style="border:1.5px solid #8BADC8;background:#FFF7F4;color:var(--primary-d)">13</div>
@@ -11180,7 +11180,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   </div>
   <div class="howto-sub">
     <h4>🔄 Sincronização</h4>
-    <p>Transfere todos os seus dados entre dispositivos. O código inclui: álbuns, repetidas, troféus conquistados, histórico de atividade, streak, trocas realizadas, dados pessoais e todas as flags de comportamento. Copie ou envie por WhatsApp, depois clique em <strong>Aplicar Código</strong> no outro aparelho.</p>
+    <p>Transfere <strong>todos</strong> os seus dados entre dispositivos. O código inclui: álbuns, repetidas, troféus conquistados, histórico de atividade, streak, trocas realizadas, dados pessoais, preferências de aparência, snapshots da Minha Jornada e todas as flags de comportamento. A foto do perfil fica salva apenas localmente. Copie ou envie por WhatsApp, depois clique em <strong>Aplicar Código</strong> no outro aparelho.</p>
   </div>
   <div class="howto-sub">
     <h4>🤝 Troca de Figurinhas</h4>
@@ -11209,11 +11209,24 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   </div>
   <div class="howto-sub">
     <h4>🏆 Troféus</h4>
-    <p>São 54 troféus em 4 níveis: 🥉 Bronze (24), 🥈 Prata (21), 🥇 Ouro (8) e 🏆 Platina (1). Os bloqueados mostram <em>"???"</em> — parte do desafio é descobrir como ganhar cada um. Ao conquistar um troféu, um modal aparece celebrando na hora.</p>
+    <p>São 55 troféus em 4 níveis: 🥉 Bronze (24), 🥈 Prata (21), 🥇 Ouro (9) e 🏆 Platina (1). O troféu Platina — <em>Lenda da Elevah</em> — só é conquistado ao obter todos os outros 54 troféus. Os bloqueados mostram <em>"???"</em> — parte do desafio é descobrir como ganhar cada um. Ao conquistar um troféu, um modal aparece celebrando na hora.</p>
   </div>
   <div class="howto-sub">
     <h4>⭐ Pontuação</h4>
     <p>Cada figurinha e troféu geram pontos, visíveis abaixo do seu nome no Perfil e detalhados em Minha Jornada. Figurinhas especiais valem mais: brilhantes e Coca-Cola têm multiplicadores maiores.</p>
+  </div>
+
+  <div class="howto-sub">
+    <h4>📸 Foto no Perfil</h4>
+    <p>Adicione uma foto sua diretamente no app. A foto aparece no seu Card de Progresso e no Mata-Mata ao comparar álbuns com amigos. A imagem fica salva apenas no dispositivo e não é incluída no código de sincronização.</p>
+  </div>
+  <div class="howto-sub">
+    <h4>🎨 Card de Progresso</h4>
+    <p>Gere um card personalizado com as cores da Elevah mostrando seu % do álbum, pontuação, troféus conquistados e o progresso por grupo de seleções. Inclui um QR Code apontando para o app. Compartilhe diretamente no WhatsApp ou baixe como imagem.</p>
+  </div>
+  <div class="howto-sub">
+    <h4>⚔️ Mata-Mata</h4>
+    <p>Compare seu álbum com o de um amigo time a time, grupo por grupo. Gere seu QR de Mata-Mata e peça ao amigo escanear — o comparativo aparece na hora sem precisar copiar nenhum código. Também há opção de código de texto. O Mata-Mata mostra % de cada seleção, pontuação total, número de troféus e quantos dias ativos cada um tem.</p>
   </div>
 
   <div class="howto-category" style="background:var(--friend)">👥 Álbum de Amigo</div>
@@ -11416,7 +11429,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 <!-- Battle QR Generate Modal -->
 <div class="modal-overlay" id="modal-battle-qr" onclick="closeModalOnOverlay(event,'modal-battle-qr')">
   <div class="modal-box">
-    <h3>⚔️ Meu QR de Batalha</h3>
+    <h3>⚔️ Meu QR de Mata-Mata</h3>
     <p style="font-size:.8rem;color:var(--text-light);margin-bottom:14px;text-align:center">Peça ao amigo escanear com a câmera ou com o botão "📸 Ler QR do amigo" no app dele.</p>
     <div id="battle-qr-img" class="qr-img-wrap"></div>
     <div class="modal-actions" style="gap:8px;margin-top:14px">
@@ -11434,7 +11447,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v77';
+const APP_VERSION = 'v78';
 const APP_DATE    = '12/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
@@ -12700,7 +12713,7 @@ const TROPHIES = [
     check:()=>getActivityStats().maxStreak>=3 },
   { id:'dark_mode_on',   tier:'bronze',   icon:'🌑', name:'Modo Noturno',           desc:'Ativou o modo escuro no app.',
     check:()=>localStorage.getItem('elevah_dark')==='1' },
-  { id:'first_shiny',    tier:'bronze',   icon:'✨', name:'Primeira Brilhante',     desc:'Marcou sua primeira figurinha brilhante (FWC ou nº 1 de uma seleção).',
+  { id:'first_shiny',    tier:'bronze',   icon:'✨', name:'Primeira Brilhante',     desc:'Marcou sua primeira figurinha brilhante (PANINI 00, FWC ou nº 1 de uma seleção).',
     check:()=>{
       if(localStorage.getItem('elevah_first_shiny')==='1') return true;
       const a=getActiveAlbum(); if(!a) return false;
@@ -12739,7 +12752,7 @@ const TROPHIES = [
     check:()=>localStorage.getItem('elevah_first_search')==='1' },
   { id:'first_share',    tier:'bronze',   icon:'📤', name:'Compartilhou',           desc:'Compartilhou sua lista de figurinhas via WhatsApp.',
     check:()=>localStorage.getItem('elevah_first_share')==='1' },
-  { id:'help_visited',   tier:'bronze',   icon:'📖', name:'Curioso',                desc:'Visitou a aba "Como Funciona".',
+  { id:'help_visited',   tier:'bronze',   icon:'📖', name:'Curioso',                desc:'Visitou a aba Ajuda.',
     check:()=>localStorage.getItem('elevah_help_visited')==='1' },
 
 
@@ -12747,7 +12760,7 @@ const TROPHIES = [
     check:()=>!!localStorage.getItem('elevah_photo') },
   { id:'card_generated_t', tier:'bronze', icon:'🎨', name:'Card em Mãos',          desc:'Gerou seu card de progresso pelo menos uma vez.',
     check:()=>localStorage.getItem('elevah_card_gen')==='1' },
-  { id:'first_battle_t', tier:'bronze',   icon:'⚔️', name:'Primeira Batalha',       desc:'Fez sua primeira batalha com um amigo.',
+  { id:'first_battle_t', tier:'bronze',   icon:'⚔️', name:'Primeiro Mata-Mata',     desc:'Fez seu primeiro Mata-Mata com um amigo.',
     check:()=>localStorage.getItem('elevah_first_battle')==='1' },
 
   // ── PRATA ──
@@ -12777,7 +12790,7 @@ const TROPHIES = [
   // ── OURO ──
   { id:'album_90',       tier:'gold',     icon:'🔥', name:'Quase Lá',             desc:'90% do álbum ativo preenchido.',
     check:()=>{ const a=getActiveAlbum(); return a&&pctForAlbum(a)>=90; } },
-  { id:'three_teams',    tier:'silver',   icon:'🎖️', name:'Trezentos',            desc:'Completou 3 times inteiros.',
+  { id:'three_teams',    tier:'silver',   icon:'🎖️', name:'Trinca',               desc:'Completou 3 times inteiros.',
     check:()=>{ const a=getActiveAlbum(); if(!a) return false;
       return ALBUM_DATA.filter(g=>g.grupo&&g.nums.every(n=>a.owned.has(chipId(g.sigla,n)))).length>=3; } },
   { id:'active_30',      tier:'gold',     icon:'⭐', name:'Obcecado',             desc:'30 dias ativos no app.',
@@ -12791,7 +12804,7 @@ const TROPHIES = [
   { id:'thirty_six_teams', tier:'gold',   icon:'🌐', name:'Copa das Copas',        desc:'Completou 36 times inteiros.',
     check:()=>{ const a=getActiveAlbum(); if(!a) return false;
       return ALBUM_DATA.filter(g=>g.grupo&&g.nums.every(n=>a.owned.has(chipId(g.sigla,n)))).length>=36; } },
-  { id:'all_shiny',      tier:'gold',     icon:'🌠', name:'Coleção Brilhante',      desc:'Coletou todas as figurinhas brilhantes (FWC + número 1 de cada seleção).',
+  { id:'all_shiny',      tier:'gold',     icon:'🌠', name:'Coleção Brilhante',      desc:'Coletou todas as figurinhas brilhantes (PANINI 00, FWC + número 1 de cada seleção).',
     check:()=>{ const a=getActiveAlbum(); if(!a) return false;
       const fwcOk=G_FWC&&G_FWC.nums.every(n=>a.owned.has(chipId('FWC',n)));
       const countryOk=ALBUM_DATA.filter(g=>g.grupo!==null).every(g=>a.owned.has(chipId(g.sigla,'1')));
@@ -12799,7 +12812,7 @@ const TROPHIES = [
       return fwcOk&&countryOk&&paniniOk; } },
 
   // ── PLATINA ──
-  { id:'complete',       tier:'platinum', icon:'🏆', name:'Torcedor Elevah',              desc:'Álbum 100% completo! Você é um verdadeiro Torcedor Elevah!',
+  { id:'complete',       tier:'gold',     icon:'🏆', name:'Torcedor Elevah',        desc:'Álbum 100% completo! Você é um verdadeiro Torcedor Elevah!',
     check:()=>{ const a=getActiveAlbum(); return a&&pctForAlbum(a)===100; } },
 
   // ── PRATA — 12 GRUPOS ──
@@ -12877,6 +12890,11 @@ const TROPHIES = [
     desc:'Preencheu seus dados pessoais no app.',
     check:()=>{ const d=JSON.parse(localStorage.getItem('elevah_dados')||'{}'); return !!(d.nome && (d.email||d.whatsapp)); } },
 ];
+
+  // ── PLATINA ──
+  { id:'all_trophies',   tier:'platinum', icon:'👑', name:'Lenda da Elevah',
+    desc:'Conquistou todos os outros troféus do álbum. O nível máximo.',
+    check:()=>{ const u=getUnlockedTrophies(); return TROPHIES.filter(t=>t.tier!=='platinum').every(t=>u[t.id]); } },
 
 const TIER_LABELS = { bronze:'Bronze', silver:'Prata', gold:'Ouro', platinum:'Platina' };
 const TIER_ORDER  = ['bronze','silver','gold','platinum'];
@@ -13106,8 +13124,9 @@ function ctxRR(ctx, x, y, w, h, r){
   ctx.closePath();
 }
 function drawCardOnCanvas(canvas, photoImg, qrImg){
-  const W=400, H=790, ctx=canvas.getContext('2d');
-  canvas.width=W; canvas.height=H;
+  const W=400, H=790, SCALE=2, ctx=canvas.getContext('2d');
+  canvas.width=W*SCALE; canvas.height=H*SCALE;
+  ctx.scale(SCALE,SCALE);
 
   // ── Background: warm dark brown Elevah ──
   const bg=ctx.createLinearGradient(0,0,0,H);
@@ -13420,7 +13439,7 @@ function shareBattleQRWhatsApp(){
     c.toBlob(async blob=>{
       const file=new File([blob],'batalha-qr.png',{type:'image/png'});
       if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-        try{ await navigator.share({files:[file],title:'Batalha Copa 2026',text:'⚔️ Abre no app Elevah e usa "📸 Ler QR do amigo" para comparar nossos álbuns!'}); return; }
+        try{ await navigator.share({files:[file],title:'Mata-Mata Copa 2026',text:'⚔️ Abre no app Elevah e usa "📸 Ler QR do amigo" para comparar nossos álbuns!'}); return; }
         catch(e){ if(e.name==='AbortError') return; }
       }
       const url=URL.createObjectURL(blob);
@@ -13465,10 +13484,10 @@ function handleBattleQRResult(data){
     // navigate to battle section
     const batEl=document.getElementById('perfil-batalha');
     if(batEl) batEl.scrollIntoView({behavior:'smooth',block:'start'});
-    showToast('⚔️ QR lido! Batalha iniciada.');
+    showToast('⚔️ QR lido! Mata-Mata iniciado.');
   } catch(e){
     console.error('Battle QR decode error:',e);
-    alert('❌ QR de batalha inválido. Certifique-se de usar o QR gerado pelo Elevah.');
+    alert('❌ QR de Mata-Mata inválido. Certifique-se de usar o QR gerado pelo Elevah.');
   }
 }
 
@@ -14524,7 +14543,7 @@ if(vBadge) vBadge.textContent = APP_VERSION + ' · ' + APP_DATE;
       switchTab('perfil');
       setTimeout(()=>{
         openPerfilSection('perfil-batalha');
-        setTimeout(()=>{ renderBattle(opp); showToast('⚔️ Batalha carregada via QR!'); }, 200);
+        setTimeout(()=>{ renderBattle(opp); showToast('⚔️ Mata-Mata carregado via QR!'); }, 200);
       }, 150);
     } catch(e){ console.error('Battle URL error:',e); }
   }, 400);
