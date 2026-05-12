@@ -12889,12 +12889,12 @@ const TROPHIES = [
   { id:'dados_saved', tier:'gold', icon:'👤', name:'Bem Cadastrado',
     desc:'Preencheu seus dados pessoais no app.',
     check:()=>{ const d=JSON.parse(localStorage.getItem('elevah_dados')||'{}'); return !!(d.nome && (d.email||d.whatsapp)); } },
-];
 
   // ── PLATINA ──
   { id:'all_trophies',   tier:'platinum', icon:'👑', name:'Lenda da Elevah',
     desc:'Conquistou todos os outros troféus do álbum. O nível máximo.',
     check:()=>{ const u=getUnlockedTrophies(); return TROPHIES.filter(t=>t.tier!=='platinum').every(t=>u[t.id]); } },
+];
 
 const TIER_LABELS = { bronze:'Bronze', silver:'Prata', gold:'Ouro', platinum:'Platina' };
 const TIER_ORDER  = ['bronze','silver','gold','platinum'];
