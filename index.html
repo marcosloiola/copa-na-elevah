@@ -11447,7 +11447,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v78';
+const APP_VERSION = 'v79';
 const APP_DATE    = '12/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
@@ -11621,7 +11621,7 @@ function createAlbum(name){
   const album = {id: generateId(), name: (name||'').trim() || `Álbum ${state.albums.length+1}`, owned: new Set()};
   state.albums.push(album);
   state.activeAlbumId = album.id;
-  saveState(); renderAll();
+  saveState(); renderAll(); setTimeout(checkTrophies,300);
 }
 function renameAlbum(id, newName){
   const a = getAlbumById(id);
@@ -12405,7 +12405,7 @@ function saveDadosPessoais(){
     trackEvent('dados_saved', { nome: nome ? 'sim' : 'nao', email: email ? 'sim' : 'nao', whatsapp: whatsapp ? 'sim' : 'nao' });
     checkTrophies();
     updateGA4UserProperties(); // atualiza user properties com novos dados
-  }).catch(() => showDadosStatus('✅ Dados salvos localmente.', 'success'));
+  }).catch(() => { showDadosStatus('✅ Dados salvos localmente.', 'success'); checkTrophies(); });
 }
 
 let _uidTapCount = 0, _uidTapTimer = null;
@@ -13089,6 +13089,7 @@ function handlePhotoUpload(e){
       localStorage.setItem('elevah_photo', data);
       applyUserPhoto(data);
       trackEvent('photo_uploaded');
+      setTimeout(checkTrophies,300);
       showToast('📷 Foto atualizada!');
     };
     img.src = ev.target.result;
@@ -14155,7 +14156,7 @@ function decodeQRMissing(str){
 
 function generateExchangeQR(){
   trackEvent('qr_generated');
-  if(!localStorage.getItem('elevah_first_qr')) localStorage.setItem('elevah_first_qr','1');
+  if(!localStorage.getItem('elevah_first_qr')){ localStorage.setItem('elevah_first_qr','1'); setTimeout(checkTrophies,300); }
   let hasAny = false;
   for(const g of ALBUM_DATA)
     for(const n of g.nums)
