@@ -11322,7 +11322,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v67';
+const APP_VERSION = 'v68';
 const APP_DATE    = '12/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
@@ -12769,6 +12769,23 @@ function checkTrophies(){
   }
 }
 
+// Aplica troféus silenciosamente (sem modal) — usado após importação de sync
+function checkTrophiesSilent(){
+  const unlocked = getUnlockedTrophies();
+  let changed = false;
+  for(const t of TROPHIES){
+    if(unlocked[t.id]) continue;
+    try{ if(t.check()){ unlocked[t.id]=todayStr(); changed=true; } }
+    catch(e){}
+  }
+  if(changed){
+    localStorage.setItem('elevah_trophies', JSON.stringify(unlocked));
+  }
+  updateTrophyBadge();
+  updateScoreDisplay();
+  renderTrofeus();
+}
+
 function showNextTrophyModal(){
   if(trophyQueueIdx >= trophyQueue.length) return;
   const t = trophyQueue[trophyQueueIdx];
@@ -13034,6 +13051,8 @@ function applyPayload(p){
   } else { throw new Error('invalid version'); }
   saveState(); renderAll();
   updateTrophyBadge(); updateScoreDisplay();
+  // Aplica e exibe troféus vindos do sync sem disparar o modal
+  checkTrophiesSilent();
 }
 function autoUpdateSyncCode(){
   const box = document.getElementById('export-code-box');
