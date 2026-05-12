@@ -11322,7 +11322,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v68';
+const APP_VERSION = 'v69';
 const APP_DATE    = '12/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
@@ -12916,24 +12916,48 @@ function setupDelegation(){
     const el = document.getElementById(cid);
 
     // ── TOUCH (mobile): tap = mark, long press = unmark ──────
+    // Per-container state: track which chip is pressed and touch origin
+    let _tChip = null, _tX = 0, _tY = 0;
+    const MOVE_THRESHOLD = 8; // px — beyond this = scroll, not tap
+
     el.addEventListener('touchstart', e=>{
       const chip = e.target.closest('.chip[data-id]');
-      if(chip) startLongPress(chip.dataset.id, tabType, chip);
+      if(!chip){ _tChip = null; return; }
+      _tChip = chip;
+      _tX = e.touches[0].clientX;
+      _tY = e.touches[0].clientY;
+      startLongPress(chip.dataset.id, tabType, chip);
     }, { passive: true });
-    el.addEventListener('touchmove',  e=>{ const chip = e.target.closest('.chip[data-id]'); if(chip) cancelLongPress(chip.dataset.id); }, { passive: true });
-    el.addEventListener('touchend',   e=>{
-      const chip = e.target.closest('.chip[data-id]');
-      if(!chip) return;
-      const wasLong = !pressMap[chip.dataset.id]; // already fired = long press happened
-      cancelLongPress(chip.dataset.id);
-      if(!wasLong){
-        // long press already handled doDouble — don't also doSingle
-        return;
+
+    el.addEventListener('touchmove', e=>{
+      if(!_tChip) return;
+      const dx = e.touches[0].clientX - _tX;
+      const dy = e.touches[0].clientY - _tY;
+      if(Math.abs(dx) > MOVE_THRESHOLD || Math.abs(dy) > MOVE_THRESHOLD){
+        // Finger moved too much — this is a scroll, cancel the press
+        cancelLongPress(_tChip.dataset.id);
+        _tChip = null;
       }
-      if(tabType==='missing' && state.missingShowAll && state.albums.length > 1) return;
-      doSingle(chip.dataset.id, tabType);
     }, { passive: true });
-    el.addEventListener('touchcancel',e=>{ const chip = e.target.closest('.chip[data-id]'); if(chip) cancelLongPress(chip.dataset.id); }, { passive: true });
+
+    el.addEventListener('touchend', e=>{
+      const chip = e.target.closest('.chip[data-id]');
+      if(!chip){ _tChip = null; return; }
+      const id = chip.dataset.id;
+      // hasPendingTimer = true → short tap (timer still running, long press did NOT fire)
+      // hasPendingTimer = false → long press already fired OR scroll cancelled it
+      const hasPendingTimer = !!pressMap[id];
+      cancelLongPress(id);
+      _tChip = null;
+      if(!hasPendingTimer) return; // long press or scroll — do nothing extra
+      if(tabType==='missing' && state.missingShowAll && state.albums.length > 1) return;
+      doSingle(id, tabType);
+    }, { passive: true });
+
+    el.addEventListener('touchcancel', e=>{
+      if(_tChip) cancelLongPress(_tChip.dataset.id);
+      _tChip = null;
+    }, { passive: true });
 
     // ── MOUSE (desktop): single click = mark, double click = unmark ──
     // Timer-based: wait 300ms after first click to detect double click.
