@@ -11447,7 +11447,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v79';
+const APP_VERSION = 'v80';
 const APP_DATE    = '12/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
@@ -13862,9 +13862,10 @@ function buildExchangeResultHTML(matches){
   let chipsHtml = '';
   for(const [sigla, nums] of sortedEntries){
     const group = ALBUM_DATA.find(g => g.sigla === sigla);
-    const chips = nums.map(n => {
+    const sortedNums = [...nums].sort((a,b) => parseInt(a)-parseInt(b));
+    const chips = sortedNums.map(n => {
       const isShiny = (sigla === 'FWC') || (sigla === 'PANINI') || (group?.grupo !== null && n === '1');
-      const isTeamPhoto = group?.grupo !== null && n !== '1' && parseInt(n) >= 17;
+      const isTeamPhoto = group?.grupo !== null && n === '13';
       const isCC = sigla === 'CC';
       return `<div class="chip repeated${isShiny?' shiny':''}${isTeamPhoto?' team-photo':''}${isCC?' cc':''}" data-id="${sigla}-${n}" onclick="removeFromRepeatedViaResult('${sigla}-${n}',this)">${n}</div>`;
     }).join('');
@@ -13888,7 +13889,7 @@ function renderExchangeResult(matches, resEl){
     ${chipsHtml}
     <div style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap">
       <button class="btn btn-outline" style="flex:1;min-width:120px;font-size:.78rem" onclick="generateExchangeMatchText()">📋 Gerar lista</button>
-      <button class="btn btn-outline" style="flex:1;min-width:120px;font-size:.78rem" onclick="copyCode('exchange-match-box')">📋 Copiar</button>
+      <button class="btn btn-outline" style="flex:1;min-width:120px;font-size:.78rem" onclick="copyExchangeMatchList()">📋 Copiar</button>
       <button class="btn btn-whatsapp" style="flex:1;min-width:120px;font-size:.78rem" onclick="shareExchangeMatchWhatsApp()">
         <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.554 4.121 1.522 5.857L.057 23.882a.5.5 0 0 0 .613.613l6.101-1.457A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.953 9.953 0 0 1-5.33-1.538l-.38-.23-3.938.94.957-3.854-.247-.393A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
         WhatsApp
@@ -13945,12 +13946,24 @@ function generateExchangeMatchText(){
   }
   const lines = Object.entries(byGroup)
     .sort((a,b) => (orderMap[a[0]]??999)-(orderMap[b[0]]??999))
-    .map(([sigla, nums]) => `${sigla}: ${nums.join(', ')}`);
+    .map(([sigla, nums]) => `${sigla}: ${[...nums].sort((a,b)=>parseInt(a)-parseInt(b)).join(', ')}`);
   const box = document.getElementById('exchange-match-box');
   if(box){
     box.value = `🤝 Minhas repetidas que você precisa (${resEl._matchIds.length} figurinha${resEl._matchIds.length!==1?'s':''}):\n\n` + lines.join('\n');
     box.style.display = 'block';
   }
+}
+
+function copyExchangeMatchList(){
+  generateExchangeMatchText(); // ensure list is generated
+  const box = document.getElementById('exchange-match-box');
+  if(!box || !box.value){ showToast('Nenhuma figurinha para copiar.'); return; }
+  box.style.display = 'block';
+  try{
+    navigator.clipboard.writeText(box.value).then(()=>showToast('✅ Lista copiada!')).catch(()=>{
+      box.select(); document.execCommand('copy'); showToast('✅ Lista copiada!');
+    });
+  } catch(e){ box.select(); document.execCommand('copy'); showToast('✅ Lista copiada!'); }
 }
 
 function shareExchangeMatchWhatsApp(){
