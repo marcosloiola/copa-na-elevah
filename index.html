@@ -11447,7 +11447,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v80';
+const APP_VERSION = 'v81';
 const APP_DATE    = '12/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
@@ -13925,7 +13925,7 @@ function markAllExchangedAsTraded(){
   if(!resEl._matchIds || !resEl._matchIds.length) return;
   if(!confirm(`Remover ${resEl._matchIds.length} figurinha(s) das suas repetidas?`)) return;
   for(const id of resEl._matchIds){
-    if(state.repeated[id]) delete state.repeated[id];
+    if(state.repeated[id]) removeRepeat(id);
   }
   resEl._matchIds = [];
   resEl.style.display = 'none';
