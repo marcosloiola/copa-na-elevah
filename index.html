@@ -10477,7 +10477,43 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     [data-theme="dark"] .modal-box { background:var(--bg-card); }
     [data-theme="dark"] .nav-btn.active { background:rgba(212,137,123,.2); }
 
+    [data-theme="copa"] {
+      --bg:#2d3e7f; --bg-card:#32458c; --text:#FFFFFF;
+      --text-mid:#c8d8f8; --text-light:#8aabda;
+      --border:#4a62a8; --shadow:rgba(0,0,0,.40);
+      --primary:#f0bd62; --primary-d:#e6a830;
+      --secondary:#cc7f67; --mauve:#cc7f67;
+      --mint:#3ca688; --mint-d:#4db899;
+      --gold:#f0bd62; --gold-d:#e6c25e;
+      --coral:#cc7f67; --peach:#ffb39c;
+      --friend:#a0d2b7; --friend-d:#3ca688; --friend-bg:#3a508a; --friend-border:#5070aa;
+    }
+    [data-theme="copa"] .chip:not(.owned):not(.repeated) { background:#3d52a0; color:#c8d8f8; }
+    [data-theme="copa"] .chip.shiny:not(.owned):not(.repeated) { background:linear-gradient(145deg,#f0bd62 0%,#e6a830 100%); border-color:#c8920a; color:#4A2800; }
+    [data-theme="copa"] .chip.team-photo:not(.owned):not(.repeated) { background:#3a5888; border-color:#5a7aaa; color:#c8d8f8; }
+    [data-theme="copa"] .chip.repeated { background:#cc7f67; border-color:#b86c52; color:#ffffff; }
+    [data-theme="copa"] .chip.shiny.repeated::after { opacity:.3; }
+    [data-theme="copa"] .chip.shiny.owned { border-color:#e6c25e; }
+    [data-theme="copa"] .modal-box { background:var(--bg-card); }
+    [data-theme="copa"] .nav-btn.active { color:#f0bd62; background:rgba(240,189,98,.18); }
+    [data-theme="copa"] .nav-btn.active::after { background:#f0bd62; }
+    [data-theme="copa"] #side-index { background:rgba(45,62,127,.92); }
+    [data-theme="copa"] .chip.cc:not(.owned):not(.repeated) { background:#4a1a20; border-color:#cc2030; color:#ff8090; }
+    [data-theme="copa"] .chip.cc.repeated { background:#cc7f67; border-color:#b86c52; color:#fff; opacity:.8; }
+
     /* ── BUSCA POR SIGLA ─────────────────────────── */
+    .theme-selector { display:flex; flex-direction:column; gap:8px; margin-top:4px; }
+    .theme-btn { display:flex; align-items:center; gap:10px; padding:11px 14px; border-radius:var(--radius-sm); border:2px solid var(--border); background:var(--bg-card); color:var(--text-mid); font-size:.88rem; font-weight:600; cursor:pointer; text-align:left; transition:all .2s; width:100%; }
+    .theme-btn:active { transform:scale(.98); }
+    .theme-btn.active { border-color:var(--primary); color:var(--primary-d); background:var(--bg); }
+    .theme-btn .theme-icon { font-size:1.2rem; min-width:24px; }
+    .theme-btn .theme-info { display:flex; flex-direction:column; gap:1px; }
+    .theme-btn .theme-name { font-size:.88rem; font-weight:700; }
+    .theme-btn .theme-desc { font-size:.72rem; color:var(--text-light); font-weight:400; }
+    .theme-btn.active .theme-desc { color:var(--primary-d); opacity:.75; }
+    .theme-preview { display:flex; gap:4px; margin-left:auto; }
+    .theme-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
+
     .search-wrap { position:relative; margin-bottom:10px; }
     .search-input {
       width:100%; padding:9px 12px 9px 36px; border-radius:var(--radius-sm);
@@ -10915,9 +10951,25 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   <div id="perfil-appearance" style="display:none">
     <button class="back-btn" onclick="goBackToPerfil()">← Voltar ao Perfil</button>
     <div class="perfil-section-title">Aparência</div>
-    <div class="toggle-row">
-      <div><div class="toggle-label">🌙 Modo escuro</div><div class="toggle-sub">Tema escuro para uso noturno</div></div>
-      <label class="toggle-switch"><input type="checkbox" id="toggle-dark" onchange="toggleDarkMode(this.checked)"><span class="toggle-slider"></span></label>
+    <div style="margin-bottom:16px">
+      <div class="toggle-label" style="margin-bottom:8px">🎨 Tema visual</div>
+      <div class="theme-selector">
+        <button class="theme-btn" data-theme-val="elevah" onclick="setTheme('elevah')">
+          <span class="theme-icon">☀️</span>
+          <span class="theme-info"><span class="theme-name">Modo Elevah</span><span class="theme-desc">Tema claro padrão da Elevah</span></span>
+          <span class="theme-preview"><span class="theme-dot" style="background:#FFF3E3;border:1.5px solid #D4897B"></span><span class="theme-dot" style="background:#D4897B"></span><span class="theme-dot" style="background:#A0D2B7"></span></span>
+        </button>
+        <button class="theme-btn" data-theme-val="dark" onclick="setTheme('dark')">
+          <span class="theme-icon">🌙</span>
+          <span class="theme-info"><span class="theme-name">Modo Escuro</span><span class="theme-desc">Tema escuro para uso noturno</span></span>
+          <span class="theme-preview"><span class="theme-dot" style="background:#1E1612;border:1.5px solid #3D2E25"></span><span class="theme-dot" style="background:#D4897B"></span><span class="theme-dot" style="background:#2D6B4F"></span></span>
+        </button>
+        <button class="theme-btn" data-theme-val="copa" onclick="setTheme('copa')">
+          <span class="theme-icon">⚽</span>
+          <span class="theme-info"><span class="theme-name">Modo Copa</span><span class="theme-desc">Azul copa do mundo com acentos dourados</span></span>
+          <span class="theme-preview"><span class="theme-dot" style="background:#32458c;border:1.5px solid #4a62a8"></span><span class="theme-dot" style="background:#f0bd62"></span><span class="theme-dot" style="background:#3ca688"></span></span>
+        </button>
+      </div>
     </div>
     <div class="toggle-row">
       <div><div class="toggle-label">📑 Índice lateral</div><div class="toggle-sub">Atalho de siglas no lado direito das listas</div></div>
@@ -11447,7 +11499,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v81';
+const APP_VERSION = 'v82';
 const APP_DATE    = '12/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
@@ -12289,9 +12341,12 @@ function openPerfilSection(sectionId){
   if(sectionId==='perfil-card'){ document.getElementById('card-preview-img').style.display='none'; document.getElementById('card-share-btns').style.display='none'; }
   if(sectionId==='perfil-batalha'){ document.getElementById('batalha-result').style.display='none'; document.getElementById('batalha-code-input').value=''; }
   if(sectionId==='perfil-appearance'){
-    const darkCb = document.getElementById('toggle-dark');
+    const currentTheme = localStorage.getItem('elevah_theme') ||
+      (document.documentElement.getAttribute('data-theme')==='dark' ? 'dark' : 'elevah');
+    document.querySelectorAll('.theme-btn[data-theme-val]').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.themeVal === currentTheme);
+    });
     const sideCb = document.getElementById('toggle-sideindex');
-    if(darkCb) darkCb.checked = document.documentElement.getAttribute('data-theme')==='dark';
     if(sideCb) sideCb.checked = _sideIndexEnabled;
   }
   // Track section view in GA4
@@ -13725,6 +13780,7 @@ function getPayload(){
     mrkFriend:  localStorage.getItem('elevah_marked_friend')||'',
     dados:      JSON.parse(localStorage.getItem('elevah_dados')||'{}'),
     // Flags de troféus e comportamento
+    themeMode:  localStorage.getItem('elevah_theme')||'',
     darkMode:   localStorage.getItem('elevah_dark')||'',
     fstShiny:   localStorage.getItem('elevah_first_shiny')||'',
     fstCC:      localStorage.getItem('elevah_first_cc')||'',
@@ -13776,6 +13832,7 @@ function applyPayload(p){
       if(p.dados && Object.keys(p.dados).length)
         localStorage.setItem('elevah_dados', JSON.stringify(p.dados));
       // Flags de troféus e comportamento
+      if(p.themeMode){ localStorage.setItem('elevah_theme', p.themeMode); }
       if(p.darkMode)    localStorage.setItem('elevah_dark',          p.darkMode);
       if(p.fstShiny)    localStorage.setItem('elevah_first_shiny',   p.fstShiny);
       if(p.fstCC)       localStorage.setItem('elevah_first_cc',      p.fstCC);
@@ -13809,8 +13866,9 @@ function applyPayload(p){
   saveState(); renderAll();
   updateTrophyBadge(); updateScoreDisplay();
   // Aplica dark mode visualmente
-  if(p.darkMode==='1') document.documentElement.setAttribute('data-theme','dark');
-  else if(p.darkMode==='0') document.documentElement.setAttribute('data-theme','light');
+  if(p.themeMode) setTheme(p.themeMode);
+  else if(p.darkMode==='1') setTheme('dark');
+  else if(p.darkMode==='0') setTheme('elevah');
   // Aplica preferência de índice lateral
   if(p.sideIndex!==undefined && p.sideIndex!==''){
     _sideIndexEnabled = p.sideIndex!=='0';
@@ -14351,13 +14409,20 @@ function processQRResult(data){
 }
 
 /* ── DARK MODE ──────────────────────────────────────────── */
-function toggleDarkMode(on){
-  trackEvent('dark_mode_toggled', { enabled: on });
+function setTheme(theme){
+  trackEvent('theme_changed', { theme });
+  const attr = theme === 'elevah' ? 'light' : theme;
+  document.documentElement.setAttribute('data-theme', attr);
+  localStorage.setItem('elevah_theme', theme);
+  localStorage.setItem('elevah_dark', theme === 'dark' ? '1' : '0');
+  // Update selector UI
+  document.querySelectorAll('.theme-btn[data-theme-val]').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.themeVal === theme);
+  });
   setTimeout(updateGA4UserProperties, 100);
-  document.documentElement.setAttribute('data-theme', on ? 'dark' : 'light');
-  localStorage.setItem('elevah_dark', on ? '1' : '0');
-  if(on) setTimeout(checkTrophies, 400);
+  if(theme === 'dark') setTimeout(checkTrophies, 400);
 }
+function toggleDarkMode(on){ setTheme(on ? 'dark' : 'elevah'); }
 
 /* ── ÍNDICE LATERAL ─────────────────────────────────────── */
 let _sideIndexEnabled = true;
@@ -14526,8 +14591,13 @@ function importBackup(inputEl){
 /* ── INIT ───────────────────────────────────────────────── */
 // Load appearance prefs BEFORE first render
 (function initAppearance(){
-  const dark = localStorage.getItem('elevah_dark') === '1';
-  if(dark) document.documentElement.setAttribute('data-theme','dark');
+  const savedTheme = localStorage.getItem('elevah_theme');
+  if(savedTheme){
+    document.documentElement.setAttribute('data-theme', savedTheme === 'elevah' ? 'light' : savedTheme);
+  } else {
+    const dark = localStorage.getItem('elevah_dark') === '1';
+    if(dark) document.documentElement.setAttribute('data-theme','dark');
+  }
   const sideOff = localStorage.getItem('elevah_sideindex') === '0';
   _sideIndexEnabled = !sideOff;
 })();
