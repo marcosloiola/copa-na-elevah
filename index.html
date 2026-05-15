@@ -10500,6 +10500,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     [data-theme="copa"] #side-index { background:rgba(45,62,127,.92); }
     [data-theme="copa"] .chip.cc:not(.owned):not(.repeated) { background:#4a1a20; border-color:#cc2030; color:#ff8090; }
     [data-theme="copa"] .chip.cc.repeated { background:#cc7f67; border-color:#b86c52; color:#fff; opacity:.8; }
+    [data-theme="copa"] .code-box,
+    [data-theme="copa"] textarea.code-box { background:#1e2d5a !important; color:#e0ecff !important; border-color:#4a62a8; }
+    [data-theme="copa"] .code-box::placeholder { color:#6888bb; }
 
     /* ── BUSCA POR SIGLA ─────────────────────────── */
     .theme-selector { display:flex; flex-direction:column; gap:8px; margin-top:4px; }
@@ -11499,7 +11502,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v82';
+const APP_VERSION = 'v83';
 const APP_DATE    = '12/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
@@ -12327,6 +12330,7 @@ function confirmDeleteFriend(){
 }
 
 function openPerfilSection(sectionId){
+  document.querySelector('.app-main').scrollTop = 0;
   document.getElementById('perfil-main').style.display = 'none';
   ['perfil-dados','perfil-albuns','perfil-sync','perfil-exchange','perfil-export','perfil-danger','perfil-appearance','perfil-jornada','perfil-trofeus','perfil-card','perfil-batalha'].forEach(id=>{
     const el = document.getElementById(id); if(el) el.style.display = 'none';
@@ -13745,6 +13749,7 @@ function switchTab(id){
   document.getElementById('tab-'+id).classList.add('active');
   document.querySelector(`.nav-btn[data-tab="${id}"]`).classList.add('active');
   document.querySelector('.app-main').scrollTop = 0;
+  if(id==='perfil') goBackToPerfil();
   // clear search fields when switching tab
   ['search-list','search-missing','search-repeated'].forEach(id=>{
     const el=document.getElementById(id); if(el && el.value){ el.value=''; }
@@ -14091,9 +14096,20 @@ function shareMissingOnWhatsApp(){ exportMissingList(); const t=document.getElem
 function shareRepeatedOnWhatsApp(){ exportRepeatedList(); const t=document.getElementById('repeated-list-box').value; if(!t||t.startsWith('😅')){alert('Nenhuma figurinha repetida.');return;} if(!localStorage.getItem('elevah_first_share')){localStorage.setItem('elevah_first_share','1');setTimeout(checkTrophies,400);} window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank'); }
 
 /* ── COPY ───────────────────────────────────────────────── */
+const _copyAutoGen = {
+  'exchange-out-box': ()=>generateExchangeCode(),
+  'missing-list-box': ()=>exportMissingList(),
+  'repeated-list-box': ()=>exportRepeatedList(),
+  'export-code-box': ()=>autoUpdateSyncCode(),
+};
 function copyCode(boxId){
-  const box=document.getElementById(boxId); const text=box.value;
-  if(!text){alert('Gere o conteúdo primeiro.');return;}
+  const box=document.getElementById(boxId);
+  // Auto-generate if box is empty or has placeholder text
+  if(!box.value || box.value.startsWith('Clique') || box.value.startsWith('Atualizado')){
+    if(_copyAutoGen[boxId]) _copyAutoGen[boxId]();
+  }
+  const text=box.value;
+  if(!text){showToast('⚠️ Nada para copiar.');return;}
   if(navigator.clipboard){ navigator.clipboard.writeText(text).then(()=>showCopyFeedback(boxId)).catch(()=>fallbackCopy(box)); }
   else fallbackCopy(box);
 }
