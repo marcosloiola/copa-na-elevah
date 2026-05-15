@@ -10389,7 +10389,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     .exchange-result.no-match h4 { color:var(--text-light); }
 
     /* ─── Toast ── */
-    .celebration-toast { position:fixed; top:80px; left:50%; transform:translateX(-50%) translateY(-16px); background:var(--bg-card); border:2px solid var(--mint-d); border-radius:var(--radius); padding:12px 24px; font-size:.95rem; font-weight:700; color:var(--mint-d); box-shadow:0 4px 24px var(--shadow); z-index:9998; opacity:0; transition:opacity .25s, transform .25s; white-space:nowrap; pointer-events:none; }
+    .celebration-toast { position:fixed; top:80px; left:50%; transform:translateX(-50%) translateY(-16px); background:var(--bg-card); border:2px solid var(--mint-d); border-radius:var(--radius); padding:12px 20px; font-size:.88rem; font-weight:700; color:var(--mint-d); box-shadow:0 4px 24px var(--shadow); z-index:9998; opacity:0; transition:opacity .25s, transform .25s; white-space:normal; word-break:break-word; max-width:88vw; text-align:center; pointer-events:none; }
     .celebration-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
     /* ─── Modals ── */
@@ -10638,7 +10638,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     [data-theme="franca"] .chip.shiny:not(.owned):not(.repeated) { background:linear-gradient(145deg,#ffcc00,#e6b800); border-color:#ccaa00; color:#4A2800; }
     [data-theme="franca"] .nav-btn.active { color:#EF4135; background:rgba(239,65,53,.2); }
     [data-theme="franca"] .nav-btn.active::after { background:#EF4135; }
-    [data-theme="franca"] #side-index { background:rgba(0,31,107,.92); }
+    [data-theme="franca"] #side-index { background:rgba(0,5,18,.96); }
+    [data-theme="franca"] #side-index .sigla-item { color:#b0c8f8; }
+    [data-theme="franca"] #side-index .sigla-item:hover { background:rgba(239,65,53,.25); color:#ffffff; }
     [data-theme="franca"] .code-box, [data-theme="franca"] textarea.code-box { background:#001040 !important; color:#b0c8f8 !important; border-color:#1a3f9e; }
     [data-theme="franca"] .modal-box { background:var(--bg-card); }
     [data-theme="franca"] .chip.cc:not(.owned):not(.repeated) { background:#2a0a10; border-color:#EF4135; color:#ff8877; }
@@ -10662,7 +10664,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     [data-theme="espanha"] .chip.shiny:not(.owned):not(.repeated) { background:linear-gradient(145deg,#ffcc00,#e6b500); border-color:#cc9a00; color:#4A2800; }
     [data-theme="espanha"] .nav-btn.active { color:#ffcc00; background:rgba(255,204,0,.2); }
     [data-theme="espanha"] .nav-btn.active::after { background:#ffcc00; }
-    [data-theme="espanha"] #side-index { background:rgba(139,0,0,.92); }
+    [data-theme="espanha"] #side-index { background:rgba(12,4,4,.96); }
+    [data-theme="espanha"] #side-index .sigla-item { color:#ffd0c0; }
+    [data-theme="espanha"] #side-index .sigla-item:hover { background:rgba(255,204,0,.2); color:#ffcc00; }
     [data-theme="espanha"] .code-box, [data-theme="espanha"] textarea.code-box { background:#5a0000 !important; color:#ffd0c0 !important; border-color:#cc2020; }
     [data-theme="espanha"] .modal-box { background:var(--bg-card); }
     [data-theme="espanha"] .chip.cc:not(.owned):not(.repeated) { background:#2a0a10; border-color:#ffcc00; color:#ffe080; }
@@ -10688,7 +10692,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     [data-theme="inglaterra"] .nav-btn { color:#002C5F; }
     [data-theme="inglaterra"] .nav-btn.active { color:#C8102E; background:rgba(200,16,46,.1); }
     [data-theme="inglaterra"] .nav-btn.active::after { background:#C8102E; }
-    [data-theme="inglaterra"] #side-index { background:rgba(0,44,95,.94); }
+    [data-theme="inglaterra"] #side-index { background:rgba(245,248,252,.97); }
+    [data-theme="inglaterra"] #side-index .sigla-item { color:#002C5F; }
+    [data-theme="inglaterra"] #side-index .sigla-item:hover { background:rgba(200,16,46,.12); color:#C8102E; }
     [data-theme="inglaterra"] .code-box, [data-theme="inglaterra"] textarea.code-box { background:#002C5F !important; color:#dde6f0 !important; border-color:#aabbd0; }
     [data-theme="inglaterra"] .modal-box { background:#ffffff; }
     [data-theme="inglaterra"] .chip.cc:not(.owned):not(.repeated) { background:#2a0a10; border-color:#C8102E; color:#ff8888; }
@@ -11777,7 +11783,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v88';
+const APP_VERSION = 'v89';
 const APP_DATE    = '12/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
@@ -14746,7 +14752,7 @@ function toggleDarkMode(on){ setTheme(on ? 'dark' : 'elevah'); }
 
 /* ── ÍNDICE LATERAL ─────────────────────────────────────── */
 let _sideIndexEnabled = true;
-const _PSYCHO_SEQ = ['BRA','GER','ARG','URU','FRA','ESP','ING'];
+const _PSYCHO_SEQ = ['BRA','GER','ARG','URU','FRA','ESP','ENG'];
 let _psychoClickSeq = [];
 function toggleSideIndex(on){
   _sideIndexEnabled = on;
