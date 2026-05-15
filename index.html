@@ -10361,7 +10361,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     .btn-primary { background:var(--primary); color:#fff; }
     .btn-gold    { background:var(--gold); color:#4A2800; }
     .btn-mint    { background:var(--mint); color:#1E4D36; }
-    .btn-danger  { background:#e74c3c; color:#fff; }
+    .btn-danger  { background:#e74c3c; color:#fff; border-color:rgba(0,0,0,.2) !important; }
     .btn-outline { background:transparent; border:2px solid var(--primary); color:var(--primary); }
     .btn-whatsapp { background:#25D366; color:#fff; }
     .btn-friend  { background:var(--friend); color:#fff; }
@@ -10500,9 +10500,242 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     [data-theme="copa"] #side-index { background:rgba(45,62,127,.92); }
     [data-theme="copa"] .chip.cc:not(.owned):not(.repeated) { background:#4a1a20; border-color:#cc2030; color:#ff8090; }
     [data-theme="copa"] .chip.cc.repeated { background:#cc7f67; border-color:#b86c52; color:#fff; opacity:.8; }
+    [data-theme="copa"] .album-item.is-active { background:#2d5e44; border-color:#3ca688; }
+    [data-theme="copa"] .album-item.is-active .album-item-name { color:#ffffff; }
+    [data-theme="copa"] .album-item.is-active .album-item-pct { color:#a0d2b7; }
     [data-theme="copa"] .code-box,
     [data-theme="copa"] textarea.code-box { background:#1e2d5a !important; color:#e0ecff !important; border-color:#4a62a8; }
     [data-theme="copa"] .code-box::placeholder { color:#6888bb; }
+
+
+    /* ═══════════ SELEÇÕES CAMPEÃS ═══════════ */
+
+    /* ── BRASIL ─────────────────────────────────────── */
+    [data-theme="brasil"] {
+      --bg:#0e3d1e; --bg-card:#1a5228;
+      --text:#ffffff; --text-mid:#b8eecc; --text-light:#70aa80;
+      --border:#2a6e3a; --shadow:rgba(0,0,0,.45);
+      --primary:#FFD600; --primary-d:#ccac00;
+      --secondary:#1b4dcc; --mauve:#1540b0;
+      --mint:#4488ee; --mint-d:#3370dd;
+      --gold:#FFD600; --gold-d:#ccac00;
+      --coral:#FFD600; --peach:#ffe580;
+      --friend-bg:#1a2e58; --friend-border:#2a4a88; --friend-d:#7ab0f0;
+    }
+    [data-theme="brasil"] .chip:not(.owned):not(.repeated) { background:#1a4a28; color:#b8eecc; border-color:#2a6e3a; }
+    [data-theme="brasil"] .chip.owned { color:#001840; }
+    [data-theme="brasil"] .chip.repeated { background:#FFD600; border-color:#ccac00; color:#4A2800; }
+    [data-theme="brasil"] .chip.shiny:not(.owned):not(.repeated) { background:linear-gradient(145deg,#FFD600,#ccac00); border-color:#a88000; color:#4A2800; }
+    [data-theme="brasil"] .nav-btn.active { color:#FFD600; background:rgba(255,214,0,.15); }
+    [data-theme="brasil"] .nav-btn.active::after { background:#FFD600; }
+    [data-theme="brasil"] #side-index { background:rgba(14,61,30,.92); }
+    [data-theme="brasil"] .code-box, [data-theme="brasil"] textarea.code-box { background:#0a2a12 !important; color:#b8eecc !important; border-color:#2a6e3a; }
+    [data-theme="brasil"] .code-box::placeholder { color:#4a8050; }
+    [data-theme="brasil"] .modal-box { background:var(--bg-card); }
+    [data-theme="brasil"] .chip.cc:not(.owned):not(.repeated) { background:#2a0a10; border-color:#ee2030; color:#ff6080; }
+    [data-theme="brasil"] .chip.cc.repeated { background:#FFD600; border-color:#ccac00; color:#4A2800; opacity:.8; }
+    [data-theme="brasil"] .album-item.is-active { background:#1a3a80; border-color:#4488ee; }
+
+    /* ── ALEMANHA ─────────────────────────────────────── */
+    [data-theme="alemanha"] {
+      --bg:#1a1a1a; --bg-card:#262626;
+      --text:#ffffff; --text-mid:#cccccc; --text-light:#888888;
+      --border:#3a3a3a; --shadow:rgba(0,0,0,.55);
+      --primary:#DD0000; --primary-d:#bb0000;
+      --secondary:#ffce00; --mauve:#cc1010;
+      --mint:#ffce00; --mint-d:#e6b800;
+      --gold:#ffce00; --gold-d:#e6b800;
+      --coral:#DD0000; --peach:#ff6666;
+      --friend-bg:#1a1a2e; --friend-border:#2a2a5a; --friend-d:#8080cc;
+    }
+    [data-theme="alemanha"] .chip:not(.owned):not(.repeated) { background:#2a2a2a; color:#cccccc; border-color:#3a3a3a; }
+    [data-theme="alemanha"] .chip.owned { color:#4A2800; }
+    [data-theme="alemanha"] .chip.repeated { background:#DD0000; border-color:#aa0000; color:#fff; }
+    [data-theme="alemanha"] .chip.shiny:not(.owned):not(.repeated) { background:linear-gradient(145deg,#ffce00,#e6b800); border-color:#ccaa00; color:#4A2800; }
+    [data-theme="alemanha"] .nav-btn.active { color:#ffce00; background:rgba(255,206,0,.15); }
+    [data-theme="alemanha"] .nav-btn.active::after { background:#ffce00; }
+    [data-theme="alemanha"] #side-index { background:rgba(26,26,26,.95); }
+    [data-theme="alemanha"] .code-box, [data-theme="alemanha"] textarea.code-box { background:#111111 !important; color:#cccccc !important; border-color:#3a3a3a; }
+    [data-theme="alemanha"] .modal-box { background:var(--bg-card); }
+    [data-theme="alemanha"] .chip.cc:not(.owned):not(.repeated) { background:#2a0000; border-color:#dd0000; color:#ff6666; }
+    [data-theme="alemanha"] .chip.cc.repeated { background:#DD0000; border-color:#aa0000; color:#fff; opacity:.8; }
+    [data-theme="alemanha"] .album-item.is-active { background:#3a3000; border-color:#ffce00; }
+
+    /* ── ARGENTINA ─────────────────────────────────────── */
+    [data-theme="argentina"] {
+      --bg:#43A1D5; --bg-card:#e8f4fc;
+      --text:#001a30; --text-mid:#0d3a60; --text-light:#1a5a8a;
+      --border:rgba(0,40,80,.22); --shadow:rgba(0,0,0,.15);
+      --primary:#43A1D5; --primary-d:#2e8bc0;
+      --secondary:#f5dc00; --mauve:#2e8bc0;
+      --mint:#f5dc00; --mint-d:#d4bc00;
+      --gold:#f5dc00; --gold-d:#d4bc00;
+      --coral:#43A1D5; --peach:#b8def5;
+      --friend-bg:#d0eaf8; --friend-border:rgba(0,40,80,.15); --friend-d:#001a30;
+    }
+    [data-theme="argentina"] .chip:not(.owned):not(.repeated) { background:#b8def5; color:#001a30; border-color:#7bbede; }
+    [data-theme="argentina"] .chip.owned { color:#1a3a00; }
+    [data-theme="argentina"] .chip.repeated { background:#f5dc00; border-color:#d4bc00; color:#2a1a00; }
+    [data-theme="argentina"] .chip.shiny:not(.owned):not(.repeated) { background:linear-gradient(145deg,#f5dc00,#d4bc00); border-color:#b8a000; color:#4A2800; }
+    [data-theme="argentina"] .nav-btn { color:#001a30; }
+    [data-theme="argentina"] .nav-btn.active { color:#001a30; background:rgba(255,255,255,.4); }
+    [data-theme="argentina"] .nav-btn.active::after { background:#001a30; }
+    [data-theme="argentina"] #side-index { background:rgba(0,26,48,.92); }
+    [data-theme="argentina"] .code-box, [data-theme="argentina"] textarea.code-box { background:#001a30 !important; color:#b8def5 !important; border-color:#2e8bc0; }
+    [data-theme="argentina"] .modal-box { background:#ffffff; }
+    [data-theme="argentina"] .chip.cc:not(.owned):not(.repeated) { background:#2a0a10; border-color:#dd2030; color:#ff8090; }
+    [data-theme="argentina"] .chip.cc.repeated { background:#f5dc00; border-color:#d4bc00; color:#2a1a00; opacity:.8; }
+    [data-theme="argentina"] .album-item.is-active { background:#fff8d0; border-color:#d4bc00; }
+    [data-theme="argentina"] .app-header, [data-theme="argentina"] .app-nav { background:#43A1D5; }
+    [data-theme="argentina"] .app-header h1, [data-theme="argentina"] .app-header .header-right button { color:#001a30; }
+    [data-theme="argentina"] .theme-btn.active { background:#ffffff; border-color:#001a30; color:#001a30; }
+    [data-theme="argentina"] .theme-btn.active .theme-desc { color:#1a5a8a; opacity:1; }
+
+    /* ── URUGUAI ─────────────────────────────────────── */
+    [data-theme="uruguai"] {
+      --bg:#55B5E5; --bg-card:#e8f6fc;
+      --text:#000000; --text-mid:#0a2a40; --text-light:#1a5070;
+      --border:rgba(0,40,70,.22); --shadow:rgba(0,0,0,.15);
+      --primary:#55B5E5; --primary-d:#3a9ed0;
+      --secondary:#FFC905; --mauve:#3a9ed0;
+      --mint:#FFC905; --mint-d:#e0b000;
+      --gold:#FFC905; --gold-d:#e0b000;
+      --coral:#D8000F; --peach:#ffa0a0;
+      --friend-bg:#cceef8; --friend-border:rgba(0,40,70,.15); --friend-d:#000000;
+    }
+    [data-theme="uruguai"] .chip:not(.owned):not(.repeated) { background:#b0dff5; color:#000000; border-color:#70c0e8; }
+    [data-theme="uruguai"] .chip.owned { color:#1a3a00; }
+    [data-theme="uruguai"] .chip.repeated { background:#FFC905; border-color:#e0b000; color:#2a1a00; }
+    [data-theme="uruguai"] .chip.shiny:not(.owned):not(.repeated) { background:linear-gradient(145deg,#FFC905,#e0b000); border-color:#c09800; color:#2A1800; }
+    [data-theme="uruguai"] .nav-btn { color:#000000; }
+    [data-theme="uruguai"] .nav-btn.active { color:#000000; background:rgba(255,255,255,.4); }
+    [data-theme="uruguai"] .nav-btn.active::after { background:#000000; }
+    [data-theme="uruguai"] #side-index { background:rgba(0,26,48,.92); }
+    [data-theme="uruguai"] .code-box, [data-theme="uruguai"] textarea.code-box { background:#001a30 !important; color:#b0dff5 !important; border-color:#3a9ed0; }
+    [data-theme="uruguai"] .modal-box { background:#ffffff; }
+    [data-theme="uruguai"] .chip.cc:not(.owned):not(.repeated) { background:#2a0a10; border-color:#D8000F; color:#ff8090; }
+    [data-theme="uruguai"] .chip.cc.repeated { background:#FFC905; border-color:#e0b000; color:#2a1a00; opacity:.8; }
+    [data-theme="uruguai"] .album-item.is-active { background:#fff8cc; border-color:#e0b000; }
+    [data-theme="uruguai"] .app-header, [data-theme="uruguai"] .app-nav { background:#55B5E5; }
+    [data-theme="uruguai"] .app-header h1, [data-theme="uruguai"] .app-header .header-right button { color:#000000; }
+    [data-theme="uruguai"] .theme-btn.active { background:#ffffff; border-color:#000000; color:#000000; }
+    [data-theme="uruguai"] .theme-btn.active .theme-desc { color:#1a5070; opacity:1; }
+
+    /* ── FRANÇA ─────────────────────────────────────── */
+    [data-theme="franca"] {
+      --bg:#001f6b; --bg-card:#00298e;
+      --text:#ffffff; --text-mid:#b0c8f8; --text-light:#6088d8;
+      --border:#1a3f9e; --shadow:rgba(0,0,0,.45);
+      --primary:#EF4135; --primary-d:#cc3028;
+      --secondary:#ffffff; --mauve:#cc3028;
+      --mint:#3ca688; --mint-d:#4db899;
+      --gold:#ffcc00; --gold-d:#e6b800;
+      --coral:#EF4135; --peach:#ff8877;
+      --friend-bg:#1a2540; --friend-border:#2a3a60; --friend-d:#90b8f0;
+    }
+    [data-theme="franca"] .chip:not(.owned):not(.repeated) { background:#001f6b; color:#b0c8f8; border-color:#1a3f9e; }
+    [data-theme="franca"] .chip.repeated { background:#EF4135; border-color:#cc3028; color:#fff; }
+    [data-theme="franca"] .chip.shiny:not(.owned):not(.repeated) { background:linear-gradient(145deg,#ffcc00,#e6b800); border-color:#ccaa00; color:#4A2800; }
+    [data-theme="franca"] .nav-btn.active { color:#EF4135; background:rgba(239,65,53,.2); }
+    [data-theme="franca"] .nav-btn.active::after { background:#EF4135; }
+    [data-theme="franca"] #side-index { background:rgba(0,31,107,.92); }
+    [data-theme="franca"] .code-box, [data-theme="franca"] textarea.code-box { background:#001040 !important; color:#b0c8f8 !important; border-color:#1a3f9e; }
+    [data-theme="franca"] .modal-box { background:var(--bg-card); }
+    [data-theme="franca"] .chip.cc:not(.owned):not(.repeated) { background:#2a0a10; border-color:#EF4135; color:#ff8877; }
+    [data-theme="franca"] .chip.cc.repeated { background:#EF4135; border-color:#cc3028; color:#fff; opacity:.8; }
+    [data-theme="franca"] .album-item.is-active { background:#1a3a18; border-color:#3ca688; }
+
+    /* ── ESPANHA ─────────────────────────────────────── */
+    [data-theme="espanha"] {
+      --bg:#8b0000; --bg-card:#a80000;
+      --text:#ffffff; --text-mid:#ffd0c0; --text-light:#e09080;
+      --border:#cc2020; --shadow:rgba(0,0,0,.45);
+      --primary:#ffcc00; --primary-d:#e6b500;
+      --secondary:#cc2020; --mauve:#aa1010;
+      --mint:#3ca688; --mint-d:#4db899;
+      --gold:#ffcc00; --gold-d:#e6b500;
+      --coral:#ffcc00; --peach:#ffe080;
+      --friend-bg:#2a1010; --friend-border:#4a2020; --friend-d:#f09090;
+    }
+    [data-theme="espanha"] .chip:not(.owned):not(.repeated) { background:#7a0000; color:#ffd0c0; border-color:#cc2020; }
+    [data-theme="espanha"] .chip.repeated { background:#ffcc00; border-color:#e6b500; color:#4A2800; }
+    [data-theme="espanha"] .chip.shiny:not(.owned):not(.repeated) { background:linear-gradient(145deg,#ffcc00,#e6b500); border-color:#cc9a00; color:#4A2800; }
+    [data-theme="espanha"] .nav-btn.active { color:#ffcc00; background:rgba(255,204,0,.2); }
+    [data-theme="espanha"] .nav-btn.active::after { background:#ffcc00; }
+    [data-theme="espanha"] #side-index { background:rgba(139,0,0,.92); }
+    [data-theme="espanha"] .code-box, [data-theme="espanha"] textarea.code-box { background:#5a0000 !important; color:#ffd0c0 !important; border-color:#cc2020; }
+    [data-theme="espanha"] .modal-box { background:var(--bg-card); }
+    [data-theme="espanha"] .chip.cc:not(.owned):not(.repeated) { background:#2a0a10; border-color:#ffcc00; color:#ffe080; }
+    [data-theme="espanha"] .chip.cc.repeated { background:#ffcc00; border-color:#e6b500; color:#4A2800; opacity:.8; }
+    [data-theme="espanha"] .album-item.is-active { background:#1a3a20; border-color:#3ca688; }
+
+    /* ── INGLATERRA ─────────────────────────────────────── */
+    [data-theme="inglaterra"] {
+      --bg:#FFFFFF; --bg-card:#f0f4f8;
+      --text:#002C5F; --text-mid:#003880; --text-light:#1a5090;
+      --border:rgba(0,44,95,.2); --shadow:rgba(0,0,0,.12);
+      --primary:#C8102E; --primary-d:#a00c24;
+      --secondary:#002C5F; --mauve:#a00c24;
+      --mint:#C8102E; --mint-d:#a00c24;
+      --gold:#f0c040; --gold-d:#d4a830;
+      --coral:#C8102E; --peach:#ffa0a8;
+      --friend-bg:#e8eef6; --friend-border:rgba(0,44,95,.15); --friend-d:#002C5F;
+    }
+    [data-theme="inglaterra"] .chip:not(.owned):not(.repeated) { background:#dde6f0; color:#002C5F; border-color:#aabbd0; }
+    [data-theme="inglaterra"] .chip.owned { color:#1a3a00; }
+    [data-theme="inglaterra"] .chip.repeated { background:#C8102E; border-color:#a00c24; color:#ffffff; }
+    [data-theme="inglaterra"] .chip.shiny:not(.owned):not(.repeated) { background:linear-gradient(145deg,#f0c040,#d4a830); border-color:#b88820; color:#4A2800; }
+    [data-theme="inglaterra"] .nav-btn { color:#002C5F; }
+    [data-theme="inglaterra"] .nav-btn.active { color:#C8102E; background:rgba(200,16,46,.1); }
+    [data-theme="inglaterra"] .nav-btn.active::after { background:#C8102E; }
+    [data-theme="inglaterra"] #side-index { background:rgba(0,44,95,.94); }
+    [data-theme="inglaterra"] .code-box, [data-theme="inglaterra"] textarea.code-box { background:#002C5F !important; color:#dde6f0 !important; border-color:#aabbd0; }
+    [data-theme="inglaterra"] .modal-box { background:#ffffff; }
+    [data-theme="inglaterra"] .chip.cc:not(.owned):not(.repeated) { background:#2a0a10; border-color:#C8102E; color:#ff8888; }
+    [data-theme="inglaterra"] .chip.cc.repeated { background:#C8102E; border-color:#a00c24; color:#fff; opacity:.8; }
+    [data-theme="inglaterra"] .album-item.is-active { background:#fff0f2; border-color:#C8102E; }
+    [data-theme="inglaterra"] .app-header, [data-theme="inglaterra"] .app-nav { background:#FFFFFF; border-bottom:2px solid rgba(0,44,95,.15); }
+    [data-theme="inglaterra"] .app-header h1, [data-theme="inglaterra"] .app-header .header-right button { color:#002C5F; }
+    [data-theme="inglaterra"] .theme-btn.active { background:#f0f4f8; border-color:#C8102E; color:#C8102E; }
+    [data-theme="inglaterra"] .theme-btn.active .theme-desc { color:#002C5F; opacity:1; }
+
+    /* ═══════════ MODO PSICODÉLICO ═══════════ */
+    @keyframes psycho-shift {
+      0%,100% { filter:hue-rotate(0deg) saturate(1.5); }
+      25%  { filter:hue-rotate(90deg)  saturate(2); }
+      50%  { filter:hue-rotate(180deg) saturate(2); }
+      75%  { filter:hue-rotate(270deg) saturate(1.5); }
+    }
+    [data-theme="psycho"] {
+      --bg:#0d0030; --bg-card:#1a0050;
+      --text:#00ffcc; --text-mid:#ff69b4; --text-light:#aa88ff;
+      --border:#ff00ff; --shadow:rgba(255,0,255,.35);
+      --primary:#ff00ff; --primary-d:#cc00cc;
+      --secondary:#00ffcc; --mauve:#7700ff;
+      --mint:#00ff88; --mint-d:#00dd66;
+      --gold:#ffff00; --gold-d:#dddd00;
+      --coral:#ff4444; --peach:#ff8888;
+      --friend-bg:#001a30; --friend-border:#0066aa; --friend-d:#00ddff;
+    }
+    [data-theme="psycho"] .app-header,
+    [data-theme="psycho"] .bottom-nav { animation:psycho-shift 4s linear infinite; }
+    [data-theme="psycho"] .chip:not(.owned):not(.repeated) { background:#200060; color:#aa88ff; border-color:#7700ff; }
+    [data-theme="psycho"] .chip.owned { color:#002020; }
+    [data-theme="psycho"] .chip.repeated { background:#ff1493; border-color:#cc0077; color:#fff; }
+    [data-theme="psycho"] .chip.shiny:not(.owned):not(.repeated) { background:linear-gradient(145deg,#ff00ff,#ffff00,#00ffff); border-color:#ff00ff; color:#000; animation:psycho-shift 2s linear infinite; }
+    [data-theme="psycho"] .chip.shiny.owned { border-color:#ffff00; }
+    [data-theme="psycho"] .nav-btn.active { color:#ff00ff; background:rgba(255,0,255,.2); }
+    [data-theme="psycho"] .nav-btn.active::after { background:#ff00ff; }
+    [data-theme="psycho"] #side-index { background:rgba(13,0,48,.92); }
+    [data-theme="psycho"] .code-box, [data-theme="psycho"] textarea.code-box { background:#100030 !important; color:#00ffcc !important; border-color:#ff00ff; }
+    [data-theme="psycho"] .code-box::placeholder { color:#7744aa; }
+    [data-theme="psycho"] .modal-box { background:var(--bg-card); }
+    [data-theme="psycho"] .chip.cc:not(.owned):not(.repeated) { background:#2a0030; border-color:#ff00aa; color:#ff88cc; }
+    [data-theme="psycho"] .chip.cc.repeated { background:#ff1493; border-color:#cc0077; color:#fff; opacity:.8; }
+    [data-theme="psycho"] .album-item.is-active { background:#1a0060; border-color:#ff00ff; }
+    /* theme-btn locked style */
+    .theme-btn.locked { opacity:.65; }
+    .theme-btn.locked:hover { opacity:.8; }
 
     /* ── BUSCA POR SIGLA ─────────────────────────── */
     .theme-selector { display:flex; flex-direction:column; gap:8px; margin-top:4px; }
@@ -10755,7 +10988,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 <div id="tab-overview" class="tab-panel active">
 
   <!-- Banner Elevah -->
-  <a class="elevah-banner-card" style="margin-bottom:16px" href="https://loja.elevah.club/" target="_blank" rel="noopener" onclick="trackEvent('elevah_banner_click',{source:'overview'})"><img src="banner.jpg" alt="Elevah — Loja de Presentes" loading="lazy" /></a>
+  <a class="elevah-banner-card" style="margin-bottom:16px" href="https://forms.gle/Dtb5kGbnhhE4aVk7A" target="_blank" rel="noopener" onclick="trackEvent('elevah_banner_click',{source:'overview'})"><img src="banner.jpg" alt="Elevah — Loja de Presentes" loading="lazy" /></a>
 
   <!-- Cards view (default) -->
   <div id="overview-cards-view">
@@ -10957,6 +11190,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     <div style="margin-bottom:16px">
       <div class="toggle-label" style="margin-bottom:8px">🎨 Tema visual</div>
       <div class="theme-selector">
+        <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-light);margin-bottom:4px">Padrões</div>
         <button class="theme-btn" data-theme-val="elevah" onclick="setTheme('elevah')">
           <span class="theme-icon">☀️</span>
           <span class="theme-info"><span class="theme-name">Modo Elevah</span><span class="theme-desc">Tema claro padrão da Elevah</span></span>
@@ -10971,6 +11205,47 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
           <span class="theme-icon">⚽</span>
           <span class="theme-info"><span class="theme-name">Modo Copa</span><span class="theme-desc">Azul copa do mundo com acentos dourados</span></span>
           <span class="theme-preview"><span class="theme-dot" style="background:#32458c;border:1.5px solid #4a62a8"></span><span class="theme-dot" style="background:#f0bd62"></span><span class="theme-dot" style="background:#3ca688"></span></span>
+        </button>
+        <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-light);margin:10px 0 4px">Seleções Campeãs</div>
+        <button class="theme-btn" data-theme-val="brasil" onclick="setTheme('brasil')">
+          <span class="theme-icon">🇧🇷</span>
+          <span class="theme-info"><span class="theme-name">Modo Brasil</span><span class="theme-desc">Verde e amarelo da Canarinha</span></span>
+          <span class="theme-preview"><span class="theme-dot" style="background:#0e3d1e;border:1.5px solid #2a6e3a"></span><span class="theme-dot" style="background:#FFD600"></span><span class="theme-dot" style="background:#4488ee"></span></span>
+        </button>
+        <button class="theme-btn" data-theme-val="alemanha" onclick="setTheme('alemanha')">
+          <span class="theme-icon">🇩🇪</span>
+          <span class="theme-info"><span class="theme-name">Modo Alemanha</span><span class="theme-desc">Preto, vermelho e dourado germânico</span></span>
+          <span class="theme-preview"><span class="theme-dot" style="background:#1a1a1a;border:1.5px solid #3a3a3a"></span><span class="theme-dot" style="background:#DD0000"></span><span class="theme-dot" style="background:#ffce00"></span></span>
+        </button>
+        <button class="theme-btn" data-theme-val="argentina" onclick="setTheme('argentina')">
+          <span class="theme-icon">🇦🇷</span>
+          <span class="theme-info"><span class="theme-name">Modo Argentina</span><span class="theme-desc">Azul celeste e Sol de Mayo</span></span>
+          <span class="theme-preview"><span class="theme-dot" style="background:#43A1D5;border:1.5px solid #2e8bc0"></span><span class="theme-dot" style="background:#ffffff;border:1.5px solid #ddd"></span><span class="theme-dot" style="background:#f5dc00"></span></span>
+        </button>
+        <button class="theme-btn" data-theme-val="uruguai" onclick="setTheme('uruguai')">
+          <span class="theme-icon">🇺🇾</span>
+          <span class="theme-info"><span class="theme-name">Modo Uruguai</span><span class="theme-desc">Azul celeste charrúa</span></span>
+          <span class="theme-preview"><span class="theme-dot" style="background:#55B5E5;border:1.5px solid #3a9ed0"></span><span class="theme-dot" style="background:#ffffff;border:1.5px solid #ddd"></span><span class="theme-dot" style="background:#FFC905"></span></span>
+        </button>
+        <button class="theme-btn" data-theme-val="franca" onclick="setTheme('franca')">
+          <span class="theme-icon">🇫🇷</span>
+          <span class="theme-info"><span class="theme-name">Modo França</span><span class="theme-desc">Bleu, Blanc, Rouge — Les Bleus</span></span>
+          <span class="theme-preview"><span class="theme-dot" style="background:#001f6b;border:1.5px solid #1a3f9e"></span><span class="theme-dot" style="background:#EF4135"></span><span class="theme-dot" style="background:#3ca688"></span></span>
+        </button>
+        <button class="theme-btn" data-theme-val="espanha" onclick="setTheme('espanha')">
+          <span class="theme-icon">🇪🇸</span>
+          <span class="theme-info"><span class="theme-name">Modo Espanha</span><span class="theme-desc">Vermelho e dourado da Fúria</span></span>
+          <span class="theme-preview"><span class="theme-dot" style="background:#8b0000;border:1.5px solid #cc2020"></span><span class="theme-dot" style="background:#ffcc00"></span><span class="theme-dot" style="background:#3ca688"></span></span>
+        </button>
+        <button class="theme-btn" data-theme-val="inglaterra" onclick="setTheme('inglaterra')">
+          <span class="theme-icon">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span>
+          <span class="theme-info"><span class="theme-name">Modo Inglaterra</span><span class="theme-desc">Azul royal e vermelho de St. George</span></span>
+          <span class="theme-preview"><span class="theme-dot" style="background:#FFFFFF;border:1.5px solid #ddd"></span><span class="theme-dot" style="background:#C8102E"></span><span class="theme-dot" style="background:#002C5F"></span></span>
+        </button>
+        <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-light);margin:10px 0 4px">Modo Especial</div>
+        <button class="theme-btn locked" data-theme-val="psycho" onclick="setTheme('psycho')" id="theme-btn-psycho">
+          <span class="theme-icon" id="psycho-icon">🔒</span>
+          <span class="theme-info"><span class="theme-name" id="psycho-name">Modo Psicodélico</span><span class="theme-desc" id="psycho-desc">Clique nas siglas do índice lateral (nas abas de lista) na sequência certa</span></span>
         </button>
       </div>
     </div>
@@ -11178,7 +11453,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     <button class="back-btn" onclick="goBackToPerfil()" style="margin-top:16px">← Voltar ao Perfil</button>
   </div>
   <div id="perfil-main-banner" style="padding:0 0 4px">
-    <a class="elevah-banner-card" href="https://loja.elevah.club/" target="_blank" rel="noopener" onclick="trackEvent('elevah_banner_click',{source:'perfil'})"><img src="banner.jpg" alt="Elevah — Loja de Presentes" loading="lazy" /></a>
+    <a class="elevah-banner-card" href="https://forms.gle/Dtb5kGbnhhE4aVk7A" target="_blank" rel="noopener" onclick="trackEvent('elevah_banner_click',{source:'perfil'})"><img src="banner.jpg" alt="Elevah — Loja de Presentes" loading="lazy" /></a>
   </div>
 
 </div><!-- /tab-perfil -->
@@ -11190,7 +11465,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     <span id="app-version-badge" style="font-size:.85rem;font-weight:800;color:var(--primary-d)"></span>
   </div>
   <!-- Banner Elevah -->
-  <a class="elevah-banner-card" style="margin-bottom:20px" href="https://loja.elevah.club/" target="_blank" rel="noopener" onclick="trackEvent('elevah_banner_click',{source:'ajuda'})"><img src="banner.jpg" alt="Elevah — Loja de Presentes" loading="lazy" /></a>
+  <a class="elevah-banner-card" style="margin-bottom:20px" href="https://forms.gle/Dtb5kGbnhhE4aVk7A" target="_blank" rel="noopener" onclick="trackEvent('elevah_banner_click',{source:'ajuda'})"><img src="banner.jpg" alt="Elevah — Loja de Presentes" loading="lazy" /></a>
   <div class="howto-section">
     <h3>🎴 O que é este app?</h3>
     <p>Gestor do álbum de figurinhas da Copa do Mundo 2026, criado pela <strong>Elevah</strong>. Gerencie até 3 álbuns diferentes, controle o que tem, o que falta e o que está repetido — tudo no celular, sem instalar nada.</p>
@@ -11502,7 +11777,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v83';
+const APP_VERSION = 'v88';
 const APP_DATE    = '12/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
@@ -12350,6 +12625,15 @@ function openPerfilSection(sectionId){
     document.querySelectorAll('.theme-btn[data-theme-val]').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.themeVal === currentTheme);
     });
+    // Reveal psycho button if already unlocked
+    if(localStorage.getItem('elevah_psycho_unlocked')){
+      const btn = document.getElementById('theme-btn-psycho');
+      if(btn) btn.classList.remove('locked');
+      const iconEl = document.getElementById('psycho-icon');
+      const descEl = document.getElementById('psycho-desc');
+      if(iconEl) iconEl.textContent = '🌈';
+      if(descEl) descEl.textContent = 'Modo secreto desbloqueado! Clique para ativar.';
+    }
     const sideCb = document.getElementById('toggle-sideindex');
     if(sideCb) sideCb.checked = _sideIndexEnabled;
   }
@@ -12772,6 +13056,8 @@ const TROPHIES = [
     check:()=>getActivityStats().maxStreak>=3 },
   { id:'dark_mode_on',   tier:'bronze',   icon:'🌑', name:'Modo Noturno',           desc:'Ativou o modo escuro no app.',
     check:()=>localStorage.getItem('elevah_dark')==='1' },
+  { id:'psycho_mode',    tier:'gold',     icon:'🌈', name:'Psicodélico',            desc:'Desbloqueou o modo psicodélico descobrindo a sequência secreta no índice lateral.',
+    check:()=>localStorage.getItem('elevah_psycho_unlocked')==='1' },
   { id:'first_shiny',    tier:'bronze',   icon:'✨', name:'Primeira Brilhante',     desc:'Marcou sua primeira figurinha brilhante (PANINI 00, FWC ou nº 1 de uma seleção).',
     check:()=>{
       if(localStorage.getItem('elevah_first_shiny')==='1') return true;
@@ -13188,9 +13474,9 @@ function drawCardOnCanvas(canvas, photoImg, qrImg){
   canvas.width=W*SCALE; canvas.height=H*SCALE;
   ctx.scale(SCALE,SCALE);
 
-  // ── Background: warm dark brown Elevah ──
+  // ── Background: warm cream Elevah ──
   const bg=ctx.createLinearGradient(0,0,0,H);
-  bg.addColorStop(0,'#2C1A13'); bg.addColorStop(1,'#1A0E09');
+  bg.addColorStop(0,'#FFF3E3'); bg.addColorStop(1,'#FFE0C4');
   ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
 
   // Soft blob accents
@@ -13227,7 +13513,7 @@ function drawCardOnCanvas(canvas, photoImg, qrImg){
     ctx.fillStyle=ag; ctx.fillRect(cx-r,cy-r,r*2,r*2);
   }
   ctx.restore();
-  ctx.strokeStyle='rgba(212,137,123,0.5)'; ctx.lineWidth=3;
+  ctx.strokeStyle='rgba(74,46,34,0.25)'; ctx.lineWidth=3;
   ctx.beginPath(); ctx.arc(cx,cy,r+3,0,Math.PI*2); ctx.stroke();
   if(!photoImg){
     ctx.font='bold 36px Arial,sans-serif'; ctx.fillStyle='#fff';
@@ -13236,27 +13522,27 @@ function drawCardOnCanvas(canvas, photoImg, qrImg){
   }
 
   // ── Name ──
-  ctx.font='bold 19px Arial,sans-serif'; ctx.fillStyle='#F5E8DF';
+  ctx.font='bold 19px Arial,sans-serif'; ctx.fillStyle='#4A2E22';
   ctx.textAlign='center'; ctx.textBaseline='alphabetic';
   const displayName=(userName||'Colecionador').length>22?(userName||'Colecionador').slice(0,22)+'…':(userName||'Colecionador');
   ctx.fillText(displayName, cx, 198);
-  ctx.font='11px Arial,sans-serif'; ctx.fillStyle='rgba(212,137,123,.7)';
+  ctx.font='11px Arial,sans-serif'; ctx.fillStyle='rgba(74,46,34,.55)';
   ctx.fillText('Copa do Mundo 2026', cx, 216);
 
   // Divider
-  ctx.fillStyle='rgba(212,137,123,.25)'; ctx.fillRect(40,226,W-80,1);
+  ctx.fillStyle='rgba(74,46,34,.15)'; ctx.fillRect(40,226,W-80,1);
 
   // ── Big percentage ──
   const album=getActiveAlbum(), pct=album?pctForAlbum(album):0;
   ctx.font='bold 62px Arial,sans-serif'; ctx.fillStyle='#D9A164';
   ctx.textAlign='center'; ctx.textBaseline='alphabetic';
   ctx.fillText(pct+'%', cx, 306);
-  ctx.font='12px Arial,sans-serif'; ctx.fillStyle='rgba(212,137,123,.55)';
+  ctx.font='12px Arial,sans-serif'; ctx.fillStyle='rgba(74,46,34,.5)';
   ctx.fillText('do álbum completo', cx, 323);
 
   // ── Progress bar ──
   const bx=50,by=334,bw=300,bh=9;
-  ctx.fillStyle='rgba(255,255,255,.08)';
+  ctx.fillStyle='rgba(74,46,34,.06)';
   ctxRR(ctx,bx,by,bw,bh,4); ctx.fill();
   if(pct>0){
     const pg=ctx.createLinearGradient(bx,0,bx+bw,0);
@@ -13275,12 +13561,12 @@ function drawCardOnCanvas(canvas, photoImg, qrImg){
   const sw=(W-60)/4,sx0=30,sy0=357;
   stats.forEach((s,i)=>{
     const x=sx0+sw*i+sw/2;
-    ctx.font='bold 18px Arial,sans-serif'; ctx.fillStyle='#F5E8DF';
+    ctx.font='bold 18px Arial,sans-serif'; ctx.fillStyle='#4A2E22';
     ctx.textAlign='center'; ctx.textBaseline='alphabetic';
     ctx.fillText(String(s.value), x, sy0+20);
-    ctx.font='7.5px Arial,sans-serif'; ctx.fillStyle='rgba(212,137,123,.6)';
+    ctx.font='7.5px Arial,sans-serif'; ctx.fillStyle='rgba(74,46,34,.5)';
     ctx.fillText(s.label, x, sy0+33);
-    if(i<3){ ctx.fillStyle='rgba(212,137,123,.2)'; ctx.fillRect(sx0+sw*(i+1)-.5,sy0,1,38); }
+    if(i<3){ ctx.fillStyle='rgba(74,46,34,.12)'; ctx.fillRect(sx0+sw*(i+1)-.5,sy0,1,38); }
   });
 
   // ── Trophy row (drawn colored circles) ──
@@ -13294,22 +13580,22 @@ function drawCardOnCanvas(canvas, photoImg, qrImg){
     {label:'Platina',count:tc.platinum,color:'#E5E4E2',ring:'#9A9A9A'},
   ];
   const ty0=406,tw=(W-60)/4,tx0=30;
-  ctx.fillStyle='rgba(255,255,255,.05)'; ctx.fillRect(0,ty0-8,W,64);
+  ctx.fillStyle='rgba(74,46,34,.05)'; ctx.fillRect(0,ty0-8,W,64);
   tierData.forEach((t,i)=>{
     const x=tx0+tw*i+tw/2,cy2=ty0+16;
     ctx.beginPath(); ctx.arc(x,cy2,11,0,Math.PI*2);
     ctx.fillStyle=t.color; ctx.fill();
     ctx.strokeStyle=t.ring; ctx.lineWidth=2; ctx.stroke();
-    ctx.font='bold 13px Arial,sans-serif'; ctx.fillStyle='#F5E8DF';
+    ctx.font='bold 13px Arial,sans-serif'; ctx.fillStyle='#4A2E22';
     ctx.textAlign='center'; ctx.textBaseline='alphabetic';
     ctx.fillText(String(t.count), x, ty0+44);
-    ctx.font='7px Arial,sans-serif'; ctx.fillStyle='rgba(212,137,123,.5)';
+    ctx.font='7px Arial,sans-serif'; ctx.fillStyle='rgba(74,46,34,.45)';
     ctx.fillText(t.label.toUpperCase(), x, ty0+54);
   });
 
   // Divider + section label
-  ctx.fillStyle='rgba(212,137,123,.2)'; ctx.fillRect(40,478,W-80,1);
-  ctx.font='7.5px Arial,sans-serif'; ctx.fillStyle='rgba(212,137,123,.45)';
+  ctx.fillStyle='rgba(74,46,34,.15)'; ctx.fillRect(40,478,W-80,1);
+  ctx.font='7.5px Arial,sans-serif'; ctx.fillStyle='rgba(74,46,34,.4)';
   ctx.textAlign='left'; ctx.textBaseline='alphabetic';
   ctx.fillText('TIMES POR GRUPO', 40, 493);
 
@@ -13343,7 +13629,7 @@ function drawCardOnCanvas(canvas, photoImg, qrImg){
     // Label do grupo (A, B, C…) na margem esquerda
     if(rowIdx>0){
       ctx.font='bold 6px Arial,sans-serif';
-      ctx.fillStyle='rgba(212,137,123,.42)';
+      ctx.fillStyle='rgba(74,46,34,.55)';
       ctx.textAlign='center'; ctx.textBaseline='middle';
       ctx.fillText(grpLetters[rowIdx-1], gLblW/2, ry+cH/2);
     }
@@ -13351,27 +13637,27 @@ function drawCardOnCanvas(canvas, photoImg, qrImg){
     row.forEach((t,col)=>{
       if(!t) return;
       const rx=gx0+col*cW;
-      ctx.fillStyle='rgba(255,255,255,.05)';
+      ctx.fillStyle='rgba(74,46,34,.05)';
       ctx.fillRect(rx+1,ry+1,cW-2,cH-2);
       const bw2=(cW-2)*t.pct/100;
       if(bw2>0){
-        ctx.fillStyle=t.pct===100?'rgba(160,210,183,.35)':'rgba(212,137,123,.22)';
+        ctx.fillStyle=t.pct===100?'rgba(60,166,136,.45)':'rgba(212,137,123,.45)';
         ctx.fillRect(rx+1,ry+1,bw2,cH-2);
       }
       ctx.font='bold 7px Arial,sans-serif';
-      ctx.fillStyle=t.pct===100?'#A0D2B7':'rgba(245,232,223,.85)';
+      ctx.fillStyle=t.pct===100?'#3ca688':'rgba(74,46,34,.85)';
       ctx.textAlign='left'; ctx.textBaseline='middle';
       ctx.fillText(t.sigla, rx+3, ry+cH/2);
       ctx.font='7px Arial,sans-serif';
-      ctx.fillStyle='rgba(212,137,123,.75)';
+      ctx.fillStyle='rgba(74,46,34,.6)';
       ctx.textAlign='right';
       ctx.fillText(t.pct+'%', rx+cW-3, ry+cH/2);
     });
   });
 
   // ── Footer ──
-  ctx.fillStyle='rgba(212,137,123,.07)'; ctx.fillRect(0,H-28,W,28);
-  ctx.font='9.5px Arial,sans-serif'; ctx.fillStyle='rgba(212,137,123,.45)';
+  ctx.fillStyle='rgba(74,46,34,.07)'; ctx.fillRect(0,H-28,W,28);
+  ctx.font='9.5px Arial,sans-serif'; ctx.fillStyle='rgba(74,46,34,.35)';
   ctx.textAlign='center'; ctx.textBaseline='middle';
   ctx.fillText('Álbum Copa 2026 · elevah.club', cx, H-14);
 }
@@ -13795,6 +14081,7 @@ function getPayload(){
     helpVisited:localStorage.getItem('elevah_help_visited')||'',
     cardGen:    localStorage.getItem('elevah_card_gen')||'',
     firstBattle:localStorage.getItem('elevah_first_battle')||'',
+    psychoUnlocked:localStorage.getItem('elevah_psycho_unlocked')||'',
     // Preferências de UI
     sortOrder:  localStorage.getItem('elevah_sort')||'alpha',
     sideIndex:  localStorage.getItem('elevah_sideindex')||'',
@@ -13847,6 +14134,7 @@ function applyPayload(p){
       if(p.helpVisited) localStorage.setItem('elevah_help_visited',  p.helpVisited);
       if(p.cardGen)     localStorage.setItem('elevah_card_gen',       p.cardGen);
       if(p.firstBattle) localStorage.setItem('elevah_first_battle',   p.firstBattle);
+      if(p.psychoUnlocked) localStorage.setItem('elevah_psycho_unlocked', p.psychoUnlocked);
       // Preferências de UI
       if(p.sortOrder){  sortOrder = p.sortOrder; localStorage.setItem('elevah_sort', p.sortOrder); }
       if(p.sideIndex !== undefined && p.sideIndex !== '')
@@ -14426,6 +14714,10 @@ function processQRResult(data){
 
 /* ── DARK MODE ──────────────────────────────────────────── */
 function setTheme(theme){
+  if(theme === 'psycho' && !localStorage.getItem('elevah_psycho_unlocked')){
+    showToast('🔒 Clique nas siglas do índice lateral (nas abas de lista) na sequência certa para desbloquear!');
+    return;
+  }
   trackEvent('theme_changed', { theme });
   const attr = theme === 'elevah' ? 'light' : theme;
   document.documentElement.setAttribute('data-theme', attr);
@@ -14438,10 +14730,24 @@ function setTheme(theme){
   setTimeout(updateGA4UserProperties, 100);
   if(theme === 'dark') setTimeout(checkTrophies, 400);
 }
+function unlockPsychoMode(){
+  localStorage.setItem('elevah_psycho_unlocked','1');
+  const btn = document.getElementById('theme-btn-psycho');
+  if(btn) btn.classList.remove('locked');
+  const iconEl = document.getElementById('psycho-icon');
+  const descEl = document.getElementById('psycho-desc');
+  if(iconEl) iconEl.textContent = '🌈';
+  if(descEl) descEl.textContent = 'Modo secreto desbloqueado! Clique para ativar.';
+  showToast('🌈 Modo Psicodélico desbloqueado!');
+  launchConfetti();
+  setTimeout(checkTrophies, 500);
+}
 function toggleDarkMode(on){ setTheme(on ? 'dark' : 'elevah'); }
 
 /* ── ÍNDICE LATERAL ─────────────────────────────────────── */
 let _sideIndexEnabled = true;
+const _PSYCHO_SEQ = ['BRA','GER','ARG','URU','FRA','ESP','ING'];
+let _psychoClickSeq = [];
 function toggleSideIndex(on){
   _sideIndexEnabled = on;
   localStorage.setItem('elevah_sideindex', on ? '1' : '0');
@@ -14489,6 +14795,14 @@ function updateSideIndex(){
     // Scroll content to top so user sees filtered results
     const appMain = document.querySelector('.app-main');
     if(appMain) appMain.scrollTop = 0;
+    // Psycho sequence detection
+    if(!localStorage.getItem('elevah_psycho_unlocked')){
+      _psychoClickSeq.push(sigla);
+      if(_psychoClickSeq.length > 7) _psychoClickSeq.shift();
+      if(_psychoClickSeq.length === 7 && _PSYCHO_SEQ.every((s,i) => s === _psychoClickSeq[i])){
+        unlockPsychoMode();
+      }
+    }
   }
   sideEl.querySelectorAll('.side-index-item:not(.dim)').forEach(item => {
     item.addEventListener('click', () => selectSigla(item.dataset.sigla));
