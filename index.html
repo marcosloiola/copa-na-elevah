@@ -11795,7 +11795,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v95';
+const APP_VERSION = 'v96';
 const APP_DATE    = '12/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
@@ -13970,7 +13970,14 @@ function renderBattle(opp){
 
 function setupDelegation(){
   const map = {'list-content':'list','missing-content':'missing','repeated-content':'repeated'};
-  const isTouchDevice = () => window.matchMedia('(hover: none)').matches;
+  // Detecção de touch mais robusta: combina media query + API de touch points
+  const isTouchDevice = () =>
+    window.matchMedia('(hover: none)').matches ||
+    navigator.maxTouchPoints > 0 ||
+    ('ontouchstart' in window);
+  // Timestamp do último touchend — usado para bloquear ghost clicks no Android
+  // O Android dispara um click sintético ~300ms após touchend no mesmo ponto
+  let _lastTouchEndMs = 0;
 
   for(const [cid, tabType] of Object.entries(map)){
     const el = document.getElementById(cid);
@@ -14001,6 +14008,7 @@ function setupDelegation(){
     }, { passive: true });
 
     el.addEventListener('touchend', e=>{
+      _lastTouchEndMs = Date.now(); // registra para bloquear ghost click
       const chip = e.target.closest('.chip[data-id]');
       if(!chip){ _tChip = null; return; }
       const id = chip.dataset.id;
@@ -14025,6 +14033,8 @@ function setupDelegation(){
     // breaking the browser's native dblclick detection.
     const clickTimers = {};
     el.addEventListener('click', e=>{
+      // Bloqueia ghost click do Android (click sintético disparado ~300ms após touchend)
+      if(Date.now() - _lastTouchEndMs < 600) return;
       if(isTouchDevice()) return; // touch handled above
       if(tabType==='missing' && state.missingShowAll && state.albums.length > 1) return;
       const chip = e.target.closest('.chip[data-id]');
