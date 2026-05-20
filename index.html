@@ -10783,12 +10783,15 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     #side-index {
       position:fixed; right:0; top:50%; transform:translateY(-50%);
       z-index:90; display:flex; flex-direction:column; align-items:center;
-      padding:6px 2px; gap:1px; max-height:80vh; overflow:hidden;
+      padding:6px 2px; gap:1px;
+      max-height:calc(100vh - 80px); overflow-y:auto; overflow-x:hidden;
       background:rgba(255,255,255,.85); border-radius:12px 0 0 12px;
       border:1px solid var(--border); border-right:none;
-      box-shadow:-2px 0 8px var(--shadow); touch-action:none;
+      box-shadow:-2px 0 8px var(--shadow); touch-action:pan-y;
       transition:opacity .2s;
+      scrollbar-width:none; -ms-overflow-style:none;
     }
+    #side-index::-webkit-scrollbar { display:none; }
     [data-theme="dark"] #side-index { background:rgba(42,31,26,.92); }
     #side-index.hidden { display:none; }
     .side-index-item {
@@ -10800,6 +10803,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     }
     .side-index-item:active, .side-index-item.active { background:var(--primary); color:#fff; }
     .side-index-item.dim { color:var(--border); pointer-events:none; }
+    @media (max-height: 600px) {
+      #side-index { gap:0; padding:4px 2px; }
+      .side-index-item { font-size:.48rem; padding:1px 4px; }
+    }
 
     /* ── PERFIL TOGGLE ────────────────────────────── */
     .toggle-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border); }
@@ -11006,7 +11013,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 <div id="tab-overview" class="tab-panel active">
 
   <!-- Banner Elevah -->
-  <a class="elevah-banner-card" style="margin-bottom:16px" href="https://forms.gle/Dtb5kGbnhhE4aVk7A" target="_blank" rel="noopener" onclick="trackEvent('elevah_banner_click',{source:'overview'})"><img src="banner.jpg" alt="Elevah — Loja de Presentes" loading="lazy" /></a>
+  <a class="elevah-banner-card" style="margin-bottom:16px" href="https://loja.elevah.club" target="_blank" rel="noopener" onclick="trackEvent('elevah_banner_click',{source:'overview'})"><img src="banner.jpg" alt="Elevah — Loja de Presentes" loading="lazy" /></a>
 
   <!-- Cards view (default) -->
   <div id="overview-cards-view">
@@ -11471,7 +11478,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     <button class="back-btn" onclick="goBackToPerfil()" style="margin-top:16px">← Voltar ao Perfil</button>
   </div>
   <div id="perfil-main-banner" style="padding:0 0 4px">
-    <a class="elevah-banner-card" href="https://forms.gle/Dtb5kGbnhhE4aVk7A" target="_blank" rel="noopener" onclick="trackEvent('elevah_banner_click',{source:'perfil'})"><img src="banner.jpg" alt="Elevah — Loja de Presentes" loading="lazy" /></a>
+    <a class="elevah-banner-card" href="https://loja.elevah.club" target="_blank" rel="noopener" onclick="trackEvent('elevah_banner_click',{source:'perfil'})"><img src="banner.jpg" alt="Elevah — Loja de Presentes" loading="lazy" /></a>
   </div>
 
 </div><!-- /tab-perfil -->
@@ -11483,7 +11490,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     <span id="app-version-badge" style="font-size:.85rem;font-weight:800;color:var(--primary-d)"></span>
   </div>
   <!-- Banner Elevah -->
-  <a class="elevah-banner-card" style="margin-bottom:20px" href="https://forms.gle/Dtb5kGbnhhE4aVk7A" target="_blank" rel="noopener" onclick="trackEvent('elevah_banner_click',{source:'ajuda'})"><img src="banner.jpg" alt="Elevah — Loja de Presentes" loading="lazy" /></a>
+  <a class="elevah-banner-card" style="margin-bottom:20px" href="https://loja.elevah.club" target="_blank" rel="noopener" onclick="trackEvent('elevah_banner_click',{source:'ajuda'})"><img src="banner.jpg" alt="Elevah — Loja de Presentes" loading="lazy" /></a>
   <div class="howto-section">
     <h3>🎴 O que é este app?</h3>
     <p>Gestor do álbum de figurinhas da Copa do Mundo 2026, criado pela <strong>Elevah</strong>. Gerencie até 3 álbuns diferentes, controle o que tem, o que falta e o que está repetido — tudo no celular, sem instalar nada.</p>
@@ -11795,7 +11802,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v96';
+const APP_VERSION = 'v97';
 const APP_DATE    = '12/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
