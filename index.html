@@ -10130,12 +10130,12 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     button, a, .chip, .nav-btn, .perfil-row, .album-item, .btn,
     .side-index-item, .elevah-banner-card, .back-btn, .btn-icon,
     input, select, textarea, label { touch-action: manipulation; }
-    html { font-size: 16px; -webkit-tap-highlight-color: transparent; }
+    html { font-size: 16px; -webkit-tap-highlight-color: transparent; height:100%; overflow:hidden; }
     body {
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
       background: var(--bg); color: var(--text);
-      min-height: 100dvh; display: flex; flex-direction: column;
-      overscroll-behavior: none;
+      height: 100dvh; max-height:100dvh; display: flex; flex-direction: column;
+      overscroll-behavior: none; overflow:hidden;
     }
     :root {
       --primary:#D4897B; --primary-d:#B8705F; --secondary:#E2A894;
@@ -10781,10 +10781,14 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 
     /* ── ÍNDICE LATERAL ──────────────────────────── */
     #side-index {
-      position:fixed; right:0; top:50%; transform:translateY(-50%);
+      position:fixed; right:0;
+      top:calc(50% - var(--nav-h) / 2);
+      transform:translateY(-50%);
       z-index:90; display:flex; flex-direction:column; align-items:center;
       padding:6px 2px; gap:1px;
-      max-height:calc(100vh - 80px); overflow-y:auto; overflow-x:hidden;
+      max-height:calc(100dvh - var(--nav-h) - 20px);
+      overflow-y:auto; overflow-x:hidden;
+      overscroll-behavior:contain;
       background:rgba(255,255,255,.85); border-radius:12px 0 0 12px;
       border:1px solid var(--border); border-right:none;
       box-shadow:-2px 0 8px var(--shadow); touch-action:pan-y;
@@ -11802,7 +11806,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 /* ─────────────────────────────────────────────────────────
    VERSÃO DO APP  ←  incrementar a cada modificação do arquivo
    ───────────────────────────────────────────────────────── */
-const APP_VERSION = 'v97';
+const APP_VERSION = 'v98';
 const APP_DATE    = '12/05/2026';
 
 /* ── ALBUM DATA ─────────────────────────────────────────── */
